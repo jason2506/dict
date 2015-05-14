@@ -39,9 +39,6 @@ private: // Private Static Property(ies)
 private: // Private Type(s) - Part 1
     typedef ::std::bitset<SIZE> bitset;
 
-public: // Public Type(s) - Part 2
-    typedef typename bitset::reference reference;
-
 public: // Public Method(s)
     ~bit_vector(void);
 
@@ -56,7 +53,6 @@ public: // Public Method(s)
     size_type size(void) const;
 
     value_type operator[](size_type i) const;
-    reference operator[](size_type i);
 
 private: // Private Type(s) - Part 2
     struct block;
@@ -104,15 +100,22 @@ inline bit_vector<N>::~bit_vector(void)
 template <::std::size_t N>
 inline bit_vector<N> &bit_vector<N>::set(size_type i, value_type b)
 {
-    (*this)[i] = b;
+    size_type pos = 0, rank = 0;
+    auto it = find_block(i, pos, rank);
+    i -= pos;
+
+    if (it->bits[i])    { --it->num_set_bits; }
+    if (b)              { ++it->num_set_bits; }
+
+    it->bits[i] = b;
+    update_counters(it);
     return *this;
 }
 
 template <::std::size_t N>
 inline bit_vector<N> &bit_vector<N>::reset(size_type i)
 {
-    (*this)[i] = false;
-    return *this;
+    return set(i, false);
 }
 
 template <::std::size_t N>
@@ -320,7 +323,7 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
             num_left_bits = num_left_set_bits = 0;
         }
 
-        if (i <= num_left_set_bits) { it.go_left(); }
+        if (i < num_left_set_bits) { it.go_left(); }
         else
         {
             pos += num_left_bits;
@@ -329,7 +332,7 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
             auto num_set_bits = b
                 ? it->num_set_bits
                 : it->num_bits - it->num_set_bits;
-            if (i <= num_set_bits) { break; }
+            if (i < num_set_bits) { break; }
             else
             {
                 pos += it->num_bits;
@@ -339,7 +342,7 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
         }
     }
 
-    for (decltype(i) j = 0, k = 0; k < i; ++pos, ++j)
+    for (decltype(i) j = 0, k = 0; k <= i; ++pos, ++j)
     {
         if (it->bits[j] == b) { ++k; }
     }
@@ -366,14 +369,6 @@ inline typename bit_vector<N>::value_type bit_vector<N>::operator[](size_type i)
 {
     size_type pos = 0, rank = 0;
     auto it = find_const_block(i, pos, rank);
-    return it->bits[i - pos];
-}
-
-template <::std::size_t N>
-inline typename bit_vector<N>::reference bit_vector<N>::operator[](size_type i)
-{
-    size_type pos = 0, rank = 0;
-    auto it = find_block(i, pos, rank);
     return it->bits[i - pos];
 }
 
