@@ -1,5 +1,5 @@
 /************************************************
- *  partial_sum_test.cpp
+ *  bit_vector_test.cpp
  *  ESA++
  *
  *  Copyright (c) 2014-2015, Chi-En Wu

@@ -1,3 +1,11 @@
+/************************************************
+ *  rbtree_test.cpp
+ *  ESA++
+ *
+ *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Distributed under The BSD 3-Clause License
+ ************************************************/
+
 #include <sstream>
 #include <utility>
 
