@@ -39,7 +39,7 @@ void construct_partial_sum_with_large_amount_of_counts(ps_t &ps)
 TEST(PartialSumTest, PartialSumWithoutKey)
 {
     ps_t ps;
-    EXPECT_EQ(ps.sum(), 0);
+    EXPECT_EQ(0, ps.sum());
 }
 
 TEST(PartialSumTest, IncreaseSingleCount)
@@ -47,8 +47,8 @@ TEST(PartialSumTest, IncreaseSingleCount)
     ps_t ps;
     ps.increase('B', 5);
 
-    EXPECT_EQ(ps.sum('B'), 5);
-    EXPECT_EQ(ps.sum(), 5);
+    EXPECT_EQ(5, ps.sum('B'));
+    EXPECT_EQ(5, ps.sum());
 }
 
 TEST(PartialSumTest, IncreaseSingleCountTwice)
@@ -57,8 +57,8 @@ TEST(PartialSumTest, IncreaseSingleCountTwice)
     ps.increase('B', 5);
     ps.increase('B', 8);
 
-    EXPECT_EQ(ps.sum('B'), 13);
-    EXPECT_EQ(ps.sum(), 13);
+    EXPECT_EQ(13, ps.sum('B'));
+    EXPECT_EQ(13, ps.sum());
 }
 
 TEST(PartialSumTest, DecreaseSingleCount)
@@ -67,19 +67,19 @@ TEST(PartialSumTest, DecreaseSingleCount)
     ps.increase('B', 5);
     ps.decrease('B', 2);
 
-    EXPECT_EQ(ps.sum('B'), 3);
-    EXPECT_EQ(ps.sum(), 3);
+    EXPECT_EQ(3, ps.sum('B'));
+    EXPECT_EQ(3, ps.sum());
 }
 
 TEST(PartialSumTest, SumWithNonExistedKey)
 {
     ps_t ps;
-    EXPECT_EQ(ps.sum('B'), 0);
+    EXPECT_EQ(0, ps.sum('B'));
 
     ps.increase('B', 5);
 
-    EXPECT_EQ(ps.sum('A'), 0);
-    EXPECT_EQ(ps.sum('C'), 5);
+    EXPECT_EQ(0, ps.sum('A'));
+    EXPECT_EQ(5, ps.sum('C'));
 }
 
 TEST(PartialSumTest, IncreaseMoreCounts)
@@ -87,12 +87,12 @@ TEST(PartialSumTest, IncreaseMoreCounts)
     ps_t ps;
     construct_partial_sum_with_more_counts(ps);
 
-    EXPECT_EQ(ps.sum('A'), 9);
-    EXPECT_EQ(ps.sum('B'), 16);
-    EXPECT_EQ(ps.sum('C'), 16);
-    EXPECT_EQ(ps.sum('D'), 19);
-    EXPECT_EQ(ps.sum('E'), 19);
-    EXPECT_EQ(ps.sum(), 19);
+    EXPECT_EQ(9, ps.sum('A'));
+    EXPECT_EQ(16, ps.sum('B'));
+    EXPECT_EQ(16, ps.sum('C'));
+    EXPECT_EQ(19, ps.sum('D'));
+    EXPECT_EQ(19, ps.sum('E'));
+    EXPECT_EQ(19, ps.sum());
 }
 
 TEST(PartialSumTest, DecreaseMoreCounts)
@@ -103,12 +103,12 @@ TEST(PartialSumTest, DecreaseMoreCounts)
     ps.decrease('A', 1);
     ps.decrease('D', 2);
 
-    EXPECT_EQ(ps.sum('A'), 8);
-    EXPECT_EQ(ps.sum('B'), 15);
-    EXPECT_EQ(ps.sum('C'), 15);
-    EXPECT_EQ(ps.sum('D'), 16);
-    EXPECT_EQ(ps.sum('E'), 16);
-    EXPECT_EQ(ps.sum(), 16);
+    EXPECT_EQ(8, ps.sum('A'));
+    EXPECT_EQ(15, ps.sum('B'));
+    EXPECT_EQ(15, ps.sum('C'));
+    EXPECT_EQ(16, ps.sum('D'));
+    EXPECT_EQ(16, ps.sum('E'));
+    EXPECT_EQ(16, ps.sum());
 }
 
 TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
@@ -116,20 +116,20 @@ TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
     ps_t ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
-    EXPECT_EQ(ps.sum('A'), 1);      EXPECT_EQ(ps.sum('B'), 3);
-    EXPECT_EQ(ps.sum('C'), 6);      EXPECT_EQ(ps.sum('D'), 10);
-    EXPECT_EQ(ps.sum('E'), 15);     EXPECT_EQ(ps.sum('F'), 21);
-    EXPECT_EQ(ps.sum('G'), 28);     EXPECT_EQ(ps.sum('H'), 36);
-    EXPECT_EQ(ps.sum('I'), 45);     EXPECT_EQ(ps.sum('J'), 55);
-    EXPECT_EQ(ps.sum('K'), 66);     EXPECT_EQ(ps.sum('L'), 78);
-    EXPECT_EQ(ps.sum('M'), 91);     EXPECT_EQ(ps.sum('N'), 105);
-    EXPECT_EQ(ps.sum('O'), 120);    EXPECT_EQ(ps.sum('P'), 136);
-    EXPECT_EQ(ps.sum('Q'), 153);    EXPECT_EQ(ps.sum('R'), 171);
-    EXPECT_EQ(ps.sum('S'), 190);    EXPECT_EQ(ps.sum('T'), 210);
-    EXPECT_EQ(ps.sum('U'), 231);    EXPECT_EQ(ps.sum('V'), 253);
-    EXPECT_EQ(ps.sum('W'), 276);    EXPECT_EQ(ps.sum('X'), 300);
-    EXPECT_EQ(ps.sum('Y'), 325);    EXPECT_EQ(ps.sum('Z'), 351);
-    EXPECT_EQ(ps.sum(), 351);
+    EXPECT_EQ(1, ps.sum('A'));      EXPECT_EQ(3, ps.sum('B'));
+    EXPECT_EQ(6, ps.sum('C'));      EXPECT_EQ(10, ps.sum('D'));
+    EXPECT_EQ(15, ps.sum('E'));     EXPECT_EQ(21, ps.sum('F'));
+    EXPECT_EQ(28, ps.sum('G'));     EXPECT_EQ(36, ps.sum('H'));
+    EXPECT_EQ(45, ps.sum('I'));     EXPECT_EQ(55, ps.sum('J'));
+    EXPECT_EQ(66, ps.sum('K'));     EXPECT_EQ(78, ps.sum('L'));
+    EXPECT_EQ(91, ps.sum('M'));     EXPECT_EQ(105, ps.sum('N'));
+    EXPECT_EQ(120, ps.sum('O'));    EXPECT_EQ(136, ps.sum('P'));
+    EXPECT_EQ(153, ps.sum('Q'));    EXPECT_EQ(171, ps.sum('R'));
+    EXPECT_EQ(190, ps.sum('S'));    EXPECT_EQ(210, ps.sum('T'));
+    EXPECT_EQ(231, ps.sum('U'));    EXPECT_EQ(253, ps.sum('V'));
+    EXPECT_EQ(276, ps.sum('W'));    EXPECT_EQ(300, ps.sum('X'));
+    EXPECT_EQ(325, ps.sum('Y'));    EXPECT_EQ(351, ps.sum('Z'));
+    EXPECT_EQ(351, ps.sum());
 }
 
 TEST(PartialSumTest, SearchOnLargeAmountOfCounts)
@@ -137,13 +137,13 @@ TEST(PartialSumTest, SearchOnLargeAmountOfCounts)
     ps_t ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
-    EXPECT_EQ(ps.search(0), 'A');
-    EXPECT_EQ(ps.search(32), 'H');
-    EXPECT_EQ(ps.search(64), 'K');
-    EXPECT_EQ(ps.search(128), 'P');
-    EXPECT_EQ(ps.search(256), 'W');
-    EXPECT_EQ(ps.search(300), 'X');
-    EXPECT_EQ(ps.search(301), 'Y');
-    EXPECT_EQ(ps.search(351), 'Z');
+    EXPECT_EQ('A', ps.search(0));
+    EXPECT_EQ('H', ps.search(32));
+    EXPECT_EQ('K', ps.search(64));
+    EXPECT_EQ('P', ps.search(128));
+    EXPECT_EQ('W', ps.search(256));
+    EXPECT_EQ('X', ps.search(300));
+    EXPECT_EQ('Y', ps.search(301));
+    EXPECT_EQ('Z', ps.search(351));
     EXPECT_THROW(ps.search(352), ::std::invalid_argument);
 }

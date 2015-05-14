@@ -34,7 +34,7 @@
         SCOPED_TRACE(ss.str()); \
         auto deleted_it = it++; \
         auto next_it = tree.erase(deleted_it, noop); \
-        EXPECT_EQ(next_it, it); \
+        EXPECT_EQ(it, next_it); \
         check_rbtree_property(tree); \
     }
 
@@ -104,18 +104,18 @@ void construct_tree(rbtree<int> &tree, rbtree<int>::iterator its[N])
 TEST(RBTreeTest, EmptyTree)
 {
     rbtree<int> tree;
-    EXPECT_EQ(tree.root(), tree.end());
-    EXPECT_EQ(tree.begin(), tree.end());
+    EXPECT_EQ(tree.end(), tree.root());
+    EXPECT_EQ(tree.end(), tree.begin());
 }
 
 TEST(RBTreeTest, InsertFirstNode)
 {
     rbtree<int> tree;
     auto it = tree.insert_before(tree.end(), 9, noop);
-    EXPECT_EQ(it, tree.root());
-    EXPECT_EQ(it, tree.begin());
-    EXPECT_EQ(it, --tree.end());
-    EXPECT_EQ(*it, 9);
+    EXPECT_EQ(tree.root(), it);
+    EXPECT_EQ(tree.begin(), it);
+    EXPECT_EQ(--tree.end(), it);
+    EXPECT_EQ(9, *it);
 }
 
 TEST(RBTreeTest, InsertAtBegin)
@@ -127,17 +127,17 @@ TEST(RBTreeTest, InsertAtBegin)
     for (auto i = n; i > 0; --i)
     {
         INSERT_CHECK(tree, it, it, i);
-        EXPECT_EQ(it, tree.begin());
+        EXPECT_EQ(tree.begin(), it);
     }
 
     // check values stored in the tree
     it = tree.begin();
     for (::size_t i = 1; i <= n; ++i, ++it)
     {
-        EXPECT_EQ(*it, i);
+        EXPECT_EQ(i, *it);
     }
 
-    EXPECT_EQ(it, tree.end());
+    EXPECT_EQ(tree.end(), it);
 }
 
 TEST(RBTreeTest, InsertAtEnd)
@@ -149,17 +149,17 @@ TEST(RBTreeTest, InsertAtEnd)
     for (auto i = n; i > 0; --i)
     {
         INSERT_CHECK(tree, tree.end(), it, i);
-        EXPECT_EQ(it, --tree.end());
+        EXPECT_EQ(--tree.end(), it);
     }
 
     // check values stored in the tree
     it = tree.begin();
     for (auto i = n; i > 0; --i, ++it)
     {
-        EXPECT_EQ(*it, i);
+        EXPECT_EQ(i, *it);
     }
 
-    EXPECT_EQ(it, tree.end());
+    EXPECT_EQ(tree.end(), it);
 }
 
 TEST(RBTreeTest, InsertInShuffleOrder)
@@ -181,10 +181,10 @@ TEST(RBTreeTest, InsertInShuffleOrder)
     auto it = tree.begin();
     for (::std::size_t i = 0; i < 9; ++i, ++it)
     {
-        EXPECT_EQ(*it, i);
+        EXPECT_EQ(i, *it);
     }
 
-    EXPECT_EQ(it, tree.end());
+    EXPECT_EQ(tree.end(), it);
 }
 
 TEST(RBTreeTest, EraseAtBegin)
@@ -201,8 +201,8 @@ TEST(RBTreeTest, EraseAtBegin)
         ERASE_CHECK(tree, its[i]);
     }
 
-    EXPECT_EQ(tree.root(), tree.end());
-    EXPECT_EQ(tree.begin(), tree.end());
+    EXPECT_EQ(tree.end(), tree.root());
+    EXPECT_EQ(tree.end(), tree.begin());
 }
 
 TEST(RBTreeTest, EraseAtEnd)
@@ -219,8 +219,8 @@ TEST(RBTreeTest, EraseAtEnd)
         ERASE_CHECK(tree, its[i - 1]);
     }
 
-    EXPECT_EQ(tree.root(), tree.end());
-    EXPECT_EQ(tree.begin(), tree.end());
+    EXPECT_EQ(tree.end(), tree.root());
+    EXPECT_EQ(tree.end(), tree.begin());
 }
 
 TEST(RBTreeTest, EraseInShuffleOrder)
@@ -241,6 +241,6 @@ TEST(RBTreeTest, EraseInShuffleOrder)
     ERASE_CHECK(tree, its[1]);  // 4
     ERASE_CHECK(tree, its[4]);
 
-    EXPECT_EQ(tree.root(), tree.end());
-    EXPECT_EQ(tree.begin(), tree.end());
+    EXPECT_EQ(tree.end(), tree.begin());
+    EXPECT_EQ(tree.end(), tree.begin());
 }

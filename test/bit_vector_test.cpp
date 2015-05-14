@@ -44,21 +44,21 @@ void construct_bitmap_with_erasure(bitmap &bits)
 TEST(BitVectorTest, EmptyBitVector)
 {
     bitmap bits;
-    EXPECT_EQ(bits.count(), 0);
-    EXPECT_EQ(bits.size(), 0);
+    EXPECT_EQ(0, bits.count());
+    EXPECT_EQ(0, bits.size());
 }
 
 TEST(BitVectorTest, InsertFirstBit)
 {
     bitmap bits1;
     bits1.insert(0, true);
-    EXPECT_EQ(bits1.count(), 1);
-    EXPECT_EQ(bits1.size(), 1);
+    EXPECT_EQ(1, bits1.count());
+    EXPECT_EQ(1, bits1.size());
 
     bitmap bits2;
     bits2.insert(0, false);
-    EXPECT_EQ(bits2.count(), 0);
-    EXPECT_EQ(bits2.size(), 1);
+    EXPECT_EQ(0, bits2.count());
+    EXPECT_EQ(1, bits2.size());
 }
 
 TEST(BitVectorTest, EraseLastBit)
@@ -66,15 +66,15 @@ TEST(BitVectorTest, EraseLastBit)
     bitmap bits1;
     bits1.insert(0, true);
     auto b1 = bits1.erase(0);
-    EXPECT_EQ(bits1.count(), 0);
-    EXPECT_EQ(bits1.size(), 0);
+    EXPECT_EQ(0, bits1.count());
+    EXPECT_EQ(0, bits1.size());
     EXPECT_TRUE(b1);
 
     bitmap bits2;
     bits2.insert(0, false);
     auto b2 = bits2.erase(0);
-    EXPECT_EQ(bits2.count(), 0);
-    EXPECT_EQ(bits2.size(), 0);
+    EXPECT_EQ(0, bits2.count());
+    EXPECT_EQ(0, bits2.size());
     EXPECT_FALSE(b2);
 }
 
@@ -82,16 +82,16 @@ TEST(BitVectorTest, InsertMoreBits)
 {
     bitmap bits;
     construct_bitmap(bits);
-    EXPECT_EQ(bits.count(), 6);
-    EXPECT_EQ(bits.size(), 12);
+    EXPECT_EQ(6, bits.count());
+    EXPECT_EQ(12, bits.size());
 }
 
 TEST(BitVectorTest, EraseMoreBit)
 {
     bitmap bits;
     construct_bitmap_with_erasure(bits);
-    EXPECT_EQ(bits.count(), 4);
-    EXPECT_EQ(bits.size(), 6);
+    EXPECT_EQ(4, bits.count());
+    EXPECT_EQ(6, bits.size());
 }
 
 TEST(BitVectorTest, AccessBitsAfterInsertion)
@@ -131,23 +131,23 @@ TEST(BitVectorTest, SetAndReset)
 
     bits.set(2);
     EXPECT_TRUE(bits[2]);
-    EXPECT_EQ(bits.count(), 7);
-    EXPECT_EQ(bits.size(), 12);
+    EXPECT_EQ(7, bits.count());
+    EXPECT_EQ(12, bits.size());
 
     bits.reset(2);
     EXPECT_FALSE(bits[2]);
-    EXPECT_EQ(bits.count(), 6);
-    EXPECT_EQ(bits.size(), 12);
+    EXPECT_EQ(6, bits.count());
+    EXPECT_EQ(12, bits.size());
 
     bits.set(10, false);
     EXPECT_FALSE(bits[10]);
-    EXPECT_EQ(bits.count(), 5);
-    EXPECT_EQ(bits.size(), 12);
+    EXPECT_EQ(5, bits.count());
+    EXPECT_EQ(12, bits.size());
 
     bits.set(11, true);
     EXPECT_TRUE(bits[11]);
-    EXPECT_EQ(bits.count(), 6);
-    EXPECT_EQ(bits.size(), 12);
+    EXPECT_EQ(6, bits.count());
+    EXPECT_EQ(12, bits.size());
 }
 
 TEST(BitVectorTest, RankBits)
@@ -155,31 +155,31 @@ TEST(BitVectorTest, RankBits)
     bitmap bits;
     construct_bitmap(bits);
 
-    EXPECT_EQ(bits.rank(0, true), 1);
-    EXPECT_EQ(bits.rank(1, true), 1);
-    EXPECT_EQ(bits.rank(2, true), 1);
-    EXPECT_EQ(bits.rank(3, true), 2);
-    EXPECT_EQ(bits.rank(4, true), 3);
-    EXPECT_EQ(bits.rank(5, true), 3);
-    EXPECT_EQ(bits.rank(6, true), 4);
-    EXPECT_EQ(bits.rank(7, true), 4);
-    EXPECT_EQ(bits.rank(8, true), 4);
-    EXPECT_EQ(bits.rank(9, true), 5);
-    EXPECT_EQ(bits.rank(10, true), 6);
-    EXPECT_EQ(bits.rank(11, true), 6);
+    EXPECT_EQ(1, bits.rank(0, true));
+    EXPECT_EQ(1, bits.rank(1, true));
+    EXPECT_EQ(1, bits.rank(2, true));
+    EXPECT_EQ(2, bits.rank(3, true));
+    EXPECT_EQ(3, bits.rank(4, true));
+    EXPECT_EQ(3, bits.rank(5, true));
+    EXPECT_EQ(4, bits.rank(6, true));
+    EXPECT_EQ(4, bits.rank(7, true));
+    EXPECT_EQ(4, bits.rank(8, true));
+    EXPECT_EQ(5, bits.rank(9, true));
+    EXPECT_EQ(6, bits.rank(10, true));
+    EXPECT_EQ(6, bits.rank(11, true));
 
-    EXPECT_EQ(bits.rank(0, false), 0);
-    EXPECT_EQ(bits.rank(1, false), 1);
-    EXPECT_EQ(bits.rank(2, false), 2);
-    EXPECT_EQ(bits.rank(3, false), 2);
-    EXPECT_EQ(bits.rank(4, false), 2);
-    EXPECT_EQ(bits.rank(5, false), 3);
-    EXPECT_EQ(bits.rank(6, false), 3);
-    EXPECT_EQ(bits.rank(7, false), 4);
-    EXPECT_EQ(bits.rank(8, false), 5);
-    EXPECT_EQ(bits.rank(9, false), 5);
-    EXPECT_EQ(bits.rank(10, false), 5);
-    EXPECT_EQ(bits.rank(11, false), 6);
+    EXPECT_EQ(0, bits.rank(0, false));
+    EXPECT_EQ(1, bits.rank(1, false));
+    EXPECT_EQ(2, bits.rank(2, false));
+    EXPECT_EQ(2, bits.rank(3, false));
+    EXPECT_EQ(2, bits.rank(4, false));
+    EXPECT_EQ(3, bits.rank(5, false));
+    EXPECT_EQ(3, bits.rank(6, false));
+    EXPECT_EQ(4, bits.rank(7, false));
+    EXPECT_EQ(5, bits.rank(8, false));
+    EXPECT_EQ(5, bits.rank(9, false));
+    EXPECT_EQ(5, bits.rank(10, false));
+    EXPECT_EQ(6, bits.rank(11, false));
 }
 
 TEST(BitVectorTest, SelectBits)
@@ -187,17 +187,17 @@ TEST(BitVectorTest, SelectBits)
     bitmap bits;
     construct_bitmap(bits);
 
-    EXPECT_EQ(bits.select(0, true), 0);
-    EXPECT_EQ(bits.select(1, true), 3);
-    EXPECT_EQ(bits.select(2, true), 4);
-    EXPECT_EQ(bits.select(3, true), 6);
-    EXPECT_EQ(bits.select(4, true), 9);
-    EXPECT_EQ(bits.select(5, true), 10);
+    EXPECT_EQ(0, bits.select(0, true));
+    EXPECT_EQ(3, bits.select(1, true));
+    EXPECT_EQ(4, bits.select(2, true));
+    EXPECT_EQ(6, bits.select(3, true));
+    EXPECT_EQ(9, bits.select(4, true));
+    EXPECT_EQ(10, bits.select(5, true));
 
-    EXPECT_EQ(bits.select(0, false), 1);
-    EXPECT_EQ(bits.select(1, false), 2);
-    EXPECT_EQ(bits.select(2, false), 5);
-    EXPECT_EQ(bits.select(3, false), 7);
-    EXPECT_EQ(bits.select(4, false), 8);
-    EXPECT_EQ(bits.select(5, false), 11);
+    EXPECT_EQ(1, bits.select(0, false));
+    EXPECT_EQ(2, bits.select(1, false));
+    EXPECT_EQ(5, bits.select(2, false));
+    EXPECT_EQ(7, bits.select(3, false));
+    EXPECT_EQ(8, bits.select(4, false));
+    EXPECT_EQ(11, bits.select(5, false));
 }
