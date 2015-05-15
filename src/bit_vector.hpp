@@ -12,6 +12,7 @@
 #include <bitset>
 #include <iterator>
 #include <stdexcept>
+#include <utility>
 
 #include "rbtree.hpp"
 
@@ -47,8 +48,9 @@ public: // Public Method(s)
     void insert(size_type i, value_type b);
     value_type erase(size_type i);
 
-    size_type rank(size_type i, value_type b = true) const;
-    size_type select(size_type i, value_type b = true) const;
+    ::std::pair<size_type, value_type> rank(size_type i) const;
+    size_type rank(size_type i, value_type b) const;
+    size_type select(size_type i, value_type b) const;
     size_type count(void) const;
     size_type size(void) const;
 
@@ -286,6 +288,23 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
     }
 
     return b;
+}
+
+template <::std::size_t N>
+inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
+bit_vector<N>::rank(size_type i) const
+{
+    size_type pos = 0, rank = 0;
+    auto it = find_const_block(i, pos, rank);
+    i -= pos;
+    for (decltype(i) j = 0; j <= i; ++j)
+    {
+        rank += it->bits[j];
+    }
+
+    auto b = it->bits[i];
+    auto r = b ? rank : i + pos + 1 - rank;
+    return ::std::make_pair(r, b);
 }
 
 template <::std::size_t N>
