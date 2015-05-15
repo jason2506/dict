@@ -40,6 +40,7 @@ public: // Public Method(s)
     size_type size(void) const;
 
     size_type sum(value_type c) const;
+    ::std::pair<size_type, value_type> rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
     value_type at(size_type i) const;
@@ -117,7 +118,25 @@ inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::sum(value_type
 }
 
 template <typename T, ::std::size_t N>
-size_t wavelet_tree<T, N>::rank(size_type i, value_type c) const
+::std::pair<typename wavelet_tree<T, N>::size_type, typename wavelet_tree<T, N>::value_type>
+wavelet_tree<T, N>::rank(size_type i) const
+{
+    value_type c = 0;
+    for (size_type l = 0; l < HEIGHT; ++l)
+    {
+        auto &bits = level_bits(l);
+        auto rb_pair = bits.rank(i);
+        c |= rb_pair.second << l;
+        i = rb_pair.first - 1;
+        i += rb_pair.second ? num_zeros(l) : 0;
+    }
+
+    auto ps = sum(c);
+    return ::std::make_pair(i + 1 - ps, c);
+}
+
+template <typename T, ::std::size_t N>
+typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::rank(size_type i, value_type c) const
 {
     auto ps = sum(c);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1)
@@ -135,7 +154,7 @@ size_t wavelet_tree<T, N>::rank(size_type i, value_type c) const
 }
 
 template <typename T, ::std::size_t N>
-size_t wavelet_tree<T, N>::select(size_type j, value_type c) const
+typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, value_type c) const
 {
     j += sum(c);
     for (auto l = HEIGHT; l > 0; --l)

@@ -134,6 +134,25 @@ TEST(WaveletTreeTest, RankChars)
     EXPECT_EQ(4, wt.rank(10, 's'));
 }
 
+TEST(WaveletTreeTest, RankAndAccessChars)
+{
+    wt_t wt;
+    construct_wavelet_tree(wt);
+
+    typedef ::std::pair<wt_t::size_type, wt_t::value_type> rb_pair;
+    EXPECT_EQ(rb_pair(1, 'm'), wt.rank(0));
+    EXPECT_EQ(rb_pair(1, 'i'), wt.rank(1));
+    EXPECT_EQ(rb_pair(1, 's'), wt.rank(2));
+    EXPECT_EQ(rb_pair(2, 's'), wt.rank(3));
+    EXPECT_EQ(rb_pair(2, 'i'), wt.rank(4));
+    EXPECT_EQ(rb_pair(3, 's'), wt.rank(5));
+    EXPECT_EQ(rb_pair(4, 's'), wt.rank(6));
+    EXPECT_EQ(rb_pair(3, 'i'), wt.rank(7));
+    EXPECT_EQ(rb_pair(1, 'p'), wt.rank(8));
+    EXPECT_EQ(rb_pair(2, 'p'), wt.rank(9));
+    EXPECT_EQ(rb_pair(4, 'i'), wt.rank(10));
+}
+
 TEST(WaveletTreeTest, SelectChars)
 {
     wt_t wt;
