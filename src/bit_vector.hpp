@@ -34,11 +34,15 @@ public: // Public Type(s)
     typedef bool value_type;
 
 private: // Private Static Property(ies)
-    static constexpr size_type SIZE = 2 * N;
-    static constexpr size_type MAX_MERGE_SIZE = 0.9 * SIZE;
+    static constexpr size_type MAX_BLOCK_SIZE = 2 * N;
+    static constexpr size_type MIN_BLOCK_SIZE = 0.25 * MAX_BLOCK_SIZE;
+    static constexpr size_type MAX_MERGE_SIZE =
+        MAX_BLOCK_SIZE - 1 < 0.9 * MAX_BLOCK_SIZE
+            ? MAX_BLOCK_SIZE - 1
+            : 0.9 * MAX_BLOCK_SIZE;
 
 private: // Private Type(s) - Part 1
-    typedef ::std::bitset<SIZE> bitset;
+    typedef ::std::bitset<MAX_BLOCK_SIZE> bitset;
 
 public: // Public Method(s)
     ~bit_vector(void);
@@ -146,7 +150,7 @@ void bit_vector<N>::insert(size_type i, value_type b)
         i -= pos;
     }
 
-    if (it->num_bits == SIZE)
+    if (it->num_bits == MAX_BLOCK_SIZE)
     {
         auto prev_it = ::std::prev(it);
         auto next_it = ::std::next(it);
@@ -249,7 +253,7 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
     {
         tree_.erase(it, update_counters);
     }
-    else
+    else if (it->num_bits < MIN_BLOCK_SIZE)
     {
         auto prev_it = ::std::prev(it);
         auto next_it = ::std::next(it);
@@ -259,7 +263,6 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
             {
                 merge_blocks(*prev_it, *it);
                 update_counters(it);
-                update_counters(next_it);
                 tree_.erase(it, update_counters);
             }
             else if (prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1))
@@ -271,19 +274,18 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
         }
         else if (next_it)
         {
-             if (next_it->num_bits + it->num_bits <= MAX_MERGE_SIZE)
-             {
-                merge_blocks(*it, *next_it);
-                update_counters(it);
-                update_counters(next_it);
-                tree_.erase(next_it, update_counters);
-             }
-             else if (next_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1))
-             {
-                equalize_blocks(*it, *next_it);
-                update_counters(it);
-                update_counters(next_it);
-             }
+            if (next_it->num_bits + it->num_bits <= MAX_MERGE_SIZE)
+            {
+               merge_blocks(*it, *next_it);
+               update_counters(it);
+               tree_.erase(next_it, update_counters);
+            }
+            else if (next_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1))
+            {
+               equalize_blocks(*it, *next_it);
+               update_counters(it);
+               update_counters(next_it);
+            }
         }
     }
 
