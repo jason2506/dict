@@ -312,7 +312,11 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
         return end();
     }
 
-    auto next_ptr = next_node(ptr);
+    auto parent_it = pos.parent();
+    ++pos;
+    auto next_parent_it = pos ? pos.parent() : end();
+
+    auto next_ptr = pos.get_node_ptr();
     if (ptr == first_)  { first_ = next_ptr; }
     if (ptr == last_)   { last_ = prev_node(ptr); }
 
@@ -396,6 +400,19 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
     if (child)
     {
         child->set_parent(parent);
+    }
+
+    if (ptr == next_parent_it.get_node_ptr())
+    {
+        update(pos);
+    }
+    else if (pos && pos.parent() != next_parent_it)
+    {
+        update(next_parent_it);
+    }
+    else
+    {
+        update(parent_it);
     }
 
     if (ptr_color == BLACK)
