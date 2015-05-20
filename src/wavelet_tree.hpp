@@ -40,6 +40,7 @@ public: // Public Method(s)
     size_type size(void) const;
 
     size_type sum(value_type c) const;
+    value_type search(size_type i) const;
     ::std::pair<size_type, value_type> rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
@@ -115,6 +116,12 @@ template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::sum(value_type c) const
 {
     return (c > 0) ? sums_.sum(c - 1) : 0;
+}
+
+template <typename T, ::std::size_t N>
+inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::search(size_type i) const
+{
+    return sums_.search(i);
 }
 
 template <typename T, ::std::size_t N>
