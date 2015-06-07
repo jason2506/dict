@@ -1,20 +1,20 @@
 /************************************************
  *  rbtree.hpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_RBTREE_HPP_
-#define ESAPP_RBTREE_HPP_
+#ifndef DESA_RBTREE_HPP_
+#define DESA_RBTREE_HPP_
 
 #include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
-namespace esapp
+namespace desa
 {
 
 namespace impl
@@ -1017,6 +1017,6 @@ inline typename rbtree<T>::template tree_iterator<B>::node_ptr rbtree<T>::tree_i
 
 } // namespace impl
 
-} // namespace esapp
+} // namespace desa
 
-#endif // ESAPP_RBTREE_HPP_
+#endif // DESA_RBTREE_HPP_

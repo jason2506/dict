@@ -1,0 +1,14 @@
+.DS_Store
+
+# binary
+lib
+test/*_test
+
+# cmake
+CMakeCache.txt
+CMakeFiles
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+*.cmake

@@ -1,13 +1,13 @@
 /************************************************
  *  bit_vector.hpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_BIT_VECTOR_HPP_
-#define ESAPP_BIT_VECTOR_HPP_
+#ifndef DESA_BIT_VECTOR_HPP_
+#define DESA_BIT_VECTOR_HPP_
 
 #include <bitset>
 #include <iterator>
@@ -16,7 +16,7 @@
 
 #include "rbtree.hpp"
 
-namespace esapp
+namespace desa
 {
 
 namespace impl
@@ -519,6 +519,6 @@ bit_vector<N>::block::block(void)
 
 } // namespace impl
 
-} // namespace esapp
+} // namespace desa
 
-#endif // ESAPP_BIT_VECTOR_HPP_
+#endif // DESA_BIT_VECTOR_HPP_

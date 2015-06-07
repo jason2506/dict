@@ -1,8 +1,5 @@
 FILE (GLOB_RECURSE project_SRCS "*.hpp" "*.cpp")
-SET (project_HPP "${PROJECT_NAME}.hpp")
 SET (project_LIB ${PROJECT_NAME})
-
-FILE (COPY ${project_HPP} DESTINATION ${HEADER_OUTPUT_PATH})
 
 IF (NOT DEFINED project_build_shared)
    IF (CMAKE_CROSSCOMPILING)

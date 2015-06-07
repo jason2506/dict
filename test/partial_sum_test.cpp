@@ -1,8 +1,8 @@
 /************************************************
  *  partial_sum_test.cpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -12,7 +12,7 @@
 
 #include "../src/partial_sum.hpp"
 
-using esapp::impl::partial_sum;
+using desa::impl::partial_sum;
 
 typedef partial_sum<char, ::std::size_t> ps_t;
 

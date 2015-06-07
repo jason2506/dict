@@ -1,13 +1,13 @@
 /************************************************
  *  wavelet_tree.hpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_WAVELET_TREE_HPP_
-#define ESAPP_WAVELET_TREE_HPP_
+#ifndef DESA_WAVELET_TREE_HPP_
+#define DESA_WAVELET_TREE_HPP_
 
 #include <climits>
 #include <array>
@@ -16,7 +16,7 @@
 #include "bit_vector.hpp"
 #include "partial_sum.hpp"
 
-namespace esapp
+namespace desa
 {
 
 namespace impl
@@ -229,6 +229,6 @@ inline typename wavelet_tree<T, N>::bitmap const &wavelet_tree<T, N>::level_bits
 
 } // namespace impl
 
-} // namespace esapp
+} // namespace desa
 
-#endif // ESAPP_WAVELET_TREE_HPP_
+#endif // DESA_WAVELET_TREE_HPP_

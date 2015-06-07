@@ -1,8 +1,8 @@
 /************************************************
  *  rbtree_test.cpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
@@ -38,7 +38,7 @@
         check_rbtree_property(tree); \
     }
 
-using esapp::impl::rbtree;
+using desa::impl::rbtree;
 
 typedef decltype(::std::declval<typename rbtree<int>::iterator>().get_node_ptr()) rbtree_node_ptr;
 typedef decltype(rbtree_node_ptr()->get_color()) rbtree_node_color;

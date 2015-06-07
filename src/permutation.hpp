@@ -1,17 +1,17 @@
 /************************************************
  *  permutation.hpp
- *  ESA++
+ *  DESA
  *
- *  Copyright (c) 2014-2015, Chi-En Wu
+ *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef ESAPP_PERMUTATION_HPP_
-#define ESAPP_PERMUTATION_HPP_
+#ifndef DESA_PERMUTATION_HPP_
+#define DESA_PERMUTATION_HPP_
 
 #include "rbtree.hpp"
 
-namespace esapp
+namespace desa
 {
 
 namespace impl
@@ -114,6 +114,6 @@ inline permutation::link_and_rank::link_and_rank(void)
 
 } // namespace impl
 
-} // namespace esapp
+} // namespace desa
 
-#endif // ESAPP_PERMUTATION_HPP_
+#endif // DESA_PERMUTATION_HPP_
