@@ -39,7 +39,7 @@ public: // Public Method(s)
     size_type at(size_type i) const;
     size_type rank(size_type j) const;
 
-    size_type operator[](size_t i) const;
+    size_type operator[](size_type i) const;
 
 private: // Private Type(s)
     struct link_and_rank;
