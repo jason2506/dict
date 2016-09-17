@@ -223,7 +223,7 @@ inline typename rbtree<T>::iterator rbtree<T>::begin(void)
 template <typename T>
 inline typename rbtree<T>::const_iterator rbtree<T>::begin(void) const
 {
-    return cbegin(this);
+    return cbegin();
 }
 
 template <typename T>
@@ -241,7 +241,7 @@ inline typename rbtree<T>::iterator rbtree<T>::end(void)
 template <typename T>
 inline typename rbtree<T>::const_iterator rbtree<T>::end(void) const
 {
-    return cend(this);
+    return cend();
 }
 
 template <typename T>
