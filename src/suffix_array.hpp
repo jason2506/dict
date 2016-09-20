@@ -134,14 +134,12 @@ inline suffix_array::term_type suffix_array::term(value_type j) const
 
 inline suffix_array::size_type suffix_array::psi(size_type i) const
 {
-    auto c = wt_.search(i + 1);
-    return wt_.select(i - wt_.sum(c), c);
+    return wt_.psi(i);
 }
 
 inline suffix_array::size_type suffix_array::lf(size_type i) const
 {
-    auto rc_pair = wt_.rank(i);
-    return wt_.sum(rc_pair.second) + rc_pair.first - 1;
+    return wt_.lf(i);
 }
 
 inline suffix_array::value_type suffix_array::operator[](size_type i) const

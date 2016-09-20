@@ -44,6 +44,8 @@ public: // Public Method(s)
     ::std::pair<size_type, value_type> rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
+    size_type psi(size_type i) const;
+    size_type lf(size_type i) const;
     value_type at(size_type i) const;
 
     value_type operator[](size_type i) const;
@@ -173,6 +175,30 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, v
     }
 
     return j;
+}
+
+template <typename T, ::std::size_t N>
+inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type i) const
+{
+    auto pair = sums_.search_with_sum(i + 1);
+    return select(i - pair.second, pair.first);
+}
+
+template <typename T, ::std::size_t N>
+inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i) const
+{
+    // TODO: extract common code from lf() and rank()
+    value_type c = 0;
+    for (size_type l = 0; l < HEIGHT; ++l)
+    {
+        auto &bits = level_bits(l);
+        auto rb_pair = bits.rank(i);
+        c |= rb_pair.second << l;
+        i = rb_pair.first - 1;
+        i += rb_pair.second ? num_zeros(l) : 0;
+    }
+
+    return i;
 }
 
 template <typename T, ::std::size_t N>
