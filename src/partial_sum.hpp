@@ -11,6 +11,7 @@
 
 #include <functional>
 #include <stdexcept>
+#include <utility>
 
 #include "rbtree.hpp"
 
@@ -40,6 +41,7 @@ public: // Public Method(s)
     value_type sum(void) const;
     value_type sum(key_type k) const;
     key_type search(value_type x) const;
+    ::std::pair<key_type, value_type> search_with_sum(value_type x) const;
 
 private: // Private Type(s)
     struct key_and_sum;
@@ -123,20 +125,29 @@ typename partial_sum<K, T>::value_type partial_sum<K, T>::sum(key_type k) const
 template <typename K, typename T>
 typename partial_sum<K, T>::key_type partial_sum<K, T>::search(value_type x) const
 {
+    auto pair = search_with_sum(x);
+    return pair.first;
+}
+
+template <typename K, typename T>
+::std::pair<typename partial_sum<K, T>::key_type, typename partial_sum<K, T>::value_type>
+partial_sum<K, T>::search_with_sum(value_type x) const
+{
     auto it = tree_.root();
 
+    decltype(x) sum = 0;
     bool found = false;
-    key_type result;
+    key_type key;
     while (it)
     {
-        if (x > it->sum)
+        if (x - sum > it->sum)
         {
-            x -= it->sum;
+            sum += it->sum;
             it.go_right();
         }
         else
         {
-            result = it->key;
+            key = it->key;
             found = true;
 
             it.go_left();
@@ -148,7 +159,7 @@ typename partial_sum<K, T>::key_type partial_sum<K, T>::search(value_type x) con
         throw ::std::invalid_argument("not found");
     }
 
-    return result;
+    return ::std::make_pair(key, sum);
 }
 
 template <typename K, typename T>
