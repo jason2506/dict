@@ -325,7 +325,7 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
     while (it)
     {
         size_type num_left_bits, num_left_set_bits;
-        if (it.left())
+        if (it.has_left())
         {
             num_left_bits = it.left()->num_sub_bits;
             num_left_set_bits = b
@@ -400,7 +400,7 @@ typename bit_vector<N>::bstree::const_iterator bit_vector<N>::find_const_block(s
     while (it)
     {
         size_type num_left_bits, num_left_set_bits;
-        if (it.left())
+        if (it.has_left())
         {
             num_left_bits = it.left()->num_sub_bits;
             num_left_set_bits = it.left()->num_sub_set_bits;
