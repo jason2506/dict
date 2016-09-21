@@ -188,12 +188,10 @@ template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i) const
 {
     // TODO: extract common code from lf() and rank()
-    value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l)
     {
         auto &bits = level_bits(l);
         auto rb_pair = bits.rank(i);
-        c |= rb_pair.second << l;
         i = rb_pair.first - 1;
         i += rb_pair.second ? num_zeros(l) : 0;
     }
