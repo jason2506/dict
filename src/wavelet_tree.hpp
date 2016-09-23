@@ -206,10 +206,10 @@ typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::at(size_type i) cons
     for (size_type l = 0; l < HEIGHT; ++l)
     {
         auto const &bits = level_bits(l);
-        auto b = bits[i];
-        i = bits.rank(i, b) - 1;
-        c |= b << l;
-        if (b) { i += num_zeros(l); }
+        auto rb_pair = bits.rank(i);
+        i = rb_pair.first - 1;
+        c |= rb_pair.second << l;
+        i += rb_pair.second ? num_zeros(l) : 0;
     }
 
     return c;
