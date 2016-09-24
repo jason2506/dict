@@ -41,7 +41,7 @@ public: // Public Method(s)
 
     size_type sum(value_type c) const;
     value_type search(size_type i) const;
-    ::std::pair<size_type, value_type> rank(size_type i) const;
+    ::std::pair<size_type, value_type> access_and_rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
     size_type psi(size_type i) const;
@@ -128,7 +128,7 @@ inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::search(size_t
 
 template <typename T, ::std::size_t N>
 ::std::pair<typename wavelet_tree<T, N>::size_type, typename wavelet_tree<T, N>::value_type>
-wavelet_tree<T, N>::rank(size_type i) const
+wavelet_tree<T, N>::access_and_rank(size_type i) const
 {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l)

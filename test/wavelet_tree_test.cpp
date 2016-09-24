@@ -140,17 +140,17 @@ TEST(WaveletTreeTest, RankAndAccessChars)
     construct_wavelet_tree(wt);
 
     typedef ::std::pair<wt_t::size_type, wt_t::value_type> rb_pair;
-    EXPECT_EQ(rb_pair(1, 'm'), wt.rank(0));
-    EXPECT_EQ(rb_pair(1, 'i'), wt.rank(1));
-    EXPECT_EQ(rb_pair(1, 's'), wt.rank(2));
-    EXPECT_EQ(rb_pair(2, 's'), wt.rank(3));
-    EXPECT_EQ(rb_pair(2, 'i'), wt.rank(4));
-    EXPECT_EQ(rb_pair(3, 's'), wt.rank(5));
-    EXPECT_EQ(rb_pair(4, 's'), wt.rank(6));
-    EXPECT_EQ(rb_pair(3, 'i'), wt.rank(7));
-    EXPECT_EQ(rb_pair(1, 'p'), wt.rank(8));
-    EXPECT_EQ(rb_pair(2, 'p'), wt.rank(9));
-    EXPECT_EQ(rb_pair(4, 'i'), wt.rank(10));
+    EXPECT_EQ(rb_pair(1, 'm'), wt.access_and_rank(0));
+    EXPECT_EQ(rb_pair(1, 'i'), wt.access_and_rank(1));
+    EXPECT_EQ(rb_pair(1, 's'), wt.access_and_rank(2));
+    EXPECT_EQ(rb_pair(2, 's'), wt.access_and_rank(3));
+    EXPECT_EQ(rb_pair(2, 'i'), wt.access_and_rank(4));
+    EXPECT_EQ(rb_pair(3, 's'), wt.access_and_rank(5));
+    EXPECT_EQ(rb_pair(4, 's'), wt.access_and_rank(6));
+    EXPECT_EQ(rb_pair(3, 'i'), wt.access_and_rank(7));
+    EXPECT_EQ(rb_pair(1, 'p'), wt.access_and_rank(8));
+    EXPECT_EQ(rb_pair(2, 'p'), wt.access_and_rank(9));
+    EXPECT_EQ(rb_pair(4, 'i'), wt.access_and_rank(10));
 }
 
 TEST(WaveletTreeTest, SelectChars)
