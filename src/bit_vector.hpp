@@ -52,7 +52,8 @@ public: // Public Method(s)
     void insert(size_type i, value_type b);
     value_type erase(size_type i);
 
-    ::std::pair<size_type, value_type> rank(size_type i) const;
+    ::std::pair<size_type, value_type> access_and_rank(size_type i) const;
+    ::std::pair<size_type, value_type> access_and_rank(size_type i, value_type b) const;
     size_type rank(size_type i, value_type b) const;
     size_type select(size_type i, value_type b) const;
     size_type count(void) const;
@@ -294,7 +295,7 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
 
 template <::std::size_t N>
 inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
-bit_vector<N>::rank(size_type i) const
+bit_vector<N>::access_and_rank(size_type i) const
 {
     size_type pos = 0, rank = 0;
     auto it = find_const_block(i, pos, rank);
@@ -304,6 +305,20 @@ bit_vector<N>::rank(size_type i) const
     auto b = it->bits[i];
     auto r = b ? rank : i + pos + 1 - rank;
     return ::std::make_pair(r, b);
+}
+
+template <::std::size_t N>
+inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
+    bit_vector<N>::access_and_rank(size_type i, value_type b) const
+{
+    // TODO: extract common code from other overloaded rank() functions
+    size_type pos = 0, rank = 0;
+    auto it = find_const_block(i, pos, rank);
+    i -= pos;
+    rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
+
+    auto r = b ? rank : i + pos + 1 - rank;
+    return ::std::make_pair(r, it->bits[i]);
 }
 
 template <::std::size_t N>

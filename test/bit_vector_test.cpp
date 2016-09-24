@@ -190,18 +190,18 @@ TEST(BitVectorTest, RankAndAccessBits)
     construct_bitmap(bits);
 
     typedef ::std::pair<bitmap::size_type, bitmap::value_type> rb_pair;
-    EXPECT_EQ(rb_pair(1, true), bits.rank(0));
-    EXPECT_EQ(rb_pair(1, false), bits.rank(1));
-    EXPECT_EQ(rb_pair(2, false), bits.rank(2));
-    EXPECT_EQ(rb_pair(2, true), bits.rank(3));
-    EXPECT_EQ(rb_pair(3, true), bits.rank(4));
-    EXPECT_EQ(rb_pair(3, false), bits.rank(5));
-    EXPECT_EQ(rb_pair(4, true), bits.rank(6));
-    EXPECT_EQ(rb_pair(4, false), bits.rank(7));
-    EXPECT_EQ(rb_pair(5, false), bits.rank(8));
-    EXPECT_EQ(rb_pair(5, true), bits.rank(9));
-    EXPECT_EQ(rb_pair(6, true), bits.rank(10));
-    EXPECT_EQ(rb_pair(6, false), bits.rank(11));
+    EXPECT_EQ(rb_pair(1, true), bits.access_and_rank(0));
+    EXPECT_EQ(rb_pair(1, false), bits.access_and_rank(1));
+    EXPECT_EQ(rb_pair(2, false), bits.access_and_rank(2));
+    EXPECT_EQ(rb_pair(2, true), bits.access_and_rank(3));
+    EXPECT_EQ(rb_pair(3, true), bits.access_and_rank(4));
+    EXPECT_EQ(rb_pair(3, false), bits.access_and_rank(5));
+    EXPECT_EQ(rb_pair(4, true), bits.access_and_rank(6));
+    EXPECT_EQ(rb_pair(4, false), bits.access_and_rank(7));
+    EXPECT_EQ(rb_pair(5, false), bits.access_and_rank(8));
+    EXPECT_EQ(rb_pair(5, true), bits.access_and_rank(9));
+    EXPECT_EQ(rb_pair(6, true), bits.access_and_rank(10));
+    EXPECT_EQ(rb_pair(6, false), bits.access_and_rank(11));
 }
 
 TEST(BitVectorTest, SelectBits)

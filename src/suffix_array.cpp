@@ -63,17 +63,18 @@ suffix_array::value_type suffix_array::at(size_type i) const
 
 suffix_array::size_type suffix_array::rank(value_type j) const
 {
-    if (isa_samples_[j])
+    auto br_pair = isa_samples_.access_and_rank(j, true);
+    auto b = br_pair.second;
+    auto r = br_pair.first;
+    if (b)
     {
         // retrieve a value at a sampled position
-        auto r = isa_samples_.rank(j, true);
         auto i = pi_.rank(r - 1);
         return sa_samples_.select(i, true);
     }
     else
     {
         // retrieve a value at a unsampled position
-        auto r = isa_samples_.rank(j, true);
         auto off = isa_samples_.select(r, true) - j;
         auto i = pi_.rank(r);
         auto v = sa_samples_.select(i, true);
