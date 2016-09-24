@@ -180,7 +180,7 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, v
 template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type i) const
 {
-    auto pair = sums_.search_with_sum(i + 1);
+    auto pair = sums_.search_and_sum(i + 1);
     return select(i - pair.second, pair.first);
 }
 
