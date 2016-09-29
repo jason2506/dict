@@ -73,6 +73,7 @@ private: // Private Static Method(s)
 private: // Private Method(s)
     typename bstree::iterator find_block(size_type i, size_type &pos, size_type &rank);
     typename bstree::const_iterator find_block(size_type i, size_type &pos, size_type &rank) const;
+    typename bstree::const_iterator find_bit(size_type &i, size_type &pos, size_type &rank) const;
 
 private: // Private Property(ies)
     bstree tree_;
@@ -298,10 +299,7 @@ inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::va
 bit_vector<N>::access_and_rank(size_type i) const
 {
     size_type pos = 0, rank = 0;
-    auto it = find_block(i, pos, rank);
-    i -= pos;
-    rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
-
+    auto it = find_bit(i, pos, rank);
     auto b = it->bits[i];
     auto r = b ? rank : i + pos + 1 - rank;
     return ::std::make_pair(r, b);
@@ -311,12 +309,8 @@ template <::std::size_t N>
 inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
     bit_vector<N>::access_and_rank(size_type i, value_type b) const
 {
-    // TODO: extract common code from other overloaded rank() functions
     size_type pos = 0, rank = 0;
-    auto it = find_block(i, pos, rank);
-    i -= pos;
-    rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
-
+    auto it = find_bit(i, pos, rank);
     auto r = b ? rank : i + pos + 1 - rank;
     return ::std::make_pair(r, it->bits[i]);
 }
@@ -324,11 +318,7 @@ inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::va
 template <::std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::rank(size_type i, value_type b) const
 {
-    size_type pos = 0, rank = 0;
-    auto it = find_block(i, pos, rank);
-    i -= pos;
-    rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
-    return b ? rank : i + pos + 1 - rank;
+    return access_and_rank(i, b).first;
 }
 
 template <::std::size_t N>
@@ -445,6 +435,16 @@ typename bit_vector<N>::bstree::const_iterator bit_vector<N>::find_block(size_ty
         }
     }
 
+    return it;
+}
+
+template <::std::size_t N>
+inline typename bit_vector<N>::bstree::const_iterator
+bit_vector<N>::find_bit(size_type &i, size_type &pos, size_type &rank) const
+{
+    auto it = find_block(i, pos, rank);
+    i -= pos;
+    rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
     return it;
 }
 
