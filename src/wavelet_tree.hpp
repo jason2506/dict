@@ -44,8 +44,11 @@ public: // Public Method(s)
     ::std::pair<size_type, value_type> access_and_rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
-    size_type psi(size_type i) const;
+
+    ::std::pair<value_type, size_type> access_and_lf(size_type i) const;
     size_type lf(size_type i) const;
+    size_type psi(size_type i) const;
+
     value_type at(size_type i) const;
 
     value_type operator[](size_type i) const;
@@ -127,21 +130,12 @@ inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::search(size_t
 }
 
 template <typename T, ::std::size_t N>
-::std::pair<typename wavelet_tree<T, N>::size_type, typename wavelet_tree<T, N>::value_type>
+inline ::std::pair<typename wavelet_tree<T, N>::size_type, typename wavelet_tree<T, N>::value_type>
 wavelet_tree<T, N>::access_and_rank(size_type i) const
 {
-    value_type c = 0;
-    for (size_type l = 0; l < HEIGHT; ++l)
-    {
-        auto &bits = level_bits(l);
-        auto br_pair = bits.access_and_rank(i);
-        c |= br_pair.first << l;
-        i = br_pair.second - 1;
-        i += br_pair.first ? num_zeros(l) : 0;
-    }
-
-    auto ps = sum(c);
-    return ::std::make_pair(i + 1 - ps, c);
+    auto pair = access_and_lf(i);
+    auto ps = sum(pair.first);
+    return ::std::make_pair(pair.second + 1 - ps, pair.first);
 }
 
 template <typename T, ::std::size_t N>
@@ -178,6 +172,28 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, v
 }
 
 template <typename T, ::std::size_t N>
+::std::pair<typename wavelet_tree<T, N>::value_type, typename wavelet_tree<T, N>::size_type>
+wavelet_tree<T, N>::access_and_lf(size_type i) const
+{
+    value_type c = 0;
+    for (size_type l = 0; l < HEIGHT; ++l)
+    {
+        auto &bits = level_bits(l);
+        auto br_pair = bits.access_and_rank(i);
+        c |= br_pair.first << l;
+        i = (br_pair.first ? num_zeros(l) : 0) + br_pair.second - 1;
+    }
+
+    return ::std::make_pair(c, i);
+}
+
+template <typename T, ::std::size_t N>
+inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i) const
+{
+    return access_and_lf(i).second;
+}
+
+template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type i) const
 {
     auto pair = sums_.search_and_sum(i + 1);
@@ -185,34 +201,9 @@ inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type 
 }
 
 template <typename T, ::std::size_t N>
-inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i) const
+inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::at(size_type i) const
 {
-    // TODO: extract common code from lf() and rank()
-    for (size_type l = 0; l < HEIGHT; ++l)
-    {
-        auto &bits = level_bits(l);
-        auto br_pair = bits.access_and_rank(i);
-        i = br_pair.second - 1;
-        i += br_pair.first ? num_zeros(l) : 0;
-    }
-
-    return i;
-}
-
-template <typename T, ::std::size_t N>
-typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::at(size_type i) const
-{
-    value_type c = 0;
-    for (size_type l = 0; l < HEIGHT; ++l)
-    {
-        auto const &bits = level_bits(l);
-        auto br_pair = bits.access_and_rank(i);
-        i = br_pair.second - 1;
-        c |= br_pair.first << l;
-        i += br_pair.first ? num_zeros(l) : 0;
-    }
-
-    return c;
+    return access_and_lf(i).first;
 }
 
 template <typename T, ::std::size_t N>
