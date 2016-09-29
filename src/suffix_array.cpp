@@ -64,8 +64,8 @@ suffix_array::value_type suffix_array::at(size_type i) const
 suffix_array::size_type suffix_array::rank(value_type j) const
 {
     auto br_pair = isa_samples_.access_and_rank(j, true);
-    auto b = br_pair.second;
-    auto r = br_pair.first;
+    auto b = br_pair.first;
+    auto r = br_pair.second;
     if (b)
     {
         // retrieve a value at a sampled position

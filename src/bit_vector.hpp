@@ -52,8 +52,8 @@ public: // Public Method(s)
     void insert(size_type i, value_type b);
     value_type erase(size_type i);
 
-    ::std::pair<size_type, value_type> access_and_rank(size_type i) const;
-    ::std::pair<size_type, value_type> access_and_rank(size_type i, value_type b) const;
+    ::std::pair<value_type, size_type> access_and_rank(size_type i) const;
+    ::std::pair<value_type, size_type> access_and_rank(size_type i, value_type b) const;
     size_type rank(size_type i, value_type b) const;
     size_type select(size_type i, value_type b) const;
     size_type count(void) const;
@@ -295,30 +295,30 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
 }
 
 template <::std::size_t N>
-inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
+inline ::std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
 bit_vector<N>::access_and_rank(size_type i) const
 {
     size_type pos = 0, rank = 0;
     auto it = find_bit(i, pos, rank);
     auto b = it->bits[i];
     auto r = b ? rank : i + pos + 1 - rank;
-    return ::std::make_pair(r, b);
+    return ::std::make_pair(b, r);
 }
 
 template <::std::size_t N>
-inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::value_type>
+inline ::std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
     bit_vector<N>::access_and_rank(size_type i, value_type b) const
 {
     size_type pos = 0, rank = 0;
     auto it = find_bit(i, pos, rank);
     auto r = b ? rank : i + pos + 1 - rank;
-    return ::std::make_pair(r, it->bits[i]);
+    return ::std::make_pair(it->bits[i], r);
 }
 
 template <::std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::rank(size_type i, value_type b) const
 {
-    return access_and_rank(i, b).first;
+    return access_and_rank(i, b).second;
 }
 
 template <::std::size_t N>

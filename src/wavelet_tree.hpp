@@ -134,10 +134,10 @@ wavelet_tree<T, N>::access_and_rank(size_type i) const
     for (size_type l = 0; l < HEIGHT; ++l)
     {
         auto &bits = level_bits(l);
-        auto rb_pair = bits.access_and_rank(i);
-        c |= rb_pair.second << l;
-        i = rb_pair.first - 1;
-        i += rb_pair.second ? num_zeros(l) : 0;
+        auto br_pair = bits.access_and_rank(i);
+        c |= br_pair.first << l;
+        i = br_pair.second - 1;
+        i += br_pair.first ? num_zeros(l) : 0;
     }
 
     auto ps = sum(c);
@@ -191,9 +191,9 @@ inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i
     for (size_type l = 0; l < HEIGHT; ++l)
     {
         auto &bits = level_bits(l);
-        auto rb_pair = bits.access_and_rank(i);
-        i = rb_pair.first - 1;
-        i += rb_pair.second ? num_zeros(l) : 0;
+        auto br_pair = bits.access_and_rank(i);
+        i = br_pair.second - 1;
+        i += br_pair.first ? num_zeros(l) : 0;
     }
 
     return i;
@@ -206,10 +206,10 @@ typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::at(size_type i) cons
     for (size_type l = 0; l < HEIGHT; ++l)
     {
         auto const &bits = level_bits(l);
-        auto rb_pair = bits.access_and_rank(i);
-        i = rb_pair.first - 1;
-        c |= rb_pair.second << l;
-        i += rb_pair.second ? num_zeros(l) : 0;
+        auto br_pair = bits.access_and_rank(i);
+        i = br_pair.second - 1;
+        c |= br_pair.first << l;
+        i += br_pair.first ? num_zeros(l) : 0;
     }
 
     return c;
