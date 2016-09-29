@@ -72,7 +72,7 @@ private: // Private Static Method(s)
 
 private: // Private Method(s)
     typename bstree::iterator find_block(size_type i, size_type &pos, size_type &rank);
-    typename bstree::const_iterator find_const_block(size_type i, size_type &pos, size_type &rank) const;
+    typename bstree::const_iterator find_block(size_type i, size_type &pos, size_type &rank) const;
 
 private: // Private Property(ies)
     bstree tree_;
@@ -298,7 +298,7 @@ inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::va
 bit_vector<N>::access_and_rank(size_type i) const
 {
     size_type pos = 0, rank = 0;
-    auto it = find_const_block(i, pos, rank);
+    auto it = find_block(i, pos, rank);
     i -= pos;
     rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
 
@@ -313,7 +313,7 @@ inline ::std::pair<typename bit_vector<N>::size_type, typename bit_vector<N>::va
 {
     // TODO: extract common code from other overloaded rank() functions
     size_type pos = 0, rank = 0;
-    auto it = find_const_block(i, pos, rank);
+    auto it = find_block(i, pos, rank);
     i -= pos;
     rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
 
@@ -325,7 +325,7 @@ template <::std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::rank(size_type i, value_type b) const
 {
     size_type pos = 0, rank = 0;
-    auto it = find_const_block(i, pos, rank);
+    auto it = find_block(i, pos, rank);
     i -= pos;
     rank += (it->bits << (MAX_BLOCK_SIZE - i - 1)).count();
     return b ? rank : i + pos + 1 - rank;
@@ -397,19 +397,20 @@ template <::std::size_t N>
 inline typename bit_vector<N>::value_type bit_vector<N>::operator[](size_type i) const
 {
     size_type pos = 0, rank = 0;
-    auto it = find_const_block(i, pos, rank);
+    auto it = find_block(i, pos, rank);
     return it->bits[i - pos];
 }
 
 template <::std::size_t N>
 inline typename bit_vector<N>::bstree::iterator bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank)
 {
-    auto it = find_const_block(i, pos, rank);
+    auto const &that = *this;
+    auto it = that.find_block(i, pos, rank);
     return it.unconst();
 }
 
 template <::std::size_t N>
-typename bit_vector<N>::bstree::const_iterator bit_vector<N>::find_const_block(size_type i, size_type &pos, size_type &rank) const
+typename bit_vector<N>::bstree::const_iterator bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) const
 {
     auto it = tree_.root();
     while (it)
