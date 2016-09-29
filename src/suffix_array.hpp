@@ -128,8 +128,7 @@ inline suffix_array::term_type suffix_array::bwt(size_type i) const
 
 inline suffix_array::term_type suffix_array::term(value_type j) const
 {
-    auto i = rank(j + 1 < size() ? j + 1 : 0);
-    return wt_[i];
+    return wt_.search(rank(j) + 1);
 }
 
 inline suffix_array::size_type suffix_array::psi(size_type i) const
