@@ -67,6 +67,7 @@ private: // Private Method(s)
     size_type num_zeros(size_type l) const;
     bitmap &level_bits(size_type l);
     bitmap const &level_bits(size_type l) const;
+    size_type select_at(size_type j, value_type c) const;
 
 private: // Private Property(ies)
     ::std::array<tree_level, N> levels_;
@@ -157,18 +158,9 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::rank(size_type i, val
 }
 
 template <typename T, ::std::size_t N>
-typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, value_type c) const
+inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select(size_type j, value_type c) const
 {
-    j += sum(c);
-    for (auto l = HEIGHT; l > 0; --l)
-    {
-        auto &bits = level_bits(l - 1);
-        auto b = (c >> (l - 1)) & 1;
-        j -= b ? num_zeros(l - 1) : 0;
-        j = bits.select(j, b);
-    }
-
-    return j;
+    return select_at(j + sum(c), c);
 }
 
 template <typename T, ::std::size_t N>
@@ -196,8 +188,8 @@ inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i
 template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type i) const
 {
-    auto pair = sums_.search_and_sum(i + 1);
-    return select(i - pair.second, pair.first);
+    auto c = sums_.search(i + 1);
+    return select_at(i, c);
 }
 
 template <typename T, ::std::size_t N>
@@ -240,6 +232,20 @@ template <typename T, ::std::size_t N>
 inline typename wavelet_tree<T, N>::bitmap const &wavelet_tree<T, N>::level_bits(size_type l) const
 {
     return levels_[l].second;
+}
+
+template <typename T, ::std::size_t N>
+typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select_at(size_type j, value_type c) const
+{
+    for (auto l = HEIGHT; l > 0; --l)
+    {
+        auto &bits = level_bits(l - 1);
+        auto b = (c >> (l - 1)) & 1;
+        j -= b ? num_zeros(l - 1) : 0;
+        j = bits.select(j, b);
+    }
+
+    return j;
 }
 
 } // namespace impl
