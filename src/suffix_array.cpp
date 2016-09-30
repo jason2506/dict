@@ -87,31 +87,38 @@ void suffix_array::gen_lcpa(void)
     lcpa_.resize(n);
     lcpa_[0] = 0;
 
-    auto sa_pos = rank(0);
+    auto x = lf(0);
     typename decltype(lcpa_)::value_type lcp = 0;
-    for (decltype(n) isa_pos = 0; isa_pos < n - 1; ++isa_pos)
+    while (--n > 1)
     {
-        if (lcp > 0) { --lcp; }
-
-        auto x = sa_pos, y = sa_pos - 1;
-        for (decltype(lcp) i = 0; i < lcp; ++i)
+        auto psi_x = x;
+        x = lf(x);
+        if (psi(x - 1) == psi_x - 1)
         {
-            x = psi(x);
-            y = psi(y);
+            auto c = wt_.search(x + 1);
+            if (c != 0 && c == wt_.search(x))
+            {
+                lcpa_[x] = ++lcp;
+            }
+            else
+            {
+                lcpa_[x] = lcp = 0;
+            }
         }
-
-        auto c1 = wt_.search(x + 1), c2 = wt_.search(y + 1);
-        while (c1 == c2 && c1 != 0)
+        else
         {
-            x = psi(x);
-            y = psi(y);
-            c1 = wt_.search(x + 1);
-            c2 = wt_.search(y + 1);
-            ++lcp;
-        }
+            auto i = x;
+            auto j = x - 1;
+            auto c = wt_.search(i + 1);
+            for (lcp = 0; c != 0 && c == wt_.search(j + 1); ++lcp)
+            {
+                i = psi(i);
+                j = psi(j);
+                c = wt_.search(i + 1);
+            }
 
-        lcpa_[sa_pos] = lcp;
-        sa_pos = psi(sa_pos);
+            lcpa_[x] = lcp;
+        }
     }
 }
 
