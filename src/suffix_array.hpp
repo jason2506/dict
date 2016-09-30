@@ -9,6 +9,7 @@
 #ifndef DESA_SUFFIX_ARRAY_HPP_
 #define DESA_SUFFIX_ARRAY_HPP_
 
+#include <cassert>
 #include <vector>
 
 #include "bit_vector.hpp"
@@ -35,9 +36,8 @@ public: // Public Type(s)
 public: // Public Method(s)
     suffix_array(void);
 
-    template <typename Sequence>
-    void insert(value_type j, Sequence const &s);
-    void erase(value_type j, size_type m);
+    template <typename InputIterator>
+    void insert(InputIterator begin, InputIterator end);
 
     size_type size(void) const;
     value_type at(size_type i) const;
@@ -52,9 +52,7 @@ public: // Public Method(s)
     value_type operator[](size_type i) const;
 
 private: // Private Method(s)
-    void insert_term(size_type i, value_type j, term_type c);
-    term_type erase_term(size_type i, value_type j);
-    void reorder(size_type actual, size_type expected);
+    void insert_term(size_type i, term_type c, bool is_sampled);
     void add_samples(value_type j);
 
 private: // Private Static Property(ies)
@@ -67,6 +65,8 @@ private: // Private Property(ies)
     bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     permutation pi_;
     ::std::vector<size_type> lcpa_;
+    size_type sentinel_pos_;
+    size_type sentinel_rank_;
 }; // class suffix_array
 
 /************************************************
@@ -74,41 +74,46 @@ private: // Private Property(ies)
  ************************************************/
 
 inline suffix_array::suffix_array(void)
+    : sentinel_pos_(0), sentinel_rank_(0)
 {
-    wt_.insert(0, 0);
-    sa_samples_.insert(0, true);
-    isa_samples_.insert(0, true);
-    pi_.insert(0, 0);
+    // do nothing
 }
 
-template <typename Sequence>
-void suffix_array::insert(value_type j, Sequence const &s)
+template <typename InputIterator>
+void suffix_array::insert(InputIterator begin, InputIterator end)
 {
-    auto it = s.crbegin();
-    if (it == s.crend()) { return; }
+    if (begin == end) { return; }
 
-    auto i = rank(j);
-    auto k = lf(i);
-    auto c = wt_.erase(i);
-    wt_.insert(i, *it);
-
-    auto kp = lf(i);
-    if (c < *it) { ++kp; }
-    while (++it != s.crend())
+    auto it = begin;
+    decltype(lf(0)) kp;
+    if (size() > 0)
     {
-        if (k >= kp) { ++k; }
-
-        insert_term(kp, j, *it);
-        kp = lf(kp);
-
-        if (c < *it) { ++kp; }
+        kp = wt_.lf(sentinel_pos_) + 1;
+    }
+    else
+    {
+        // insert first sampled point at last position
+        assert(*it != 0);
+        insert_term(0, *it, true);
+        pi_.insert(0, 0);
+        kp = 1;
+        ++it;
     }
 
-    if (k >= kp) { ++k; }
-    insert_term(kp, j, c);
+    while (it != end)
+    {
+        assert(*it != 0);
+        insert_term(kp, *it, false);
+        kp = wt_.lf(kp) + 1;
+        ++it;
+    }
 
-    reorder(k, lf(kp));
-    add_samples(j);
+    insert_term(kp, 0, false);
+
+    sentinel_pos_ = kp;
+    sentinel_rank_ = wt_.rank(kp, 0);
+
+    add_samples(0);
 }
 
 inline suffix_array::size_type suffix_array::size(void) const
@@ -133,12 +138,19 @@ inline suffix_array::term_type suffix_array::term(value_type j) const
 
 inline suffix_array::size_type suffix_array::psi(size_type i) const
 {
-    return wt_.psi(i);
+    if (i == 0) { return sentinel_pos_; }
+
+    return i < sentinel_rank_
+        ? wt_.select(i - 1, 0)
+        : wt_.psi(i);
 }
 
 inline suffix_array::size_type suffix_array::lf(size_type i) const
 {
-    return wt_.lf(i);
+    if (i == sentinel_pos_) { return 0; }
+
+    auto pair = wt_.access_and_lf(i);
+    return (pair.first == 0 && i < sentinel_pos_) + pair.second;
 }
 
 inline suffix_array::value_type suffix_array::operator[](size_type i) const
@@ -146,24 +158,11 @@ inline suffix_array::value_type suffix_array::operator[](size_type i) const
     return at(i);
 }
 
-inline void suffix_array::insert_term(size_type i, value_type j, term_type c)
+inline void suffix_array::insert_term(size_type i, term_type c, bool is_sampled)
 {
     wt_.insert(i, c);
-    sa_samples_.insert(i, false);
-    isa_samples_.insert(j, false);
-}
-
-inline suffix_array::term_type suffix_array::erase_term(size_type i, value_type j)
-{
-    sa_samples_.erase(i);
-    auto b = isa_samples_.erase(j);
-    if (b)
-    {
-        auto r = i > 0 ? sa_samples_.rank(i - 1, true) : 0;
-        pi_.erase(r);
-    }
-
-    return wt_.erase(i);
+    sa_samples_.insert(i, is_sampled);
+    isa_samples_.insert(0, is_sampled);
 }
 
 } // namespace impl
