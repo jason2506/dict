@@ -54,6 +54,7 @@ public: // Public Method(s)
 private: // Private Method(s)
     void insert_term(size_type i, term_type c, bool is_sampled);
     void add_samples(value_type j);
+    void gen_lcpa(void);
 
 private: // Private Static Property(ies)
     static constexpr size_type MAX_SAMPLE_DISTANCE = 100;
@@ -114,6 +115,7 @@ void suffix_array::insert(InputIterator begin, InputIterator end)
     sentinel_rank_ = wt_.rank(kp, 0);
 
     add_samples(0);
+    gen_lcpa();
 }
 
 inline suffix_array::size_type suffix_array::size(void) const

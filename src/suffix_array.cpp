@@ -81,6 +81,40 @@ void suffix_array::add_samples(value_type j)
     }
 }
 
+void suffix_array::gen_lcpa(void)
+{
+    auto n = size();
+    lcpa_.resize(n);
+    lcpa_[0] = 0;
+
+    auto sa_pos = rank(0);
+    typename decltype(lcpa_)::value_type lcp = 0;
+    for (decltype(n) isa_pos = 0; isa_pos < n - 1; ++isa_pos)
+    {
+        if (lcp > 0) { --lcp; }
+
+        auto x = sa_pos, y = sa_pos - 1;
+        for (decltype(lcp) i = 0; i < lcp; ++i)
+        {
+            x = psi(x);
+            y = psi(y);
+        }
+
+        auto c1 = wt_.search(x + 1), c2 = wt_.search(y + 1);
+        while (c1 == c2 && c1 != 0)
+        {
+            x = psi(x);
+            y = psi(y);
+            c1 = wt_.search(x + 1);
+            c2 = wt_.search(y + 1);
+            ++lcp;
+        }
+
+        lcpa_[sa_pos] = lcp;
+        sa_pos = psi(sa_pos);
+    }
+}
+
 } // namespace impl
 
 } // namespace desa
