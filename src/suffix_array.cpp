@@ -81,45 +81,66 @@ void suffix_array::add_samples(value_type j)
     }
 }
 
-void suffix_array::gen_lcpa(void)
+void suffix_array::insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp)
 {
-    auto n = size();
-    lcpa_.resize(n);
-    lcpa_[0] = 0;
+    auto psi = [&](size_type x) {
+        return x == 0 ? kp : wt_.psi(x - (x < lf_kp));
+    };
 
-    auto x = lf(0);
-    typename decltype(lcpa_)::value_type lcp = 0;
-    while (--n > 1)
+    auto term_at_f = [&](size_type x) {
+        return x == 0 ? 0 : wt_.search(x + 1 - (x < lf_kp));
+    };
+
+    // calculate LCP[kp]
+    auto lcpa_it = lcpa_.find(kp);
+    auto old_lcp = lcpa_it ? *lcpa_it : 0;
+    if (kp > 0 && psi_kp > 0 && psi(kp - 1) == psi_kp - 1)
     {
-        auto psi_x = x;
-        x = lf(x);
-        if (psi(x - 1) == psi_x - 1)
+        auto c = term_at_f(kp);
+        if (c != 0 && c == term_at_f(kp - 1))   { ++lcp; }
+        else                                    { lcp = 0; }
+    }
+    else
+    {
+        auto x = kp, y = kp - 1;
+        for (lcp = 0; lcp < old_lcp; ++lcp)
         {
-            auto c = wt_.search(x + 1);
-            if (c != 0 && c == wt_.search(x))
-            {
-                lcpa_[x] = ++lcp;
-            }
-            else
-            {
-                lcpa_[x] = lcp = 0;
-            }
+            x = psi(x);
+            y = psi(y);
         }
-        else
-        {
-            auto i = x;
-            auto j = x - 1;
-            auto c = wt_.search(i + 1);
-            for (lcp = 0; c != 0 && c == wt_.search(j + 1); ++lcp)
-            {
-                i = psi(i);
-                j = psi(j);
-                c = wt_.search(i + 1);
-            }
 
-            lcpa_[x] = lcp;
+        auto c = term_at_f(x);
+        while (c != 0 && c == term_at_f(y))
+        {
+            x = psi(x);
+            y = psi(y);
+            c = term_at_f(x);
+            ++lcp;
         }
     }
+
+    if (lcpa_it && old_lcp == lcp)
+    {
+        // re-calculate LCP[kp + 1]
+        auto &lcp = *lcpa_it;
+        auto x = kp + 1, y = kp;
+        for (lcp = 0; lcp < old_lcp; ++lcp)
+        {
+            x = psi(x);
+            y = psi(y);
+        }
+
+        auto c = term_at_f(x);
+        while (c != 0 && c == term_at_f(y))
+        {
+            x = psi(x);
+            y = psi(y);
+            c = term_at_f(x);
+            ++lcp;
+        }
+    }
+
+    lcpa_.insert(lcpa_it, lcp);
 }
 
 } // namespace impl

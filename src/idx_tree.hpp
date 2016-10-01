@@ -354,7 +354,7 @@ inline idx_tree::tree_iterator<B>::operator bool(void) const
  * Implementation: struct idx_tree::data
  ************************************************/
 
-idx_tree::data::data(value_type x)
+inline idx_tree::data::data(value_type x)
     : val(x), size(1)
 {
     // do nothing

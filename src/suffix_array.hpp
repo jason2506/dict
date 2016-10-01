@@ -10,11 +10,11 @@
 #define DESA_SUFFIX_ARRAY_HPP_
 
 #include <cassert>
-#include <vector>
 
 #include "bit_vector.hpp"
 #include "permutation.hpp"
 #include "wavelet_tree.hpp"
+#include "idx_tree.hpp"
 
 namespace desa
 {
@@ -54,7 +54,7 @@ public: // Public Method(s)
 private: // Private Method(s)
     void insert_term(size_type i, term_type c, bool is_sampled);
     void add_samples(value_type j);
-    void gen_lcpa(void);
+    void insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp);
 
 private: // Private Static Property(ies)
     static constexpr size_type MAX_SAMPLE_DISTANCE = 100;
@@ -65,7 +65,7 @@ private: // Private Property(ies)
     bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     permutation pi_;
-    ::std::vector<size_type> lcpa_;
+    idx_tree lcpa_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
 }; // class suffix_array
@@ -85,37 +85,48 @@ void suffix_array::insert(InputIterator begin, InputIterator end)
 {
     if (begin == end) { return; }
 
-    auto it = begin;
-    decltype(lf(0)) kp;
+    auto seq_it = begin;
+    decltype(lf(0)) kp, psi_kp;
     if (size() > 0)
     {
+        psi_kp = sentinel_pos_;
         kp = wt_.lf(sentinel_pos_) + 1;
+        if (kp <= psi_kp) { ++psi_kp; }
     }
     else
     {
         // insert first sampled point at last position
-        assert(*it != 0);
-        insert_term(0, *it, true);
+        assert(*seq_it != 0);
+        insert_term(0, *seq_it, true);
         pi_.insert(0, 0);
+        lcpa_.insert(lcpa_.begin(), 0);
         kp = 1;
-        ++it;
+        psi_kp = 0;
+        ++seq_it;
     }
 
-    while (it != end)
+    typename decltype(lcpa_)::value_type lcp = 0;
+    while (seq_it != end)
     {
-        assert(*it != 0);
-        insert_term(kp, *it, false);
-        kp = wt_.lf(kp) + 1;
-        ++it;
+        assert(*seq_it != 0);
+        insert_term(kp, *seq_it, false);
+
+        auto lf_kp = wt_.lf(kp) + 1;
+        insert_lcp(kp, psi_kp, lf_kp, lcp);
+        psi_kp = kp;
+        kp = lf_kp;
+        if (kp <= psi_kp) { ++psi_kp; }
+
+        ++seq_it;
     }
 
     insert_term(kp, 0, false);
+    insert_lcp(kp, psi_kp, 0, lcp);
 
     sentinel_pos_ = kp;
     sentinel_rank_ = wt_.rank(kp, 0);
 
     add_samples(0);
-    gen_lcpa();
 }
 
 inline suffix_array::size_type suffix_array::size(void) const
