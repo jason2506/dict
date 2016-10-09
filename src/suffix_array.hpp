@@ -11,6 +11,7 @@
 
 #include <cassert>
 
+#include "noop.hpp"
 #include "bit_vector.hpp"
 #include "permutation.hpp"
 #include "wavelet_tree.hpp"
@@ -38,6 +39,8 @@ public: // Public Method(s)
 
     template <typename InputIterator>
     void insert(InputIterator begin, InputIterator end);
+    template <typename InputIterator, typename Update>
+    void insert(InputIterator begin, InputIterator end, Update const &update);
 
     size_type size(void) const;
     value_type at(size_type i) const;
@@ -54,7 +57,7 @@ public: // Public Method(s)
 private: // Private Method(s)
     void insert_term(size_type i, term_type c, bool is_sampled);
     void add_samples(value_type j);
-    void insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp);
+    size_type insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp);
 
 private: // Private Static Property(ies)
     static constexpr size_type MAX_SAMPLE_DISTANCE = 100;
@@ -81,7 +84,13 @@ inline suffix_array::suffix_array(void)
 }
 
 template <typename InputIterator>
-void suffix_array::insert(InputIterator begin, InputIterator end)
+inline void suffix_array::insert(InputIterator begin, InputIterator end)
+{
+    insert(begin, end, noop<decltype(rank(0)), decltype(lcp(0)), decltype(lcp(0))>);
+}
+
+template <typename InputIterator, typename Update>
+void suffix_array::insert(InputIterator begin, InputIterator end, Update const &update)
 {
     if (begin == end) { return; }
 
@@ -99,7 +108,10 @@ void suffix_array::insert(InputIterator begin, InputIterator end)
         assert(*seq_it != 0);
         insert_term(0, *seq_it, true);
         pi_.insert(0, 0);
+
         lcpa_.insert(lcpa_.begin(), 0);
+        update(0, 0, 0);
+
         kp = 1;
         psi_kp = 0;
         ++seq_it;
@@ -112,7 +124,9 @@ void suffix_array::insert(InputIterator begin, InputIterator end)
         insert_term(kp, *seq_it, false);
 
         auto lf_kp = wt_.lf(kp) + 1;
-        insert_lcp(kp, psi_kp, lf_kp, lcp);
+        auto lcp_next = insert_lcp(kp, psi_kp, lf_kp, lcp);
+        update(kp, lcp, lcp_next);
+
         psi_kp = kp;
         kp = lf_kp;
         if (kp <= psi_kp) { ++psi_kp; }
@@ -121,7 +135,9 @@ void suffix_array::insert(InputIterator begin, InputIterator end)
     }
 
     insert_term(kp, 0, false);
-    insert_lcp(kp, psi_kp, 0, lcp);
+
+    auto lcp_next = insert_lcp(kp, psi_kp, 0, lcp);
+    update(kp, lcp, lcp_next);
 
     sentinel_pos_ = kp;
     sentinel_rank_ = wt_.rank(kp, 0);

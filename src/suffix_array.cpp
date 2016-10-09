@@ -81,7 +81,7 @@ void suffix_array::add_samples(value_type j)
     }
 }
 
-void suffix_array::insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp)
+suffix_array::size_type suffix_array::insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, size_type &lcp)
 {
     auto psi = [&](size_type x) {
         return x == 0 ? kp : wt_.psi(x - (x < lf_kp));
@@ -141,6 +141,7 @@ void suffix_array::insert_lcp(size_type kp, size_type psi_kp, size_type lf_kp, s
     }
 
     lcpa_.insert(lcpa_it, lcp);
+    return lcpa_it ? *lcpa_it : 0;
 }
 
 } // namespace impl
