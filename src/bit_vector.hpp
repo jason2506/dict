@@ -89,7 +89,6 @@ struct bit_vector<N>::block
     block(void);
 
     size_type num_bits;
-    size_type num_set_bits;
     size_type num_sub_bits;
     size_type num_sub_set_bits;
     bitset bits;
@@ -112,9 +111,6 @@ inline bit_vector<N> &bit_vector<N>::set(size_type i, value_type b)
     auto it = find_block(i, pos, rank);
     i -= pos;
 
-    if (it->bits[i])    { --it->num_set_bits; }
-    if (b)              { ++it->num_set_bits; }
-
     it->bits[i] = b;
     update_counters(it);
     return *this;
@@ -133,7 +129,7 @@ void bit_vector<N>::insert(size_type i, value_type b)
     {
         block bb;
         bb.num_bits = bb.num_sub_bits = 1;
-        bb.num_set_bits = bb.num_sub_set_bits = (b ? 1 : 0);
+        bb.num_sub_set_bits = (b ? 1 : 0);
         bb.bits[i] = b;
         tree_.insert_before(tree_.end(), bb, update_counters);
         return;
@@ -219,7 +215,6 @@ void bit_vector<N>::insert(size_type i, value_type b)
 
     // update counters
     it->num_bits++;
-    it->num_set_bits += (b ? 1 : 0);
     update_counters(it);
 }
 
@@ -247,7 +242,6 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i)
 
     // update counters
     it->num_bits--;
-    it->num_set_bits -= (b ? 1 : 0);
     update_counters(it);
 
     // delete or merge small blocks
@@ -349,8 +343,8 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
             i -= num_left_set_bits;
 
             auto num_set_bits = b
-                ? it->num_set_bits
-                : it->num_bits - it->num_set_bits;
+                ? it->bits.count()
+                : it->num_bits - it->bits.count();
             if (i < num_set_bits) { break; }
             else
             {
@@ -427,7 +421,7 @@ typename bit_vector<N>::bstree::const_iterator bit_vector<N>::find_block(size_ty
             else
             {
                 pos += it->num_bits;
-                rank += it->num_set_bits;
+                rank += it->bits.count();
 
                 i -= it->num_bits;
                 it.go_right();
@@ -472,9 +466,6 @@ void bit_vector<N>::equalize_blocks(block &p, block &q)
         p.num_bits += offset;
         q.num_bits -= offset;
     }
-
-    p.num_set_bits = p.bits.count();
-    q.num_set_bits = q.bits.count();
 }
 
 template <::std::size_t N>
@@ -484,9 +475,7 @@ void bit_vector<N>::merge_blocks(block &p, block &q)
     q.bits.reset();
 
     p.num_bits += q.num_bits;
-    p.num_set_bits += q.num_set_bits;
     q.num_bits = 0;
-    q.num_set_bits = 0;
 }
 
 template <::std::size_t N>
@@ -495,7 +484,7 @@ void bit_vector<N>::update_counters(typename bstree::iterator it)
     while (it)
     {
         it->num_sub_bits = it->num_bits;
-        it->num_sub_set_bits = it->num_set_bits;
+        it->num_sub_set_bits = it->bits.count();
 
         if (it.has_left())
         {
@@ -521,7 +510,7 @@ void bit_vector<N>::update_counters(typename bstree::iterator it)
 
 template <::std::size_t N>
 bit_vector<N>::block::block(void)
-    : num_bits(0), num_set_bits(0), num_sub_bits(0), num_sub_set_bits(0)
+    : num_bits(0), num_sub_bits(0), num_sub_set_bits(0)
 {
     // do nothing
 }
