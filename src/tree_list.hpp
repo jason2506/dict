@@ -1,13 +1,13 @@
 /************************************************
- *  idx_tree.hpp
+ *  tree_list.hpp
  *  DESA
  *
  *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_IDX_TREE_HPP_
-#define DESA_IDX_TREE_HPP_
+#ifndef DESA_TREE_LIST_HPP_
+#define DESA_TREE_LIST_HPP_
 
 #include "rbtree.hpp"
 
@@ -18,10 +18,10 @@ namespace impl
 {
 
 /************************************************
- * Declaration: class idx_tree
+ * Declaration: class tree_list
  ************************************************/
 
-class idx_tree
+class tree_list
 {
 private: // Private Type(s) - Part 1
     template <bool IsConst> class tree_iterator;
@@ -36,7 +36,7 @@ public: // Public Type(s)
     typedef tree_iterator<true> const_iterator;
 
 public: // Public Method(s)
-    ~idx_tree(void);
+    ~tree_list(void);
 
     iterator insert(iterator it, value_type val);
     iterator erase(iterator it);
@@ -67,14 +67,14 @@ private: // Private Static Method(s)
 
 private: // Private Property(ies)
     tree tree_;
-}; // class idx_tree
+}; // class tree_list
 
 /************************************************
- * Declaration: class idx_tree::tree_iterator<B>
+ * Declaration: class tree_list::tree_iterator<B>
  ************************************************/
 
 template <bool IsConst>
-class idx_tree::tree_iterator
+class tree_list::tree_iterator
 {
 public: // Public Type(s)
     typedef ::std::bidirectional_iterator_tag iterator_category;
@@ -112,96 +112,96 @@ public: // Public Method(s)
 
 private: // Private Property(ies)
     rbtree_iterator it_;
-}; // class idx_tree::tree_iterator<B>
+}; // class tree_list::tree_iterator<B>
 
 /************************************************
- * Declaration: struct idx_tree::data
+ * Declaration: struct tree_list::data
  ************************************************/
 
-struct idx_tree::data
+struct tree_list::data
 {
     explicit data(value_type x);
 
     value_type val;
     size_type size;
-}; // struct idx_tree::data
+}; // struct tree_list::data
 
 /************************************************
- * Implementation: class idx_tree
+ * Implementation: class tree_list
  ************************************************/
 
-inline idx_tree::~idx_tree(void)
+inline tree_list::~tree_list(void)
 {
     // do nothing
 }
 
-inline idx_tree::iterator idx_tree::insert(iterator it, value_type val)
+inline tree_list::iterator tree_list::insert(iterator it, value_type val)
 {
     auto tree_it = tree_.insert_before(it.get_tree_iterator(), tree::value_type(val), update_sizes);
     update_sizes(tree_it);
     return decltype(insert(it, val))(tree_it);
 }
 
-inline idx_tree::iterator idx_tree::erase(iterator it)
+inline tree_list::iterator tree_list::erase(iterator it)
 {
     auto tree_it = tree_.erase(it.get_tree_iterator(), update_sizes);
     update_sizes(tree_it);
     return decltype(erase(it))(tree_it);
 }
 
-inline idx_tree::size_type idx_tree::size(void) const
+inline tree_list::size_type tree_list::size(void) const
 {
     auto root = tree_.root();
     return root ? root->size : 0;
 }
 
-inline idx_tree::iterator idx_tree::begin(void)
+inline tree_list::iterator tree_list::begin(void)
 {
     return decltype(begin())(tree_.begin());
 }
 
-inline idx_tree::const_iterator idx_tree::begin(void) const
+inline tree_list::const_iterator tree_list::begin(void) const
 {
     return cbegin();
 }
 
-inline idx_tree::const_iterator idx_tree::cbegin(void) const
+inline tree_list::const_iterator tree_list::cbegin(void) const
 {
     return decltype(cbegin())(tree_.cbegin());
 }
 
-inline idx_tree::iterator idx_tree::end(void)
+inline tree_list::iterator tree_list::end(void)
 {
     return decltype(end())(tree_.end());
 }
 
-inline idx_tree::const_iterator idx_tree::end(void) const
+inline tree_list::const_iterator tree_list::end(void) const
 {
     return cend();
 }
 
-inline idx_tree::const_iterator idx_tree::cend(void) const
+inline tree_list::const_iterator tree_list::cend(void) const
 {
     return decltype(cend())(tree_.cend());
 }
 
-inline idx_tree::reference idx_tree::at(size_type i)
+inline tree_list::reference tree_list::at(size_type i)
 {
     return *(find(i));
 }
 
-inline idx_tree::const_reference idx_tree::at(size_type i) const
+inline tree_list::const_reference tree_list::at(size_type i) const
 {
     return *(find(i));
 }
 
-inline idx_tree::iterator idx_tree::find(size_type i)
+inline tree_list::iterator tree_list::find(size_type i)
 {
     const auto &that = *this;
     return that.find(i).unconst();
 }
 
-inline idx_tree::const_iterator idx_tree::find(size_type i) const
+inline tree_list::const_iterator tree_list::find(size_type i) const
 {
     auto it = tree_.root();
     while (it) {
@@ -219,17 +219,17 @@ inline idx_tree::const_iterator idx_tree::find(size_type i) const
     return decltype(find(i))(it);
 }
 
-inline idx_tree::reference idx_tree::operator[](size_type i)
+inline tree_list::reference tree_list::operator[](size_type i)
 {
     return at(i);
 }
 
-inline idx_tree::const_reference idx_tree::operator[](size_type i) const
+inline tree_list::const_reference tree_list::operator[](size_type i) const
 {
     return at(i);
 }
 
-inline void idx_tree::update_sizes(typename tree::iterator it)
+inline void tree_list::update_sizes(typename tree::iterator it)
 {
     while (it)
     {
@@ -249,50 +249,50 @@ inline void idx_tree::update_sizes(typename tree::iterator it)
 }
 
 /************************************************
- * Implementation: class idx_tree::tree_iterator<B>
+ * Implementation: class tree_list::tree_iterator<B>
  ************************************************/
 
 template <bool B>
-inline idx_tree::tree_iterator<B>::tree_iterator(void)
+inline tree_list::tree_iterator<B>::tree_iterator(void)
 {
     // do nothing
 }
 
 template <bool B>
-inline idx_tree::tree_iterator<B>::tree_iterator(rbtree_iterator it)
+inline tree_list::tree_iterator<B>::tree_iterator(rbtree_iterator it)
     : it_(it)
 {
     // do nothing
 }
 
 template <bool B>
-inline idx_tree::tree_iterator<B>::~tree_iterator(void)
+inline tree_list::tree_iterator<B>::~tree_iterator(void)
 {
     // do nothing
 }
 
 template <bool B>
-inline typename idx_tree::tree_iterator<B>::rbtree_iterator &
-    idx_tree::tree_iterator<B>::get_tree_iterator(void)
+inline typename tree_list::tree_iterator<B>::rbtree_iterator &
+    tree_list::tree_iterator<B>::get_tree_iterator(void)
 {
     return it_;
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<false> idx_tree::tree_iterator<B>::unconst(void) const
+inline typename tree_list::template tree_iterator<false> tree_list::tree_iterator<B>::unconst(void) const
 {
     return tree_iterator<false>(it_.unconst());
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B> &idx_tree::tree_iterator<B>::operator++(void)
+inline typename tree_list::template tree_iterator<B> &tree_list::tree_iterator<B>::operator++(void)
 {
     ++it_;
     return *this;
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B> idx_tree::tree_iterator<B>::operator++(int)
+inline typename tree_list::template tree_iterator<B> tree_list::tree_iterator<B>::operator++(int)
 {
     tree_iterator it(it_);
     operator++();
@@ -300,14 +300,14 @@ inline typename idx_tree::template tree_iterator<B> idx_tree::tree_iterator<B>::
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B> &idx_tree::tree_iterator<B>::operator--(void)
+inline typename tree_list::template tree_iterator<B> &tree_list::tree_iterator<B>::operator--(void)
 {
     --it_;
     return *this;
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B> idx_tree::tree_iterator<B>::operator--(int)
+inline typename tree_list::template tree_iterator<B> tree_list::tree_iterator<B>::operator--(int)
 {
     tree_iterator it(it_);
     operator--();
@@ -315,46 +315,46 @@ inline typename idx_tree::template tree_iterator<B> idx_tree::tree_iterator<B>::
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B>::reference idx_tree::tree_iterator<B>::operator*(void)
+inline typename tree_list::template tree_iterator<B>::reference tree_list::tree_iterator<B>::operator*(void)
 {
     return *operator->();
 }
 
 template <bool B>
-inline typename idx_tree::template tree_iterator<B>::pointer idx_tree::tree_iterator<B>::operator->(void)
+inline typename tree_list::template tree_iterator<B>::pointer tree_list::tree_iterator<B>::operator->(void)
 {
     return &(it_->val);
 }
 
 template <bool B>
-inline bool idx_tree::tree_iterator<B>::operator==(tree_iterator it) const
+inline bool tree_list::tree_iterator<B>::operator==(tree_iterator it) const
 {
     return it_ == it.it_;
 }
 
 template <bool B>
-inline bool idx_tree::tree_iterator<B>::operator!=(tree_iterator it) const
+inline bool tree_list::tree_iterator<B>::operator!=(tree_iterator it) const
 {
     return !(*this == it);
 }
 
 template <bool B>
-inline bool idx_tree::tree_iterator<B>::operator!(void) const
+inline bool tree_list::tree_iterator<B>::operator!(void) const
 {
     return !this->operator bool();
 }
 
 template <bool B>
-inline idx_tree::tree_iterator<B>::operator bool(void) const
+inline tree_list::tree_iterator<B>::operator bool(void) const
 {
     return static_cast<bool>(it_);
 }
 
 /************************************************
- * Implementation: struct idx_tree::data
+ * Implementation: struct tree_list::data
  ************************************************/
 
-inline idx_tree::data::data(value_type x)
+inline tree_list::data::data(value_type x)
     : val(x), size(1)
 {
     // do nothing
@@ -364,4 +364,4 @@ inline idx_tree::data::data(value_type x)
 
 } // namespace desa
 
-#endif // DESA_IDX_TREE_HPP_
+#endif // DESA_TREE_LIST_HPP_

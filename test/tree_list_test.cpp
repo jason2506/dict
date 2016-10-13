@@ -8,11 +8,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/idx_tree.hpp"
+#include "../src/tree_list.hpp"
 
-using desa::impl::idx_tree;
+using desa::impl::tree_list;
 
-void construct_tree(idx_tree &tree, idx_tree::iterator its[9])
+void construct_tree(tree_list &tree, tree_list::iterator its[9])
 {
     its[5] = tree.insert(tree.end(), 5);    // 5
     its[3] = tree.insert(its[5], 3);        // 3 5
@@ -27,14 +27,14 @@ void construct_tree(idx_tree &tree, idx_tree::iterator its[9])
 
 TEST(LcpArrayTest, EmptyArray)
 {
-    idx_tree tree;
+    tree_list tree;
     EXPECT_EQ(0, tree.size());
     EXPECT_EQ(tree.end(), tree.begin());
 }
 
 TEST(LcpArrayTest, InsertSingleValue)
 {
-    idx_tree tree;
+    tree_list tree;
     auto it = tree.insert(tree.begin(), 255);
 
     EXPECT_EQ(1, tree.size());
@@ -49,8 +49,8 @@ TEST(LcpArrayTest, InsertSingleValue)
 
 TEST(LcpArrayTest, InsertMultipleValues)
 {
-    idx_tree tree;
-    idx_tree::iterator its[9];
+    tree_list tree;
+    tree_list::iterator its[9];
     construct_tree(tree, its);
 
     EXPECT_EQ(9, tree.size());
@@ -68,8 +68,8 @@ TEST(LcpArrayTest, InsertMultipleValues)
 
 TEST(LcpArrayTest, EraseValues)
 {
-    idx_tree tree;
-    idx_tree::iterator its[9];
+    tree_list tree;
+    tree_list::iterator its[9];
     construct_tree(tree, its);
 
     tree.erase(tree.find(3)); // 0 1 2 4 5 6 7 8

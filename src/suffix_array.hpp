@@ -15,7 +15,7 @@
 #include "bit_vector.hpp"
 #include "permutation.hpp"
 #include "wavelet_tree.hpp"
-#include "idx_tree.hpp"
+#include "tree_list.hpp"
 
 namespace desa
 {
@@ -68,7 +68,7 @@ private: // Private Property(ies)
     bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     permutation pi_;
-    idx_tree lcpa_;
+    tree_list lcpa_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
 }; // class suffix_array
