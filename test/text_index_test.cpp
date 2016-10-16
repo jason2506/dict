@@ -1,5 +1,5 @@
 /************************************************
- *  suffix_array_test.cpp
+ *  text_index_test.cpp
  *  DESA
  *
  *  Copyright (c) 2015, Chi-En Wu
@@ -10,9 +10,20 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/suffix_array.hpp"
+#include "../src/text_index.hpp"
+#include "../src/chained_updating_policy.hpp"
+#include "../src/updating_lcp_policy.hpp"
+#include "../src/updating_csa_policy.hpp"
 
-using desa::impl::suffix_array;
+template <typename TextIndex>
+using updating_policy = ::desa::impl::chained_updating_policy
+<
+    TextIndex,
+    ::desa::impl::updating_csa_policy,
+    ::desa::impl::updating_lcp_policy
+>;
+
+using suffix_array = ::desa::impl::text_index<updating_policy>;
 
 void insert(suffix_array &sa, ::std::vector<suffix_array::term_type> seq)
 {
