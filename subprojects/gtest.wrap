@@ -1,0 +1,10 @@
+[wrap-file]
+directory = googletest-release-1.8.0
+
+source_url = https://github.com/google/googletest/archive/release-1.8.0.zip
+source_filename = gtest-1.8.0.zip
+source_hash = f3ed3b58511efd272eb074a3a6d6fb79d7c2e6a0e374323d1e6bcbcc1ef141bf
+
+patch_url = https://github.com/jason2506/gtest.wrap/releases/download/1.8.0/gtest-1.8.0-wrap.zip
+patch_filename = gtest-1.8.0-wrap.zip
+patch_hash = dfefbc178cf33d8ce5390c84d62b19f30aadeaa8510710b206957f26bc72c462
