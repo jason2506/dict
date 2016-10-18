@@ -15,15 +15,14 @@
 #include "../src/updating_lcp_policy.hpp"
 #include "../src/updating_csa_policy.hpp"
 
-template <typename TextIndex>
-using updating_policy = ::desa::impl::chained_updating_policy
+using suffix_array = ::desa::impl::text_index
 <
-    TextIndex,
-    ::desa::impl::updating_csa_policy,
-    ::desa::impl::updating_lcp_policy
+    ::desa::impl::chained_updating_policy
+    <
+        ::desa::impl::updating_csa_policy,
+        ::desa::impl::updating_lcp_policy
+    >::policy
 >;
-
-using suffix_array = ::desa::impl::text_index<updating_policy>;
 
 void insert(suffix_array &sa, ::std::vector<suffix_array::term_type> seq)
 {
