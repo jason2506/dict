@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/rbtree.hpp"
+#include <desa/rbtree.hpp>
 
 // TODO: there should be a better way for testing insertion/erasure operation
 

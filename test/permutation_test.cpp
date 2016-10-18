@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/permutation.hpp"
+#include <desa/permutation.hpp>
 
 using desa::impl::permutation;
 

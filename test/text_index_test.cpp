@@ -10,10 +10,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/text_index.hpp"
-#include "../src/chained_updating_policy.hpp"
-#include "../src/updating_lcp_policy.hpp"
-#include "../src/updating_csa_policy.hpp"
+#include <desa/text_index.hpp>
+#include <desa/chained_updating_policy.hpp>
+#include <desa/updating_lcp_policy.hpp>
+#include <desa/updating_csa_policy.hpp>
 
 using suffix_array = ::desa::impl::text_index
 <

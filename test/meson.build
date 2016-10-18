@@ -11,7 +11,7 @@ tests = [
 foreach test_name: tests
   exe = executable(test_name, test_name + '.cpp',
     link_with: lib,
-    dependencies: gtest_dep,
+    dependencies: [gtest_dep, dep],
   )
   test(test_name, exe,
     args: ['--gtest_color=yes'],

@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/tree_list.hpp"
+#include <desa/tree_list.hpp>
 
 using desa::impl::tree_list;
 

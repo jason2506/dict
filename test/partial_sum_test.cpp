@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/partial_sum.hpp"
+#include <desa/partial_sum.hpp>
 
 using desa::impl::partial_sum;
 

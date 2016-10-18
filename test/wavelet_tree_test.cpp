@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/wavelet_tree.hpp"
+#include <desa/wavelet_tree.hpp>
 
 using desa::impl::wavelet_tree;
 

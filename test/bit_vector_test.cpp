@@ -10,7 +10,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../src/bit_vector.hpp"
+#include <desa/bit_vector.hpp>
 
 using desa::impl::bit_vector;
 
