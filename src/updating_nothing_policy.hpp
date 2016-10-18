@@ -9,7 +9,6 @@
 #ifndef DESA_UPDATING_NOTHING_POLICY_HPP_
 #define DESA_UPDATING_NOTHING_POLICY_HPP_
 
-#include "tree_list.hpp"
 #include "wavelet_tree.hpp"
 
 namespace desa
