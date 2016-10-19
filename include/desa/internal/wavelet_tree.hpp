@@ -26,7 +26,7 @@ namespace internal
  * Declaration: class wavelet_tree<T, N>
  ************************************************/
 
-template <typename T, size_t N = sizeof(T) * CHAR_BIT>
+template <typename T, ::std::size_t N = sizeof(T) * CHAR_BIT>
 class wavelet_tree
 {
 public: // Public Type(s)
@@ -59,7 +59,7 @@ private: // Private Static Property(ies)
 
 private: // Private Type(s)
     typedef bit_vector<BITMAP_BLOCK_SIZE> bitmap;
-    typedef std::pair<size_type, bitmap> tree_level;
+    typedef ::std::pair<size_type, bitmap> tree_level;
 
 private: // Private Method(s)
     void increase_num_zeros(size_type l);
