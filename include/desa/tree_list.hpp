@@ -78,7 +78,12 @@ class tree_list::tree_iterator
 {
 public: // Public Type(s)
     typedef ::std::bidirectional_iterator_tag iterator_category;
-    typedef typename ::std::conditional<IsConst, value_type const, value_type>::type value_type;
+    typedef typename ::std::conditional
+        <
+            IsConst,
+            tree_list::value_type const,
+            tree_list::value_type
+        >::type value_type;
     typedef value_type *pointer;
     typedef value_type &reference;
     typedef ptrdiff_t difference_type;
