@@ -7,6 +7,7 @@ project('desa', 'cpp',
   ]
 )
 
+threads_dep = dependency('threads')
 gtest_sp = subproject('gtest')
 gtest_dep = gtest_sp.get_variable('gtest_main_dep')
 
