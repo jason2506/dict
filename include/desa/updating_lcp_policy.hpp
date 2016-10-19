@@ -9,13 +9,10 @@
 #ifndef DESA_UPDATING_LCP_POLICY_HPP_
 #define DESA_UPDATING_LCP_POLICY_HPP_
 
-#include "tree_list.hpp"
-#include "wavelet_tree.hpp"
+#include "internal/tree_list.hpp"
+#include "internal/wavelet_tree.hpp"
 
 namespace desa
-{
-
-namespace impl
 {
 
 /************************************************
@@ -30,7 +27,7 @@ public: // Public Type(s)
     typedef ::std::uint16_t term_type;
 
 public: // Public Method(s)
-    updating_lcp_policy(wavelet_tree<term_type> const &wt);
+    updating_lcp_policy(internal::wavelet_tree<term_type> const &wt);
 
     size_type lcp(size_type i) const;
 
@@ -40,8 +37,8 @@ protected: // Protected Method(s)
     void update_after_inserting_sequence(void);
 
 private: // Private Property(ies)
-    wavelet_tree<term_type> const &wt_;
-    tree_list lcpa_;
+    internal::wavelet_tree<term_type> const &wt_;
+    internal::tree_list lcpa_;
 }; // class updating_lcp_policy<TI>
 
 /************************************************
@@ -49,7 +46,7 @@ private: // Private Property(ies)
  ************************************************/
 
 template <typename TI>
-inline updating_lcp_policy<TI>::updating_lcp_policy(wavelet_tree<term_type> const &wt)
+inline updating_lcp_policy<TI>::updating_lcp_policy(internal::wavelet_tree<term_type> const &wt)
     : wt_(wt)
 {
     // do nothing
@@ -138,8 +135,6 @@ inline void updating_lcp_policy<TI>::update_after_inserting_sequence(void)
 {
     // do nothing
 }
-
-} // namespace impl
 
 } // namespace desa
 

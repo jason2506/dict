@@ -15,12 +15,12 @@
 #include <desa/updating_lcp_policy.hpp>
 #include <desa/updating_csa_policy.hpp>
 
-using suffix_array = ::desa::impl::text_index
+using suffix_array = ::desa::text_index
 <
-    ::desa::impl::chained_updating_policy
+    ::desa::chained_updating_policy
     <
-        ::desa::impl::updating_csa_policy,
-        ::desa::impl::updating_lcp_policy
+        ::desa::updating_csa_policy,
+        ::desa::updating_lcp_policy
     >::policy
 >;
 

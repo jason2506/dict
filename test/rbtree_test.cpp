@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/rbtree.hpp>
+#include <desa/internal/rbtree.hpp>
 
 // TODO: there should be a better way for testing insertion/erasure operation
 
@@ -38,7 +38,7 @@
         check_rbtree_property(tree); \
     }
 
-using desa::impl::rbtree;
+using ::desa::internal::rbtree;
 
 typedef decltype(::std::declval<typename rbtree<int>::iterator>().get_node_ptr()) rbtree_node_ptr;
 typedef decltype(rbtree_node_ptr()->get_color()) rbtree_node_color;

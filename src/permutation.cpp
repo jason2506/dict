@@ -6,12 +6,12 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include "../include/desa/permutation.hpp"
+#include "../include/desa/internal/permutation.hpp"
 
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -119,6 +119,6 @@ void permutation::update_ranks(typename bstree::iterator it)
     }
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa

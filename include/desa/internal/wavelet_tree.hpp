@@ -19,7 +19,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -248,7 +248,7 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select_at(size_type j
     return j;
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

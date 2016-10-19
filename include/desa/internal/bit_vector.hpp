@@ -19,7 +19,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -515,7 +515,7 @@ bit_vector<N>::block::block(void)
     // do nothing
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

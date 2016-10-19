@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/bit_vector.hpp>
+#include <desa/internal/bit_vector.hpp>
 
-using desa::impl::bit_vector;
+using ::desa::internal::bit_vector;
 
 typedef bit_vector<2> bitmap;
 

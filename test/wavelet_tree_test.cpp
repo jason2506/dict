@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/wavelet_tree.hpp>
+#include <desa/internal/wavelet_tree.hpp>
 
-using desa::impl::wavelet_tree;
+using ::desa::internal::wavelet_tree;
 
 typedef wavelet_tree<char> wt_t;
 

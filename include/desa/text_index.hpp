@@ -11,14 +11,11 @@
 
 #include <cassert>
 
+#include "internal/wavelet_tree.hpp"
+
 #include "updating_nothing_policy.hpp"
-#include "bit_vector.hpp"
-#include "wavelet_tree.hpp"
 
 namespace desa
-{
-
-namespace impl
 {
 
 /************************************************
@@ -52,7 +49,7 @@ private: // Private Type(s)
     typedef UpdatingPolicy<text_index> updating_policy;
 
 private: // Private Property(ies)
-    wavelet_tree<term_type> wt_;
+    internal::wavelet_tree<term_type> wt_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
 }; // class text_index<UP>
@@ -150,8 +147,6 @@ inline typename text_index<UP>::size_type text_index<UP>::lf(size_type i) const
     auto pair = wt_.access_and_lf(i);
     return (pair.first == 0 && i < sentinel_pos_) + pair.second;
 }
-
-} // namespace impl
 
 } // namespace desa
 

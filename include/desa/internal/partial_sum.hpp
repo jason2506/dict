@@ -18,7 +18,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -218,7 +218,7 @@ inline void partial_sum<K, T>::update_sums(typename bstree::iterator it)
     }
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

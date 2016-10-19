@@ -14,7 +14,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -112,7 +112,7 @@ inline permutation::link_and_rank::link_and_rank(void)
     // do nothing
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

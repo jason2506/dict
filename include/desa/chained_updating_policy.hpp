@@ -9,12 +9,9 @@
 #ifndef DESA_CHAINED_UPDATING_POLICY_HPP_
 #define DESA_CHAINED_UPDATING_POLICY_HPP_
 
-#include "wavelet_tree.hpp"
+#include "internal/wavelet_tree.hpp"
 
 namespace desa
-{
-
-namespace impl
 {
 
 /************************************************
@@ -51,7 +48,7 @@ public: // Public Type(s)
     typedef ::std::uint16_t term_type;
 
 public: // Public Method(s)
-    policy(wavelet_tree<term_type> const &wt);
+    policy(internal::wavelet_tree<term_type> const &wt);
 
 protected: // Protected Method(s)
     void update_after_inserting_first_term(void);
@@ -69,7 +66,7 @@ private: // Private Type(s)
 
 template <template <typename> class FUP, template <typename> class SUP>
 template <typename TI>
-inline chained_updating_policy<FUP, SUP>::policy<TI>::policy(wavelet_tree<term_type> const &wt)
+inline chained_updating_policy<FUP, SUP>::policy<TI>::policy(internal::wavelet_tree<term_type> const &wt)
     : first_policy_type(wt), second_policy_type(wt)
 {
     // do nothing
@@ -98,8 +95,6 @@ inline void chained_updating_policy<FUP, SUP>::policy<TI>::update_after_insertin
     first_policy_type::update_after_inserting_sequence();
     second_policy_type::update_after_inserting_sequence();
 }
-
-} // namespace impl
 
 } // namespace desa
 

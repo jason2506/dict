@@ -17,7 +17,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -1020,7 +1020,7 @@ inline typename rbtree<T>::template tree_iterator<B>::node_ptr rbtree<T>::tree_i
     return ptr_;
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

@@ -14,7 +14,7 @@
 namespace desa
 {
 
-namespace impl
+namespace internal
 {
 
 /************************************************
@@ -365,7 +365,7 @@ inline tree_list::data::data(value_type x)
     // do nothing
 }
 
-} // namespace impl
+} // namespace internal
 
 } // namespace desa
 

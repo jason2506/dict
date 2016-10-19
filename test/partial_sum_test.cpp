@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/partial_sum.hpp>
+#include <desa/internal/partial_sum.hpp>
 
-using desa::impl::partial_sum;
+using ::desa::internal::partial_sum;
 
 typedef partial_sum<char, ::std::size_t> ps_t;
 

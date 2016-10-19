@@ -9,12 +9,9 @@
 #ifndef DESA_UPDATING_NOTHING_POLICY_HPP_
 #define DESA_UPDATING_NOTHING_POLICY_HPP_
 
-#include "wavelet_tree.hpp"
+#include "internal/wavelet_tree.hpp"
 
 namespace desa
-{
-
-namespace impl
 {
 
 /************************************************
@@ -29,7 +26,7 @@ public: // Public Type(s)
     typedef ::std::uint16_t term_type;
 
 public: // Public Method(s)
-    updating_nothing_policy(wavelet_tree<term_type> const &wt);
+    updating_nothing_policy(internal::wavelet_tree<term_type> const &wt);
 
 protected: // Protected Method(s)
     void update_after_inserting_first_term(void);
@@ -42,7 +39,7 @@ protected: // Protected Method(s)
  ************************************************/
 
 template <typename TI>
-inline updating_nothing_policy<TI>::updating_nothing_policy(wavelet_tree<term_type> const &wt)
+inline updating_nothing_policy<TI>::updating_nothing_policy(internal::wavelet_tree<term_type> const &wt)
 {
     // do nothing
 }
@@ -64,8 +61,6 @@ inline void updating_nothing_policy<TI>::update_after_inserting_sequence(void)
 {
     // do nothing
 }
-
-} // namespace impl
 
 } // namespace desa
 

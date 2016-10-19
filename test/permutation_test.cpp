@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/permutation.hpp>
+#include <desa/internal/permutation.hpp>
 
-using desa::impl::permutation;
+using ::desa::internal::permutation;
 
 void construct_permutation(permutation &pi)
 {

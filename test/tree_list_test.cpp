@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/tree_list.hpp>
+#include <desa/internal/tree_list.hpp>
 
-using desa::impl::tree_list;
+using ::desa::internal::tree_list;
 
 void construct_tree(tree_list &tree, tree_list::iterator its[9])
 {
