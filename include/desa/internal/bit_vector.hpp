@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_BIT_VECTOR_HPP_
-#define DESA_BIT_VECTOR_HPP_
+#ifndef DESA_INTERNAL_BIT_VECTOR_HPP_
+#define DESA_INTERNAL_BIT_VECTOR_HPP_
 
 #include <bitset>
 #include <iterator>
@@ -519,4 +519,4 @@ bit_vector<N>::block::block(void)
 
 } // namespace desa
 
-#endif // DESA_BIT_VECTOR_HPP_
+#endif // DESA_INTERNAL_BIT_VECTOR_HPP_

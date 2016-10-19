@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_PARTIAL_SUM_HPP_
-#define DESA_PARTIAL_SUM_HPP_
+#ifndef DESA_INTERNAL_PARTIAL_SUM_HPP_
+#define DESA_INTERNAL_PARTIAL_SUM_HPP_
 
 #include <functional>
 #include <stdexcept>
@@ -222,4 +222,4 @@ inline void partial_sum<K, T>::update_sums(typename bstree::iterator it)
 
 } // namespace desa
 
-#endif // DESA_PARTIAL_SUM_HPP_
+#endif // DESA_INTERNAL_PARTIAL_SUM_HPP_

@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_WAVELET_TREE_HPP_
-#define DESA_WAVELET_TREE_HPP_
+#ifndef DESA_INTERNAL_WAVELET_TREE_HPP_
+#define DESA_INTERNAL_WAVELET_TREE_HPP_
 
 #include <climits>
 #include <array>
@@ -252,4 +252,4 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::select_at(size_type j
 
 } // namespace desa
 
-#endif // DESA_WAVELET_TREE_HPP_
+#endif // DESA_INTERNAL_WAVELET_TREE_HPP_

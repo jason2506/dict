@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_PERMUTATION_HPP_
-#define DESA_PERMUTATION_HPP_
+#ifndef DESA_INTERNAL_PERMUTATION_HPP_
+#define DESA_INTERNAL_PERMUTATION_HPP_
 
 #include "rbtree.hpp"
 
@@ -116,4 +116,4 @@ inline permutation::link_and_rank::link_and_rank(void)
 
 } // namespace desa
 
-#endif // DESA_PERMUTATION_HPP_
+#endif // DESA_INTERNAL_PERMUTATION_HPP_

@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_RBTREE_HPP_
-#define DESA_RBTREE_HPP_
+#ifndef DESA_INTERNAL_RBTREE_HPP_
+#define DESA_INTERNAL_RBTREE_HPP_
 
 #include <cstddef>
 #include <memory>
@@ -1024,4 +1024,4 @@ inline typename rbtree<T>::template tree_iterator<B>::node_ptr rbtree<T>::tree_i
 
 } // namespace desa
 
-#endif // DESA_RBTREE_HPP_
+#endif // DESA_INTERNAL_RBTREE_HPP_

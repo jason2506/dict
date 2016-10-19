@@ -6,8 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_TREE_LIST_HPP_
-#define DESA_TREE_LIST_HPP_
+#ifndef DESA_INTERNAL_TREE_LIST_HPP_
+#define DESA_INTERNAL_TREE_LIST_HPP_
 
 #include "rbtree.hpp"
 
@@ -369,4 +369,4 @@ inline tree_list::data::data(value_type x)
 
 } // namespace desa
 
-#endif // DESA_TREE_LIST_HPP_
+#endif // DESA_INTERNAL_TREE_LIST_HPP_
