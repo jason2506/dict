@@ -28,7 +28,7 @@ struct lcp_trait
     {
         struct after_inserting_lcp
         {
-            size_type kp;
+            size_type pos;
             size_type lcp;
             size_type lcp_next;
         };

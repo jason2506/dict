@@ -34,9 +34,9 @@ struct text_index_trait
 
         struct after_inserting_term
         {
-            size_type kp;
-            size_type psi_kp;
-            size_type lf_kp;
+            size_type pos;
+            size_type psi_pos;
+            size_type lf_pos;
         };
 
         struct after_inserting_sequence

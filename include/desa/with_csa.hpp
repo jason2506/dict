@@ -138,7 +138,7 @@ inline void with_csa<TI, T>::update(typename event::after_inserting_first_term)
 template <typename TI, typename T>
 inline void with_csa<TI, T>::update(typename event::after_inserting_term info)
 {
-    insert_term(info.kp, false);
+    insert_term(info.pos, false);
 }
 
 template <typename TI, typename T>

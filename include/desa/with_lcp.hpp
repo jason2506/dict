@@ -95,28 +95,28 @@ template <typename TI, typename T>
 void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_term info)
 {
     static typename decltype(lcpa_)::size_type lcp = 0;
-    auto kp = info.kp, psi_kp = info.psi_kp, lf_kp = info.lf_kp;
+    auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
 
     auto psi = [&](size_type x) {
-        return x == 0 ? kp : wt_.psi(x - (x < lf_kp));
+        return x == 0 ? pos : wt_.psi(x - (x < lf_pos));
     };
 
     auto term_at_f = [&](size_type x) {
-        return x == 0 ? 0 : wt_.search(x + 1 - (x < lf_kp));
+        return x == 0 ? 0 : wt_.search(x + 1 - (x < lf_pos));
     };
 
-    // calculate LCP[kp]
-    auto lcpa_it = lcpa_.find(kp);
+    // calculate LCP[pos]
+    auto lcpa_it = lcpa_.find(pos);
     auto old_lcp = lcpa_it ? *lcpa_it : 0;
-    if (kp > 0 && psi_kp > 0 && psi(kp - 1) == psi_kp - 1)
+    if (pos > 0 && psi_pos > 0 && psi(pos - 1) == psi_pos - 1)
     {
-        auto c = term_at_f(kp);
-        if (c != 0 && c == term_at_f(kp - 1))   { ++lcp; }
+        auto c = term_at_f(pos);
+        if (c != 0 && c == term_at_f(pos - 1))   { ++lcp; }
         else                                    { lcp = 0; }
     }
     else
     {
-        auto x = kp, y = kp - 1;
+        auto x = pos, y = pos - 1;
         for (lcp = 0; lcp < old_lcp; ++lcp)
         {
             x = psi(x);
@@ -135,9 +135,9 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
 
     if (lcpa_it && old_lcp == lcp)
     {
-        // re-calculate LCP[kp + 1]
+        // re-calculate LCP[pos + 1]
         auto &lcp = *lcpa_it;
-        auto x = kp + 1, y = kp;
+        auto x = pos + 1, y = pos;
         for (lcp = 0; lcp < old_lcp; ++lcp)
         {
             x = psi(x);
@@ -157,7 +157,7 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
     lcpa_.insert(lcpa_it, lcp);
     updating_policies::update(
         typename lcp_trait::event::after_inserting_lcp{
-            kp, lcp, lcpa_it ? *lcpa_it : 0
+            pos, lcp, lcpa_it ? *lcpa_it : 0
         }
     );
 }
