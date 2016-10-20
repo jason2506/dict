@@ -21,25 +21,26 @@ namespace internal
  * Declaration: struct text_index_trait
  ************************************************/
 
-struct text_index_trait {
+struct text_index_trait
+{
     using size_type = ::std::size_t;
     using term_type = ::std::uint16_t;
     using wt_type = wavelet_tree<term_type>;
 
-    struct event {
-        struct after_inserting_first_term {
-            // empty
-        };
+    struct event
+    {
+        struct after_inserting_first_term
+        { /* empty */ };
 
-        struct after_inserting_term {
+        struct after_inserting_term
+        {
             size_type kp;
             size_type psi_kp;
             size_type lf_kp;
         };
 
-        struct after_inserting_sequence {
-            // empty
-        };
+        struct after_inserting_sequence
+        { /* empty */ };
     };
 }; // class text_index_trait
 
