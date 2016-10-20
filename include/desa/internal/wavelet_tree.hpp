@@ -30,8 +30,8 @@ template <typename T, ::std::size_t N = sizeof(T) * CHAR_BIT>
 class wavelet_tree
 {
 public: // Public Type(s)
-    typedef T value_type;
-    typedef ::std::size_t size_type;
+    using value_type = T;
+    using size_type = ::std::size_t;
 
 public: // Public Method(s)
     void insert(size_type i, value_type c);
@@ -58,8 +58,8 @@ private: // Private Static Property(ies)
     static constexpr size_type BITMAP_BLOCK_SIZE = 64;
 
 private: // Private Type(s)
-    typedef bit_vector<BITMAP_BLOCK_SIZE> bitmap;
-    typedef ::std::pair<size_type, bitmap> tree_level;
+    using bitmap = bit_vector<BITMAP_BLOCK_SIZE>;
+    using tree_level = ::std::pair<size_type, bitmap>;
 
 private: // Private Method(s)
     void increase_num_zeros(size_type l);

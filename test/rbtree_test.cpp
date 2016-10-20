@@ -39,9 +39,8 @@
     }
 
 using ::desa::internal::rbtree;
-
-typedef decltype(::std::declval<typename rbtree<int>::iterator>().get_node_ptr()) rbtree_node_ptr;
-typedef decltype(rbtree_node_ptr()->get_color()) rbtree_node_color;
+using rbtree_node_ptr = decltype(::std::declval<typename rbtree<int>::iterator>().get_node_ptr());
+using rbtree_node_color = decltype(rbtree_node_ptr()->get_color());
 
 auto noop = [](rbtree<int>::iterator){};
 

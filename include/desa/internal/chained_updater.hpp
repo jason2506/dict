@@ -72,8 +72,8 @@ protected: // Protected Method(s)
     void update(Event info);
 
 private: // Private Type(s)
-    typedef FirstUpdater<Args...> first_updater;
-    typedef typename chained_updater<RestUpdaters...>::template updater<Args...> rest_updaters;
+    using first_updater = FirstUpdater<Args...>;
+    using rest_updaters = typename chained_updater<RestUpdaters...>::template updater<Args...>;
 }; // class chained_updater<U, Us...>::updater<Args...>
 
 /************************************************

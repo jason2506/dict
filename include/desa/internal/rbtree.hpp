@@ -31,10 +31,10 @@ private: // Private Type(s) - Part 1
     template <bool IsConst> class tree_iterator;
 
 public: // Public Type(s)
-    typedef T value_type;
+    using value_type = T;
 
-    typedef tree_iterator<false> iterator;
-    typedef tree_iterator<true> const_iterator;
+    using iterator = tree_iterator<false>;
+    using const_iterator = tree_iterator<true>;
 
 public: // Public Method(s)
     rbtree(void);
@@ -57,10 +57,10 @@ public: // Public Method(s)
 private: // Private Type(s) - Part 2
     enum color {RED, BLACK};
     class node;
-    typedef node *weak_node_ptr;
-    typedef node const *weak_const_node_ptr;
-    typedef ::std::unique_ptr<node> node_ptr;
-    typedef ::std::unique_ptr<node const> const_node_ptr;
+    using weak_node_ptr = node *;
+    using weak_const_node_ptr = node const *;
+    using node_ptr = ::std::unique_ptr<node>;
+    using const_node_ptr = ::std::unique_ptr<node const>;
 
 private: // Private Method(s)
     template <typename Update>
@@ -133,23 +133,23 @@ template <bool IsConst>
 class rbtree<T>::tree_iterator
 {
 public: // Public Type(s)
-    typedef ::std::bidirectional_iterator_tag iterator_category;
-    typedef typename ::std::conditional
+    using iterator_category = ::std::bidirectional_iterator_tag;
+    using value_type = typename ::std::conditional
         <
             IsConst,
             rbtree<T>::value_type const,
             rbtree<T>::value_type
-        >::type value_type;
-    typedef value_type *pointer;
-    typedef value_type &reference;
-    typedef ptrdiff_t difference_type;
+        >::type;
+    using pointer = value_type *;
+    using reference = value_type &;
+    using difference_type = ptrdiff_t;
 
-    typedef typename ::std::conditional
+    using node_ptr = typename ::std::conditional
         <
             IsConst,
             weak_const_node_ptr,
             weak_node_ptr
-        >::type node_ptr;
+        >::type;
 
 public: // Public Method(s)
     tree_iterator(void);
@@ -933,7 +933,7 @@ template <typename T>
 template <bool B>
 inline typename rbtree<T>::template tree_iterator<false> rbtree<T>::tree_iterator<B>::unconst(void) const
 {
-    typedef typename tree_iterator<false>::node_ptr node_ptr;
+    using node_ptr = typename tree_iterator<false>::node_ptr;
     return tree_iterator<false>(tree_, const_cast<node_ptr>(ptr_));
 }
 

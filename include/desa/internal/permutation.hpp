@@ -24,8 +24,8 @@ namespace internal
 class permutation
 {
 public: // Public Type(s)
-    typedef ::std::size_t value_type;
-    typedef ::std::size_t size_type;
+    using size_type = ::std::size_t;
+    using value_type = ::std::size_t;
 
 public: // Public Method(s)
     permutation(void);
@@ -43,7 +43,7 @@ public: // Public Method(s)
 
 private: // Private Type(s)
     struct link_and_rank;
-    typedef rbtree<link_and_rank> bstree;
+    using bstree = rbtree<link_and_rank>;
 
 private: // Private Static Method(s)
     static typename bstree::const_iterator find_node(typename bstree::const_iterator it, size_type i);

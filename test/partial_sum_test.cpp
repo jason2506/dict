@@ -12,18 +12,16 @@
 
 #include <desa/internal/partial_sum.hpp>
 
-using ::desa::internal::partial_sum;
+using partial_sum = ::desa::internal::partial_sum<char, ::std::size_t>;
 
-typedef partial_sum<char, ::std::size_t> ps_t;
-
-void construct_partial_sum_with_more_counts(ps_t &ps)
+void construct_partial_sum_with_more_counts(partial_sum &ps)
 {
     ps.increase('B', 7);
     ps.increase('A', 9);
     ps.increase('D', 3);
 }
 
-void construct_partial_sum_with_large_amount_of_counts(ps_t &ps)
+void construct_partial_sum_with_large_amount_of_counts(partial_sum &ps)
 {
     ps.increase('A', 1);    ps.increase('I', 9);    ps.increase('S', 19);
     ps.increase('P', 16);   ps.increase('E', 5);    ps.increase('F', 6);
@@ -38,13 +36,13 @@ void construct_partial_sum_with_large_amount_of_counts(ps_t &ps)
 
 TEST(PartialSumTest, PartialSumWithoutKey)
 {
-    ps_t ps;
+    partial_sum ps;
     EXPECT_EQ(0, ps.sum());
 }
 
 TEST(PartialSumTest, IncreaseSingleCount)
 {
-    ps_t ps;
+    partial_sum ps;
     ps.increase('B', 5);
 
     EXPECT_EQ(5, ps.sum('B'));
@@ -53,7 +51,7 @@ TEST(PartialSumTest, IncreaseSingleCount)
 
 TEST(PartialSumTest, IncreaseSingleCountTwice)
 {
-    ps_t ps;
+    partial_sum ps;
     ps.increase('B', 5);
     ps.increase('B', 8);
 
@@ -63,7 +61,7 @@ TEST(PartialSumTest, IncreaseSingleCountTwice)
 
 TEST(PartialSumTest, DecreaseSingleCount)
 {
-    ps_t ps;
+    partial_sum ps;
     ps.increase('B', 5);
     ps.decrease('B', 2);
 
@@ -73,7 +71,7 @@ TEST(PartialSumTest, DecreaseSingleCount)
 
 TEST(PartialSumTest, SumWithNonExistedKey)
 {
-    ps_t ps;
+    partial_sum ps;
     EXPECT_EQ(0, ps.sum('B'));
 
     ps.increase('B', 5);
@@ -84,7 +82,7 @@ TEST(PartialSumTest, SumWithNonExistedKey)
 
 TEST(PartialSumTest, IncreaseMoreCounts)
 {
-    ps_t ps;
+    partial_sum ps;
     construct_partial_sum_with_more_counts(ps);
 
     EXPECT_EQ(9, ps.sum('A'));
@@ -97,7 +95,7 @@ TEST(PartialSumTest, IncreaseMoreCounts)
 
 TEST(PartialSumTest, DecreaseMoreCounts)
 {
-    ps_t ps;
+    partial_sum ps;
     construct_partial_sum_with_more_counts(ps);
 
     ps.decrease('A', 1);
@@ -113,7 +111,7 @@ TEST(PartialSumTest, DecreaseMoreCounts)
 
 TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
 {
-    ps_t ps;
+    partial_sum ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
     EXPECT_EQ(1, ps.sum('A'));      EXPECT_EQ(3, ps.sum('B'));
@@ -134,7 +132,7 @@ TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
 
 TEST(PartialSumTest, SearchOnLargeAmountOfCounts)
 {
-    ps_t ps;
+    partial_sum ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
     EXPECT_EQ('A', ps.search(0));

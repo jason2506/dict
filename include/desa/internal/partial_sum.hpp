@@ -29,8 +29,8 @@ template <typename Key, typename T>
 class partial_sum
 {
 public: // Public Type(s)
-    typedef Key key_type;
-    typedef T value_type;
+    using key_type = Key;
+    using value_type = T;
 
 public: // Public Method(s)
     ~partial_sum(void);
@@ -45,7 +45,7 @@ public: // Public Method(s)
 
 private: // Private Type(s)
     struct key_and_sum;
-    typedef rbtree<key_and_sum> bstree;
+    using bstree = rbtree<key_and_sum>;
 
 private: // Private Static Method(s)
     template <typename Op>

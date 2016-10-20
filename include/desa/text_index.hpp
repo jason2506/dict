@@ -30,8 +30,8 @@ class text_index : public internal::chained_updater<UpdatingPolicies...>::templa
     >
 {
 public: // Public Type(s)
-    typedef internal::text_index_trait::size_type size_type;
-    typedef internal::text_index_trait::term_type term_type;
+    using size_type = internal::text_index_trait::size_type;
+    using term_type = internal::text_index_trait::term_type;
 
 public: // Public Method(s)
     text_index(void);
@@ -45,12 +45,12 @@ public: // Public Method(s)
     size_type lf(size_type i) const;
 
 private: // Private Type(s)
-    typedef internal::text_index_trait::event event;
+    using event = internal::text_index_trait::event;
     using updating_policies = typename internal::chained_updater<UpdatingPolicies...>::template updater
-    <
-        text_index,
-        internal::text_index_trait
-    >;
+        <
+            text_index,
+            internal::text_index_trait
+        >;
 
 private: // Private Property(ies)
     internal::wavelet_tree<term_type> wt_;

@@ -30,8 +30,8 @@ template <::std::size_t N>
 class bit_vector
 {
 public: // Public Type(s)
-    typedef ::std::size_t size_type;
-    typedef bool value_type;
+    using size_type = ::std::size_t;
+    using value_type = bool;
 
 private: // Private Static Property(ies)
     static constexpr size_type MAX_BLOCK_SIZE = 2 * N;
@@ -42,7 +42,7 @@ private: // Private Static Property(ies)
             : 0.9 * MAX_BLOCK_SIZE;
 
 private: // Private Type(s) - Part 1
-    typedef ::std::bitset<MAX_BLOCK_SIZE> bitset;
+    using bitset = ::std::bitset<MAX_BLOCK_SIZE>;
 
 public: // Public Method(s)
     ~bit_vector(void);
@@ -63,7 +63,7 @@ public: // Public Method(s)
 
 private: // Private Type(s) - Part 2
     struct block;
-    typedef rbtree<block> bstree;
+    using bstree = rbtree<block>;
 
 private: // Private Static Method(s)
     static void equalize_blocks(block &p, block &q);

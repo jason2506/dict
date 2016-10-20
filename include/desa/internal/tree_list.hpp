@@ -27,13 +27,13 @@ private: // Private Type(s) - Part 1
     template <bool IsConst> class tree_iterator;
 
 public: // Public Type(s)
-    typedef ::std::size_t value_type;
-    typedef ::std::size_t size_type;
-    typedef value_type &reference;
-    typedef value_type const &const_reference;
+    using value_type = ::std::size_t;
+    using size_type = ::std::size_t;
+    using reference = value_type &;
+    using const_reference = value_type const &;
 
-    typedef tree_iterator<false> iterator;
-    typedef tree_iterator<true> const_iterator;
+    using iterator = tree_iterator<false>;
+    using const_iterator = tree_iterator<true>;
 
 public: // Public Method(s)
     ~tree_list(void);
@@ -60,7 +60,7 @@ public: // Public Method(s)
 
 private: // Private Type(s) - Part 2
     struct data;
-    typedef rbtree<data> tree;
+    using tree = rbtree<data>;
 
 private: // Private Static Method(s)
     static void update_sizes(typename tree::iterator it);
@@ -77,23 +77,23 @@ template <bool IsConst>
 class tree_list::tree_iterator
 {
 public: // Public Type(s)
-    typedef ::std::bidirectional_iterator_tag iterator_category;
-    typedef typename ::std::conditional
+    using iterator_category = ::std::bidirectional_iterator_tag;
+    using value_type = typename ::std::conditional
         <
             IsConst,
             tree_list::value_type const,
             tree_list::value_type
-        >::type value_type;
-    typedef value_type *pointer;
-    typedef value_type &reference;
-    typedef ptrdiff_t difference_type;
+        >::type;
+    using pointer = value_type *;
+    using reference = value_type &;
+    using difference_type = ptrdiff_t;
 
-    typedef typename ::std::conditional
+    using rbtree_iterator = typename ::std::conditional
         <
             IsConst,
             tree::const_iterator,
             tree::iterator
-        >::type rbtree_iterator;
+        >::type;
 
 public: // Public Method(s)
     tree_iterator(void);

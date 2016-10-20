@@ -10,9 +10,7 @@
 
 #include <desa/internal/wavelet_tree.hpp>
 
-using ::desa::internal::wavelet_tree;
-
-typedef wavelet_tree<char> wt_t;
+using wt_t = ::desa::internal::wavelet_tree<char>;
 
 void construct_wavelet_tree(wt_t &wt)
 {
@@ -139,7 +137,7 @@ TEST(WaveletTreeTest, RankAndAccessChars)
     wt_t wt;
     construct_wavelet_tree(wt);
 
-    typedef decltype(wt.access_and_rank(0)) cr_pair;
+    using cr_pair = decltype(wt.access_and_rank(0));
     EXPECT_EQ(cr_pair('m', 1), wt.access_and_rank(0));
     EXPECT_EQ(cr_pair('i', 1), wt.access_and_rank(1));
     EXPECT_EQ(cr_pair('s', 1), wt.access_and_rank(2));

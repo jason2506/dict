@@ -12,9 +12,7 @@
 
 #include <desa/internal/bit_vector.hpp>
 
-using ::desa::internal::bit_vector;
-
-typedef bit_vector<2> bitmap;
+using bitmap = ::desa::internal::bit_vector<2>;
 
 void construct_bitmap(bitmap &bits)
 {
@@ -189,7 +187,7 @@ TEST(BitVectorTest, RankAndAccessBits)
     bitmap bits;
     construct_bitmap(bits);
 
-    typedef decltype(bits.access_and_rank(0)) br_pair;
+    using br_pair = decltype(bits.access_and_rank(0));
     EXPECT_EQ(br_pair(true, 1), bits.access_and_rank(0));
     EXPECT_EQ(br_pair(false, 1), bits.access_and_rank(1));
     EXPECT_EQ(br_pair(false, 2), bits.access_and_rank(2));

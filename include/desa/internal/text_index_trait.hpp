@@ -22,9 +22,9 @@ namespace internal
  ************************************************/
 
 struct text_index_trait {
-    typedef ::std::size_t size_type;
-    typedef ::std::uint16_t term_type;
-    typedef wavelet_tree<term_type> wt_type;
+    using size_type = ::std::size_t;
+    using term_type = ::std::uint16_t;
+    using wt_type = wavelet_tree<term_type>;
 
     struct event {
         struct after_inserting_first_term {

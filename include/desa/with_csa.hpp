@@ -23,13 +23,13 @@ template <typename TextIndex, typename Trait>
 class with_csa
 {
 public: // Public Type(s)
-    typedef typename Trait::size_type size_type;
-    typedef typename Trait::size_type value_type;
-    typedef typename Trait::term_type term_type;
+    using size_type = typename Trait::size_type;
+    using value_type = typename Trait::size_type;
+    using term_type = typename Trait::term_type;
 
 private: // Private Types(s)
-    typedef typename Trait::wt_type wt_type;
-    typedef typename Trait::event event;
+    using wt_type = typename Trait::wt_type;
+    using event = typename Trait::event;
 
 public: // Public Method(s)
     with_csa(wt_type const &wt);
