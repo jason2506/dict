@@ -1,35 +1,38 @@
 /************************************************
- *  updating_csa_policy.hpp
+ *  with_csa.hpp
  *  DESA
  *
  *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_UPDATING_CSA_POLICY_HPP_
-#define DESA_UPDATING_CSA_POLICY_HPP_
+#ifndef DESA_WITH_CSA_HPP_
+#define DESA_WITH_CSA_HPP_
 
 #include "internal/bit_vector.hpp"
 #include "internal/permutation.hpp"
-#include "internal/wavelet_tree.hpp"
 
 namespace desa
 {
 
 /************************************************
- * Declaration: class updating_csa_policy<TI>
+ * Declaration: class with_csa<TI, T>
  ************************************************/
 
-template <typename TextIndex>
-class updating_csa_policy
+template <typename TextIndex, typename Trait>
+class with_csa
 {
 public: // Public Type(s)
-    typedef ::std::size_t size_type;
-    typedef ::std::size_t value_type;
-    typedef ::std::uint16_t term_type;
+    typedef typename Trait::size_type size_type;
+    typedef typename Trait::size_type value_type;
+    typedef typename Trait::term_type term_type;
+
+private: // Private Types(s)
+    typedef typename Trait::wt_type wt_type;
+    typedef typename Trait::event event;
 
 public: // Public Method(s)
-    updating_csa_policy(internal::wavelet_tree<term_type> const &wt);
+    with_csa(wt_type const &wt);
 
     value_type at(size_type i) const;
     size_type rank(value_type j) const;
@@ -38,9 +41,9 @@ public: // Public Method(s)
     value_type operator[](size_type i) const;
 
 protected: // Protected Method(s)
-    void update_after_inserting_first_term(void);
-    void update_after_inserting_term(size_type kp, size_type psi_kp, size_type lf_kp);
-    void update_after_inserting_sequence(void);
+    void update(typename event::after_inserting_first_term);
+    void update(typename event::after_inserting_term info);
+    void update(typename event::after_inserting_sequence);
 
 private: // Private Method(s)
     void insert_term(size_type i, bool is_sampled);
@@ -51,25 +54,25 @@ private: // Private Static Property(ies)
     static constexpr size_type BIT_BLOCK_SIZE = 64;
 
 private: // Private Property(ies)
-    internal::wavelet_tree<term_type> const &wt_;
+    wt_type const &wt_;
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
-}; // class updating_csa_policy<TI>
+}; // class with_csa<TI, T>
 
 /************************************************
- * Implementation: class updating_csa_policy<TI>
+ * Implementation: class with_csa<TI, T>
  ************************************************/
 
-template <typename TI>
-inline updating_csa_policy<TI>::updating_csa_policy(internal::wavelet_tree<term_type> const &wt)
+template <typename TI, typename T>
+inline with_csa<TI, T>::with_csa(wt_type const &wt)
     : wt_(wt)
 {
     // do nothing
 }
 
-template <typename TI>
-typename updating_csa_policy<TI>::value_type updating_csa_policy<TI>::at(size_type i) const
+template <typename TI, typename T>
+typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
 {
     size_type off = 0;
     while (!sa_samples_[i])
@@ -86,8 +89,8 @@ typename updating_csa_policy<TI>::value_type updating_csa_policy<TI>::at(size_ty
     return sa < n ? sa : sa - n;
 }
 
-template <typename TI>
-typename updating_csa_policy<TI>::size_type updating_csa_policy<TI>::rank(value_type j) const
+template <typename TI, typename T>
+typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const
 {
     auto br_pair = isa_samples_.access_and_rank(j, true);
     auto b = br_pair.first;
@@ -113,46 +116,46 @@ typename updating_csa_policy<TI>::size_type updating_csa_policy<TI>::rank(value_
     }
 }
 
-template <typename TI>
-inline typename updating_csa_policy<TI>::term_type updating_csa_policy<TI>::term(value_type j) const
+template <typename TI, typename T>
+inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const
 {
     return wt_.search(rank(j) + 1);
 }
 
-template <typename TI>
-inline typename updating_csa_policy<TI>::value_type updating_csa_policy<TI>::operator[](size_type i) const
+template <typename TI, typename T>
+inline typename with_csa<TI, T>::value_type with_csa<TI, T>::operator[](size_type i) const
 {
     return at(i);
 }
 
-template <typename TI>
-inline void updating_csa_policy<TI>::update_after_inserting_first_term(void)
+template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::after_inserting_first_term)
 {
     insert_term(0, true);
     pi_.insert(0, 0);
 }
 
-template <typename TI>
-inline void updating_csa_policy<TI>::update_after_inserting_term(size_type kp, size_type psi_kp, size_type lf_kp)
+template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::after_inserting_term info)
 {
-    insert_term(kp, false);
+    insert_term(info.kp, false);
 }
 
-template <typename TI>
-inline void updating_csa_policy<TI>::update_after_inserting_sequence(void)
+template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::after_inserting_sequence)
 {
     add_samples(0);
 }
 
-template <typename TI>
-inline void updating_csa_policy<TI>::insert_term(size_type i, bool is_sampled)
+template <typename TI, typename T>
+inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled)
 {
     sa_samples_.insert(i, is_sampled);
     isa_samples_.insert(0, is_sampled);
 }
 
-template <typename TI>
-void updating_csa_policy<TI>::add_samples(value_type j)
+template <typename TI, typename T>
+void with_csa<TI, T>::add_samples(value_type j)
 {
     auto n = static_cast<TI const *>(this)->size();
     if (j + 1 == n) { return; }
@@ -176,4 +179,4 @@ void updating_csa_policy<TI>::add_samples(value_type j)
 
 } // namespace desa
 
-#endif // DESA_UPDATING_CSA_POLICY_HPP_
+#endif // DESA_WITH_CSA_HPP_

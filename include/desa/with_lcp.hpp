@@ -1,73 +1,77 @@
 /************************************************
- *  updating_lcp_policy.hpp
+ *  with_lcp.hpp
  *  DESA
  *
  *  Copyright (c) 2015, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_UPDATING_LCP_POLICY_HPP_
-#define DESA_UPDATING_LCP_POLICY_HPP_
+#ifndef DESA_WITH_LCP_HPP_
+#define DESA_WITH_LCP_HPP_
 
 #include "internal/tree_list.hpp"
-#include "internal/wavelet_tree.hpp"
 
 namespace desa
 {
 
 /************************************************
- * Declaration: class updating_lcp_policy<TI>
+ * Declaration: class with_lcp<TI, T>
  ************************************************/
 
-template <typename TextIndex>
-class updating_lcp_policy
+template <typename TextIndex, typename Trait>
+class with_lcp
 {
 public: // Public Type(s)
-    typedef ::std::size_t size_type;
-    typedef ::std::uint16_t term_type;
+    typedef typename Trait::size_type size_type;
+    typedef typename Trait::term_type term_type;
+
+private: // Private Types(s)
+    typedef typename Trait::wt_type wt_type;
+    typedef typename Trait::event event;
 
 public: // Public Method(s)
-    updating_lcp_policy(internal::wavelet_tree<term_type> const &wt);
+    with_lcp(wt_type const &wt);
 
     size_type lcp(size_type i) const;
 
 protected: // Protected Method(s)
-    void update_after_inserting_first_term(void);
-    void update_after_inserting_term(size_type kp, size_type psi_kp, size_type lf_kp);
-    void update_after_inserting_sequence(void);
+    void update(typename event::after_inserting_first_term);
+    void update(typename event::after_inserting_term info);
+    void update(typename event::after_inserting_sequence);
 
 private: // Private Property(ies)
-    internal::wavelet_tree<term_type> const &wt_;
+    wt_type const &wt_;
     internal::tree_list lcpa_;
-}; // class updating_lcp_policy<TI>
+}; // class with_lcp<TI, T>
 
 /************************************************
- * Implementation: class updating_lcp_policy<TI>
+ * Implementation: class with_lcp<TI, T>
  ************************************************/
 
-template <typename TI>
-inline updating_lcp_policy<TI>::updating_lcp_policy(internal::wavelet_tree<term_type> const &wt)
+template <typename TI, typename T>
+inline with_lcp<TI, T>::with_lcp(wt_type const &wt)
     : wt_(wt)
 {
     // do nothing
 }
 
-template <typename TI>
-inline typename updating_lcp_policy<TI>::size_type updating_lcp_policy<TI>::lcp(size_type i) const
+template <typename TI, typename T>
+inline typename with_lcp<TI, T>::size_type with_lcp<TI, T>::lcp(size_type i) const
 {
     return lcpa_[i];
 }
 
-template <typename TI>
-inline void updating_lcp_policy<TI>::update_after_inserting_first_term(void)
+template <typename TI, typename T>
+inline void with_lcp<TI, T>::update(typename event::after_inserting_first_term)
 {
     lcpa_.insert(lcpa_.begin(), 0);
 }
 
-template <typename TI>
-void updating_lcp_policy<TI>::update_after_inserting_term(size_type kp, size_type psi_kp, size_type lf_kp)
+template <typename TI, typename T>
+void with_lcp<TI, T>::update(typename event::after_inserting_term info)
 {
     static typename decltype(lcpa_)::size_type lcp = 0;
+    auto kp = info.kp, psi_kp = info.psi_kp, lf_kp = info.lf_kp;
 
     auto psi = [&](size_type x) {
         return x == 0 ? kp : wt_.psi(x - (x < lf_kp));
@@ -130,12 +134,12 @@ void updating_lcp_policy<TI>::update_after_inserting_term(size_type kp, size_typ
     // return lcpa_it ? *lcpa_it : 0;
 }
 
-template <typename TI>
-inline void updating_lcp_policy<TI>::update_after_inserting_sequence(void)
+template <typename TI, typename T>
+inline void with_lcp<TI, T>::update(typename event::after_inserting_sequence)
 {
     // do nothing
 }
 
 } // namespace desa
 
-#endif // DESA_UPDATING_LCP_POLICY_HPP_
+#endif // DESA_WITH_LCP_HPP_
