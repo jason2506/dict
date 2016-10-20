@@ -2,7 +2,7 @@
  *  bit_vector.hpp
  *  DESA
  *
- *  Copyright (c) 2015, Chi-En Wu
+ *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
