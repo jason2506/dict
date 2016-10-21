@@ -65,7 +65,7 @@ class chained_updater<FirstUpdater, RestUpdaters...>::updater
 {
 public: // Public Method(s)
     template <typename... ConstructorArgs>
-    updater(ConstructorArgs &&... args);
+    updater(ConstructorArgs const &... args);
 
 protected: // Protected Method(s)
     template <typename Event>
@@ -85,7 +85,7 @@ class chained_updater<>::updater
 {
 public: // Public Method(s)
     template <typename... ConstructorArgs>
-    updater(ConstructorArgs &&... args);
+    updater(ConstructorArgs const &... args);
 
 protected: // Protected Method(s)
     template <typename Event>
@@ -99,9 +99,9 @@ protected: // Protected Method(s)
 template <template <typename...> class U, template <typename...> class... Us>
 template <typename... Args>
 template <typename... ConstructorArgs>
-inline chained_updater<U, Us...>::updater<Args...>::updater(ConstructorArgs &&... args)
-    : first_updater(::std::forward<ConstructorArgs>(args)...)
-    , rest_updaters(::std::forward<ConstructorArgs>(args)...)
+inline chained_updater<U, Us...>::updater<Args...>::updater(ConstructorArgs const &... args)
+    : first_updater(args...)
+    , rest_updaters(args...)
 {
     // do nothing
 }
@@ -121,7 +121,7 @@ inline void chained_updater<U, Us...>::updater<Args...>::update(Event info)
 
 template <typename... Args>
 template <typename... ConstructorArgs>
-inline chained_updater<>::updater<Args...>::updater(ConstructorArgs &&... args)
+inline chained_updater<>::updater<Args...>::updater(ConstructorArgs const &... args)
 {
     // do nothing
 }
