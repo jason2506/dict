@@ -88,6 +88,7 @@ template <typename TI, typename T>
 inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_first_term)
 {
     lcpa_.insert(lcpa_.begin(), 0);
+    updating_policies::update(typename lcp_trait::event::after_inserting_lcp{0, 0, 0});
 }
 
 template <template <typename, typename> class... UPs>
