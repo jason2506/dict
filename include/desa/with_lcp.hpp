@@ -61,6 +61,7 @@ protected: // Protected Method(s)
 private: // Private Property(ies)
     wt_type const &wt_;
     internal::tree_list lcpa_;
+    size_type lcp_;
 }; // class with_lcp<UPs...>::policy<TI, T>
 
 /************************************************
@@ -70,7 +71,7 @@ private: // Private Property(ies)
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 inline with_lcp<UPs...>::policy<TI, T>::policy(wt_type const &wt)
-    : wt_(wt)
+    : wt_(wt), lcp_(0)
 {
     // do nothing
 }
@@ -87,6 +88,7 @@ template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_first_term)
 {
+    // lcp_ = 0;
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::after_inserting_lcp{0, 0, 0});
 }
@@ -95,7 +97,6 @@ template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_term info)
 {
-    static typename decltype(lcpa_)::size_type lcp = 0;
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
 
     auto psi = [&](size_type x) {
@@ -112,13 +113,13 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
     if (pos > 0 && psi_pos > 0 && psi(pos - 1) == psi_pos - 1)
     {
         auto c = term_at_f(pos);
-        if (c != 0 && c == term_at_f(pos - 1))   { ++lcp; }
-        else                                    { lcp = 0; }
+        if (c != 0 && c == term_at_f(pos - 1))   { ++lcp_; }
+        else                                    { lcp_ = 0; }
     }
     else
     {
         auto x = pos, y = pos - 1;
-        for (lcp = 0; lcp < old_lcp; ++lcp)
+        for (lcp_ = 0; lcp_ < old_lcp; ++lcp_)
         {
             x = psi(x);
             y = psi(y);
@@ -130,11 +131,11 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
             x = psi(x);
             y = psi(y);
             c = term_at_f(x);
-            ++lcp;
+            ++lcp_;
         }
     }
 
-    if (lcpa_it && old_lcp == lcp)
+    if (lcpa_it && old_lcp == lcp_)
     {
         // re-calculate LCP[pos + 1]
         auto &lcp = *lcpa_it;
@@ -155,10 +156,10 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
         }
     }
 
-    lcpa_.insert(lcpa_it, lcp);
+    lcpa_.insert(lcpa_it, lcp_);
     updating_policies::update(
         typename lcp_trait::event::after_inserting_lcp{
-            pos, lcp, lcpa_it ? *lcpa_it : 0
+            pos, lcp_, lcpa_it ? *lcpa_it : 0
         }
     );
 }
