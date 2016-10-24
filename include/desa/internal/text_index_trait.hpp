@@ -29,18 +29,28 @@ struct text_index_trait
 
     struct event
     {
+        template <typename Sequence>
         struct after_inserting_first_term
-        { /* empty */ };
+        {
+            Sequence const &s;
+        };
 
+        template <typename Sequence>
         struct after_inserting_term
         {
+            Sequence const &s;
+            size_type num_inserted;
+
             size_type pos;
             size_type psi_pos;
             size_type lf_pos;
         };
 
+        template <typename Sequence>
         struct after_inserting_sequence
-        { /* empty */ };
+        {
+            Sequence const &s;
+        };
     };
 }; // class text_index_trait
 

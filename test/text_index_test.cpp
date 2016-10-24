@@ -6,7 +6,7 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include <vector>
+#include <initializer_list>
 
 #include <gtest/gtest.h>
 
@@ -20,9 +20,9 @@ using text_index = ::desa::text_index
         ::desa::with_lcp<>::policy
     >;
 
-void insert(text_index &ti, ::std::vector<text_index::term_type> seq)
+void insert(text_index &ti, ::std::initializer_list<text_index::term_type> seq)
 {
-    ti.insert(seq.crbegin(), seq.crend());
+    ti.insert(seq);
 }
 
 TEST(SuffixArrayTest, EmptyArray)

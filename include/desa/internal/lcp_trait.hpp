@@ -26,8 +26,12 @@ struct lcp_trait
 
     struct event
     {
+        template <typename Sequence>
         struct after_inserting_lcp
         {
+            Sequence const &s;
+            size_type num_inserted;
+
             size_type pos;
             size_type lcp;
             size_type lcp_next;

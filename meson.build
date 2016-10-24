@@ -2,7 +2,7 @@ project('desa', 'cpp',
   version: '0.1.0',
   license: 'BSD 3-Clause',
   default_options: [
-    'cpp_std=c++11',
+    'cpp_std=c++14',
     'default_library=static',
   ]
 )

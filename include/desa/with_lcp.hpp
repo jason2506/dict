@@ -54,9 +54,12 @@ public: // Public Method(s)
     size_type lcp(size_type i) const;
 
 protected: // Protected Method(s)
-    void update(typename event::after_inserting_first_term);
-    void update(typename event::after_inserting_term info);
-    void update(typename event::after_inserting_sequence);
+    template <typename Sequence>
+    void update(typename event::template after_inserting_first_term<Sequence> info);
+    template <typename Sequence>
+    void update(typename event::template after_inserting_term<Sequence> info);
+    template <typename Sequence>
+    void update(typename event::template after_inserting_sequence<Sequence>);
 
 private: // Private Property(ies)
     wt_type const &wt_;
@@ -86,16 +89,21 @@ with_lcp<UPs...>::policy<TI, T>::lcp(size_type i) const
 
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
-inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_first_term)
+template <typename Sequence>
+inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::template after_inserting_first_term<Sequence> info)
 {
     // lcp_ = 0;
     lcpa_.insert(lcpa_.begin(), 0);
-    updating_policies::update(typename lcp_trait::event::after_inserting_lcp{0, 0, 0});
+    updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
+        info.s, 1,
+        0, 0, 0
+    });
 }
 
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
-void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_term info)
+template <typename Sequence>
+void with_lcp<UPs...>::policy<TI, T>::update(typename event::template after_inserting_term<Sequence> info)
 {
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
 
@@ -158,7 +166,8 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
 
     lcpa_.insert(lcpa_it, lcp_);
     updating_policies::update(
-        typename lcp_trait::event::after_inserting_lcp{
+        typename lcp_trait::event::template after_inserting_lcp<Sequence>{
+            info.s, info.num_inserted,
             pos, lcp_, lcpa_it ? *lcpa_it : 0
         }
     );
@@ -166,7 +175,8 @@ void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_ter
 
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
-inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::after_inserting_sequence)
+template <typename Sequence>
+inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::template after_inserting_sequence<Sequence>)
 {
     // do nothing
 }

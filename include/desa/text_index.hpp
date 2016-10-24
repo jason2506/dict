@@ -10,6 +10,7 @@
 #define DESA_TEXT_INDEX_HPP_
 
 #include <cassert>
+#include <iterator>
 
 #include "internal/chained_updater.hpp"
 #include "internal/text_index_trait.hpp"
@@ -36,8 +37,8 @@ public: // Public Type(s)
 public: // Public Method(s)
     text_index(void);
 
-    template <typename InputIterator>
-    void insert(InputIterator begin, InputIterator end);
+    template <typename Sequence>
+    void insert(Sequence const &s);
 
     size_type size(void) const;
     term_type bwt(size_type i) const;
@@ -70,12 +71,14 @@ inline text_index<UPs...>::text_index(void)
 }
 
 template <template <typename, typename> class... UPs>
-template <typename InputIterator>
-void text_index<UPs...>::insert(InputIterator begin, InputIterator end)
+template <typename Sequence>
+void text_index<UPs...>::insert(Sequence const &s)
 {
-    if (begin == end) { return; }
+    auto seq_it = ::std::rbegin(s);
+    auto seq_end = ::std::rend(s);
+    if (seq_it == seq_end) { return; }
 
-    auto seq_it = begin;
+    size_type num_inserted = 0;
     decltype(lf(0)) kp, psi_kp;
     if (size() > 0)
     {
@@ -89,20 +92,24 @@ void text_index<UPs...>::insert(InputIterator begin, InputIterator end)
         assert(*seq_it != 0);
         wt_.insert(0, *seq_it);
 
-        updating_policies::update(event::after_inserting_first_term());
+        updating_policies::update(event::after_inserting_first_term<Sequence>{s});
 
         kp = 1;
         psi_kp = 0;
         ++seq_it;
+        ++num_inserted;
     }
 
-    while (seq_it != end)
+    while (seq_it != seq_end)
     {
         assert(*seq_it != 0);
         wt_.insert(kp, *seq_it);
 
         auto lf_kp = wt_.lf(kp) + 1;
-        updating_policies::update(event::after_inserting_term{kp, psi_kp, lf_kp});
+        updating_policies::update(event::after_inserting_term<Sequence>{
+            s, ++num_inserted,
+            kp, psi_kp, lf_kp
+        });
 
         psi_kp = kp;
         kp = lf_kp;
@@ -113,12 +120,15 @@ void text_index<UPs...>::insert(InputIterator begin, InputIterator end)
 
     wt_.insert(kp, 0);
 
-    updating_policies::update(event::after_inserting_term{kp, psi_kp, 0});
+    updating_policies::update(event::after_inserting_term<Sequence>{
+        s, ++num_inserted,
+        kp, psi_kp, 0
+    });
 
     sentinel_pos_ = kp;
     sentinel_rank_ = wt_.rank(kp, 0);
 
-    updating_policies::update(event::after_inserting_sequence());
+    updating_policies::update(event::after_inserting_sequence<Sequence>{s});
 }
 
 template <template <typename, typename> class... UPs>
