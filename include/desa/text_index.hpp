@@ -107,7 +107,7 @@ void text_index<UPs...>::insert(Sequence const &s)
 
         auto lf_kp = wt_.lf(kp) + 1;
         updating_policies::update(event::after_inserting_term<Sequence>{
-            s, ++num_inserted,
+            s, num_inserted++,
             kp, psi_kp, lf_kp
         });
 
@@ -121,7 +121,7 @@ void text_index<UPs...>::insert(Sequence const &s)
     wt_.insert(kp, 0);
 
     updating_policies::update(event::after_inserting_term<Sequence>{
-        s, ++num_inserted,
+        s, num_inserted++,
         kp, psi_kp, 0
     });
 
