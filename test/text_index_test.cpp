@@ -28,7 +28,8 @@ void insert(text_index &ti, ::std::initializer_list<text_index::term_type> seq)
 TEST(SuffixArrayTest, EmptyArray)
 {
     text_index ti;
-    EXPECT_EQ(0, ti.size());
+    EXPECT_EQ(0, ti.num_seqs());
+    EXPECT_EQ(0, ti.num_terms());
 }
 
 TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray)
@@ -36,7 +37,8 @@ TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray)
     text_index ti;
     insert(ti, {5});
 
-    EXPECT_EQ(2, ti.size());
+    EXPECT_EQ(1, ti.num_seqs());
+    EXPECT_EQ(2, ti.num_terms());
 
     EXPECT_EQ(1, ti.lf(0));
     EXPECT_EQ(0, ti.lf(1));
@@ -65,7 +67,8 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyArray)
     text_index ti;
     insert(ti, {1, 3, 1, 3, 2, 1});
 
-    EXPECT_EQ(7, ti.size());
+    EXPECT_EQ(1, ti.num_seqs());
+    EXPECT_EQ(7, ti.num_terms());
 
     EXPECT_EQ(1, ti.lf(0));
     EXPECT_EQ(4, ti.lf(1));
@@ -130,7 +133,8 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyArray)
     insert(ti, {1, 3, 1, 3, 2, 1});
     insert(ti, {1, 3, 2});
 
-    EXPECT_EQ(11, ti.size());
+    EXPECT_EQ(2, ti.num_seqs());
+    EXPECT_EQ(11, ti.num_terms());
 
     EXPECT_EQ(2, ti.lf(0));
     EXPECT_EQ(6, ti.lf(1));
@@ -224,7 +228,8 @@ TEST(SuffixArrayTest, InsertMultipleSequences)
     insert(ti, {1});
     insert(ti, {2});
 
-    EXPECT_EQ(6, ti.size());
+    EXPECT_EQ(3, ti.num_seqs());
+    EXPECT_EQ(6, ti.num_terms());
 
     EXPECT_EQ(5, ti.lf(0));
     EXPECT_EQ(4, ti.lf(1));

@@ -40,7 +40,10 @@ public: // Public Method(s)
     template <typename Sequence>
     void insert(Sequence const &s);
 
-    size_type size(void) const;
+    bool empty(void) const;
+    size_type num_seqs(void) const;
+    size_type num_terms(void) const;
+
     term_type bwt(size_type i) const;
     size_type psi(size_type i) const;
     size_type lf(size_type i) const;
@@ -57,6 +60,7 @@ private: // Private Property(ies)
     internal::wavelet_tree<term_type> wt_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
+    size_type num_seqs_;
 }; // class text_index<UPs...>
 
 /************************************************
@@ -65,7 +69,7 @@ private: // Private Property(ies)
 
 template <template <typename, typename> class... UPs>
 inline text_index<UPs...>::text_index(void)
-    : updating_policies(wt_), sentinel_pos_(0), sentinel_rank_(0)
+    : updating_policies(wt_), sentinel_pos_(0), sentinel_rank_(0), num_seqs_(0)
 {
     // do nothing
 }
@@ -80,13 +84,7 @@ void text_index<UPs...>::insert(Sequence const &s)
 
     size_type num_inserted = 0;
     decltype(lf(0)) kp, psi_kp;
-    if (size() > 0)
-    {
-        psi_kp = sentinel_pos_;
-        kp = wt_.lf(sentinel_pos_) + 1;
-        if (kp <= psi_kp) { ++psi_kp; }
-    }
-    else
+    if (empty())
     {
         // insert first sampled point at last position
         assert(*seq_it != 0);
@@ -98,6 +96,12 @@ void text_index<UPs...>::insert(Sequence const &s)
         psi_kp = 0;
         ++seq_it;
         ++num_inserted;
+    }
+    else
+    {
+        psi_kp = sentinel_pos_;
+        kp = wt_.lf(sentinel_pos_) + 1;
+        if (kp <= psi_kp) { ++psi_kp; }
     }
 
     while (seq_it != seq_end)
@@ -127,12 +131,25 @@ void text_index<UPs...>::insert(Sequence const &s)
 
     sentinel_pos_ = kp;
     sentinel_rank_ = wt_.rank(kp, 0);
+    ++num_seqs_;
 
     updating_policies::update(event::after_inserting_sequence<Sequence>{s});
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::size_type text_index<UPs...>::size(void) const
+inline bool text_index<UPs...>::empty(void) const
+{
+    return num_seqs_ == 0;
+}
+
+template <template <typename, typename> class... UPs>
+inline typename text_index<UPs...>::size_type text_index<UPs...>::num_seqs(void) const
+{
+    return num_seqs_;
+}
+
+template <template <typename, typename> class... UPs>
+inline typename text_index<UPs...>::size_type text_index<UPs...>::num_terms(void) const
 {
     return wt_.size();
 }

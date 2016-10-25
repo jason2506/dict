@@ -88,7 +88,7 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
     auto j = pi_.at(r - 1);
 
     auto sa = isa_samples_.select(j, true) + off;
-    auto n = static_cast<TI const *>(this)->size();
+    auto n = static_cast<TI const *>(this)->num_terms();
     return sa < n ? sa : sa - n;
 }
 
@@ -163,7 +163,7 @@ inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled)
 template <typename TI, typename T>
 void with_csa<TI, T>::add_samples(value_type j)
 {
-    auto n = static_cast<TI const *>(this)->size();
+    auto n = static_cast<TI const *>(this)->num_terms();
     if (j + 1 == n) { return; }
 
     auto r = isa_samples_.rank(j, true);
