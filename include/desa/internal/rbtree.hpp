@@ -55,7 +55,7 @@ public: // Public Method(s)
     iterator erase(iterator pos, Update const &update);
 
 private: // Private Type(s) - Part 2
-    enum color {RED, BLACK};
+    enum class color: bool {RED, BLACK};
     class node;
     using weak_node_ptr = node *;
     using weak_const_node_ptr = node const *;
@@ -281,13 +281,13 @@ typename rbtree<T>::iterator rbtree<T>::insert_before(iterator pos, value_type c
         }
 
         new_node->set_parent(ptr);
-        new_node->set_color(RED);
+        new_node->set_color(color::RED);
     }
     else if (last_)
     {
         // insert after the last node
         new_node->set_parent(last_);
-        new_node->set_color(RED);
+        new_node->set_color(color::RED);
         last_->set_right(new_node);
         last_ = new_node;
     }
@@ -296,7 +296,7 @@ typename rbtree<T>::iterator rbtree<T>::insert_before(iterator pos, value_type c
         // current node is at the root of the tree
         first_ = last_ = new_node;
         root_.reset(new_node);
-        root_->set_color(BLACK);
+        root_->set_color(color::BLACK);
         return iterator(this, root_);
     }
 
@@ -420,7 +420,7 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
         update(parent_it);
     }
 
-    if (ptr_color == BLACK)
+    if (ptr_color == color::BLACK)
     {
         rebalance_after_erasure(child, parent, update);
     }
@@ -443,9 +443,9 @@ void rbtree<T>::rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr paren
         if (is_red_node(uncle))
         {
             // Case 1
-            parent->set_color(BLACK);
-            uncle->set_color(BLACK);
-            grandparent->set_color(RED);
+            parent->set_color(color::BLACK);
+            uncle->set_color(color::BLACK);
+            grandparent->set_color(color::RED);
             ptr = grandparent;
             parent = ptr->get_parent();
         }
@@ -468,8 +468,8 @@ void rbtree<T>::rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr paren
             }
 
             // Case 3
-            parent->set_color(BLACK);
-            grandparent->set_color(RED);
+            parent->set_color(color::BLACK);
+            grandparent->set_color(color::RED);
             if (ptr == parent->get_left())
             {
                 rotate_right(grandparent, update);
@@ -481,7 +481,7 @@ void rbtree<T>::rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr paren
         }
     }
 
-    root_->set_color(BLACK);
+    root_->set_color(color::BLACK);
 }
 
 template <typename T>
@@ -493,11 +493,11 @@ void rbtree<T>::rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent,
         auto sibling = (ptr == parent->get_left())
             ? parent->get_right()
             : parent->get_left();
-        if (sibling->get_color() == RED)
+        if (sibling->get_color() == color::RED)
         {
             // Case 1
-            sibling->set_color(BLACK);
-            parent->set_color(RED);
+            sibling->set_color(color::BLACK);
+            parent->set_color(color::RED);
             if (ptr == parent->get_left())
             {
                 rotate_left(parent, update);
@@ -514,7 +514,7 @@ void rbtree<T>::rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent,
             is_black_node(sibling->get_right()))
         {
             // Case 2
-            sibling->set_color(RED);
+            sibling->set_color(color::RED);
             ptr = parent;
             parent = parent->get_parent();
         }
@@ -525,18 +525,18 @@ void rbtree<T>::rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent,
                 // Case 3
                 if (sibling->get_left())
                 {
-                    sibling->get_left()->set_color(BLACK);
+                    sibling->get_left()->set_color(color::BLACK);
                 }
 
-                sibling->set_color(RED);
+                sibling->set_color(color::RED);
                 rotate_right(sibling, update);
                 sibling = parent->get_right();
             }
 
             // Case 4
             sibling->set_color(parent->get_color());
-            parent->set_color(BLACK);
-            sibling->get_right()->set_color(BLACK);
+            parent->set_color(color::BLACK);
+            sibling->get_right()->set_color(color::BLACK);
             rotate_left(parent, update);
             ptr = root_.get();
             break;
@@ -548,18 +548,18 @@ void rbtree<T>::rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent,
                 // Case 3
                 if (sibling->get_right())
                 {
-                    sibling->get_right()->set_color(BLACK);
+                    sibling->get_right()->set_color(color::BLACK);
                 }
 
-                sibling->set_color(RED);
+                sibling->set_color(color::RED);
                 rotate_left(sibling, update);
                 sibling = parent->get_left();
             }
 
             // Case 4
             sibling->set_color(parent->get_color());
-            parent->set_color(BLACK);
-            sibling->get_left()->set_color(BLACK);
+            parent->set_color(color::BLACK);
+            sibling->get_left()->set_color(color::BLACK);
             rotate_right(parent, update);
             ptr = root_.get();
             break;
@@ -568,7 +568,7 @@ void rbtree<T>::rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent,
 
     if (ptr)
     {
-        ptr->set_color(BLACK);
+        ptr->set_color(color::BLACK);
     }
 }
 
@@ -695,7 +695,7 @@ typename rbtree<T>::weak_node_ptr rbtree<T>::prev_node(weak_node_ptr ptr) const
 template <typename T>
 inline bool rbtree<T>::is_red_node(weak_const_node_ptr ptr)
 {
-    return ptr && ptr->get_color() == RED;
+    return ptr && ptr->get_color() == color::RED;
 }
 
 template <typename T>
