@@ -44,6 +44,7 @@ public: // Public Method(s)
     size_type num_seqs(void) const;
     size_type num_terms(void) const;
 
+    term_type f(size_type i) const;
     term_type bwt(size_type i) const;
     size_type psi(size_type i) const;
     size_type lf(size_type i) const;
@@ -152,6 +153,12 @@ template <template <typename, typename> class... UPs>
 inline typename text_index<UPs...>::size_type text_index<UPs...>::num_terms(void) const
 {
     return wt_.size();
+}
+
+template <template <typename, typename> class... UPs>
+inline typename text_index<UPs...>::term_type text_index<UPs...>::f(size_type i) const
+{
+    return wt_.search(i + 1);
 }
 
 template <template <typename, typename> class... UPs>
