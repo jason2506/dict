@@ -96,7 +96,7 @@ inline void with_lcp<UPs...>::policy<TI, T>::update(typename event::template aft
     // lcp_ = 0;
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
-        info.s, 1,
+        info.s, 0,
         0, 0, 0
     });
 }
