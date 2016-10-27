@@ -39,6 +39,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>::templ
     >
 {
 public: // Public Type(s)
+    using host_type = TextIndex;
     using size_type = typename Trait::size_type;
 
 private: // Private Types(s)

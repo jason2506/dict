@@ -23,6 +23,7 @@ template <typename TextIndex, typename Trait>
 class with_csa
 {
 public: // Public Type(s)
+    using host_type = TextIndex;
     using size_type = typename Trait::size_type;
     using value_type = typename Trait::size_type;
     using term_type = typename Trait::term_type;
@@ -80,7 +81,7 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
     size_type off = 0;
     while (!sa_samples_[i])
     {
-        i = static_cast<TI const *>(this)->lf(i);
+        i = static_cast<host_type const *>(this)->lf(i);
         ++off;
     }
 
@@ -88,7 +89,7 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
     auto j = pi_.at(r - 1);
 
     auto sa = isa_samples_.select(j, true) + off;
-    auto n = static_cast<TI const *>(this)->num_terms();
+    auto n = static_cast<host_type const *>(this)->num_terms();
     return sa < n ? sa : sa - n;
 }
 
@@ -112,7 +113,7 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const
         auto v = sa_samples_.select(i, true);
         for (decltype(off) t = 0; t < off; ++t)
         {
-            v = static_cast<TI const *>(this)->lf(v);
+            v = static_cast<host_type const *>(this)->lf(v);
         }
 
         return v;
@@ -163,7 +164,7 @@ inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled)
 template <typename TI, typename T>
 void with_csa<TI, T>::add_samples(value_type j)
 {
-    auto n = static_cast<TI const *>(this)->num_terms();
+    auto n = static_cast<host_type const *>(this)->num_terms();
     if (j + 1 == n) { return; }
 
     auto r = isa_samples_.rank(j, true);
