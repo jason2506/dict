@@ -6,7 +6,7 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include "../include/desa/internal/permutation.hpp"
+#include <desa/internal/permutation.hpp>
 
 namespace desa
 {

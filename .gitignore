@@ -1,4 +1,4 @@
 .DS_Store
-build
-subprojects/*
-!subprojects/*.wrap
+_build
+_install
+*.pyc
