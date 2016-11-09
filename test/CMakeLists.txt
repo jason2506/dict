@@ -10,14 +10,13 @@ set(${PROJECT_NAME}_TESTS
     text_index_test
 )
 
-include_directories(${GTEST_INCLUDE_DIRS})
-
 enable_testing()
 foreach(test ${${PROJECT_NAME}_TESTS})
     add_executable(${test} ${test}.cpp)
 
     target_link_libraries(${test}
-        ${GTEST_BOTH_LIBRARIES}
+        GTest::GTest
+        GTest::Main
         ${PROJECT_NAME}
     )
 
