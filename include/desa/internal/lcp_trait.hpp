@@ -9,26 +9,21 @@
 #ifndef DESA_INTERNAL_LCP_TRAIT_HPP_
 #define DESA_INTERNAL_LCP_TRAIT_HPP_
 
-namespace desa
-{
+namespace desa {
 
-namespace internal
-{
+namespace internal {
 
 /************************************************
  * Declaration: struct lcp_trait<T>
  ************************************************/
 
 template <typename Trait>
-struct lcp_trait
-{
+struct lcp_trait {
     using size_type = typename Trait::size_type;
 
-    struct event
-    {
+    struct event {
         template <typename Sequence>
-        struct after_inserting_lcp
-        {
+        struct after_inserting_lcp {
             Sequence const &s;
             size_type num_inserted;
 
@@ -37,10 +32,10 @@ struct lcp_trait
             size_type lcp_next;
         };
     };
-}; // class lcp_trait<T>
+};  // class lcp_trait<T>
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace desa
+}  // namespace desa
 
-#endif // DESA_INTERNAL_LCP_TRAIT_HPP_
+#endif  // DESA_INTERNAL_LCP_TRAIT_HPP_

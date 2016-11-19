@@ -12,8 +12,8 @@
 
 using wt_t = ::desa::internal::wavelet_tree<char>;
 
-void construct_wavelet_tree(wt_t &wt)
-{
+// NOLINTNEXTLINE(runtime/references)
+void construct_wavelet_tree(wt_t &wt) {
     wt.insert(0, 'i');  // [i]
     wt.insert(0, 'i');  // [i]  i
     wt.insert(1, 's');  //  i  [s]  i
@@ -27,31 +27,28 @@ void construct_wavelet_tree(wt_t &wt)
     wt.insert(9, 'p');  //  m   i   s   s   i   s   s   i   p  [p]  i
 }
 
-void construct_wavelet_tree_with_erasure(wt_t &wt)
-{
+// NOLINTNEXTLINE(runtime/references)
+void construct_wavelet_tree_with_erasure(wt_t &wt) {
     construct_wavelet_tree(wt);
-    wt.erase(3); // m i s i s s i p p i
-    wt.erase(9); // m i s i s s i p p
-    wt.erase(0); // i s i s s i p p
-    wt.erase(5); // i s i s s p p
-    wt.erase(3); // i s i s p p
+    wt.erase(3);  // m i s i s s i p p i
+    wt.erase(9);  // m i s i s s i p p
+    wt.erase(0);  // i s i s s i p p
+    wt.erase(5);  // i s i s s p p
+    wt.erase(3);  // i s i s p p
 }
 
-TEST(WaveletTreeTest, EmptyTree)
-{
+TEST(WaveletTreeTest, EmptyTree) {
     wt_t wt;
     EXPECT_EQ(0, wt.size());
 }
 
-TEST(WaveletTreeTest, InsertFirstChar)
-{
+TEST(WaveletTreeTest, InsertFirstChar) {
     wt_t wt;
     wt.insert(0, 'X');
     EXPECT_EQ(1, wt.size());
 }
 
-TEST(WaveletTreeTest, EraseLastChar)
-{
+TEST(WaveletTreeTest, EraseLastChar) {
     wt_t wt;
     wt.insert(0, 'X');
     auto c = wt.erase(0);
@@ -59,22 +56,19 @@ TEST(WaveletTreeTest, EraseLastChar)
     EXPECT_EQ('X', c);
 }
 
-TEST(WaveletTreeTest, InsertMoreChars)
-{
+TEST(WaveletTreeTest, InsertMoreChars) {
     wt_t wt;
     construct_wavelet_tree(wt);
     EXPECT_EQ(11, wt.size());
 }
 
-TEST(WaveletTreeTest, EraseMoreChars)
-{
+TEST(WaveletTreeTest, EraseMoreChars) {
     wt_t wt;
     construct_wavelet_tree_with_erasure(wt);
     EXPECT_EQ(6, wt.size());
 }
 
-TEST(WaveletTreeTest, AccessAfterInsertion)
-{
+TEST(WaveletTreeTest, AccessAfterInsertion) {
     wt_t wt;
     construct_wavelet_tree(wt);
     EXPECT_EQ('m', wt[0]);
@@ -90,8 +84,7 @@ TEST(WaveletTreeTest, AccessAfterInsertion)
     EXPECT_EQ('i', wt[10]);
 }
 
-TEST(WaveletTreeTest, AccessAfterErasure)
-{
+TEST(WaveletTreeTest, AccessAfterErasure) {
     wt_t wt;
     construct_wavelet_tree_with_erasure(wt);
     EXPECT_EQ('i', wt[0]);
@@ -102,8 +95,7 @@ TEST(WaveletTreeTest, AccessAfterErasure)
     EXPECT_EQ('p', wt[5]);
 }
 
-TEST(WaveletTreeTest, RankChars)
-{
+TEST(WaveletTreeTest, RankChars) {
     wt_t wt;
     construct_wavelet_tree(wt);
 
@@ -132,8 +124,7 @@ TEST(WaveletTreeTest, RankChars)
     EXPECT_EQ(4, wt.rank(10, 's'));
 }
 
-TEST(WaveletTreeTest, RankAndAccessChars)
-{
+TEST(WaveletTreeTest, RankAndAccessChars) {
     wt_t wt;
     construct_wavelet_tree(wt);
 
@@ -151,8 +142,7 @@ TEST(WaveletTreeTest, RankAndAccessChars)
     EXPECT_EQ(cr_pair('i', 4), wt.access_and_rank(10));
 }
 
-TEST(WaveletTreeTest, SelectChars)
-{
+TEST(WaveletTreeTest, SelectChars) {
     wt_t wt;
     construct_wavelet_tree(wt);
 
@@ -167,8 +157,7 @@ TEST(WaveletTreeTest, SelectChars)
     EXPECT_EQ(6, wt.select(3, 's'));
 }
 
-TEST(WaveletTreeTest, Sum)
-{
+TEST(WaveletTreeTest, Sum) {
     wt_t wt;
     construct_wavelet_tree(wt);
     EXPECT_EQ(0, wt.sum('i'));

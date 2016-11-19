@@ -14,24 +14,24 @@
 
 using bitmap = ::desa::internal::bit_vector<2>;
 
-void construct_bitmap(bitmap &bits)
-{
-    bits.insert(0, true);   // [1]
-    bits.insert(1, false);  //  1  [0]
-    bits.insert(0, false);  // [0]  1   0
-    bits.insert(1, false);  //  0  [0]  1   0
-    bits.insert(2, true);   //  0   0  [1]  1   0
-    bits.insert(5, true);   //  0   0   1   1   0  [1]
-    bits.insert(3, false);  //  0   0   1  [0]  1   0   1
-    bits.insert(6, false);  //  0   0   1   0   1   0  [0]  1
-    bits.insert(3, true);   //  0   0   1  [1]  0   1   0   0   1
-    bits.insert(9, true);   //  0   0   1   1   0   1   0   0   1  [1]
-    bits.insert(10, false); //  0   0   1   1   0   1   0   0   1   1  [0]
-    bits.insert(0, true);   // [1]  0   0   1   1   0   1   0   0   1   1   0
+// NOLINTNEXTLINE(runtime/references)
+void construct_bitmap(bitmap &bits) {
+    bits.insert(0, true);       // [1]
+    bits.insert(1, false);      //  1  [0]
+    bits.insert(0, false);      // [0]  1   0
+    bits.insert(1, false);      //  0  [0]  1   0
+    bits.insert(2, true);       //  0   0  [1]  1   0
+    bits.insert(5, true);       //  0   0   1   1   0  [1]
+    bits.insert(3, false);      //  0   0   1  [0]  1   0   1
+    bits.insert(6, false);      //  0   0   1   0   1   0  [0]  1
+    bits.insert(3, true);       //  0   0   1  [1]  0   1   0   0   1
+    bits.insert(9, true);       //  0   0   1   1   0   1   0   0   1  [1]
+    bits.insert(10, false);     //  0   0   1   1   0   1   0   0   1   1  [0]
+    bits.insert(0, true);       // [1]  0   0   1   1   0   1   0   0   1   1   0
 }
 
-void construct_bitmap_with_erasure(bitmap &bits)
-{
+// NOLINTNEXTLINE(runtime/references)
+void construct_bitmap_with_erasure(bitmap &bits) {
     construct_bitmap(bits);
     EXPECT_FALSE(bits.erase(5));    // 1 0 0 1 1 1 0 0 1 1 0
     EXPECT_TRUE(bits.erase(0));     // 0 0 1 1 1 0 0 1 1 0
@@ -41,15 +41,13 @@ void construct_bitmap_with_erasure(bitmap &bits)
     EXPECT_FALSE(bits.erase(6));    // 0 0 1 1 1 1
 }
 
-TEST(BitVectorTest, EmptyBitVector)
-{
+TEST(BitVectorTest, EmptyBitVector) {
     bitmap bits;
     EXPECT_EQ(0, bits.count());
     EXPECT_EQ(0, bits.size());
 }
 
-TEST(BitVectorTest, InsertFirstBit)
-{
+TEST(BitVectorTest, InsertFirstBit) {
     bitmap bits1;
     bits1.insert(0, true);
     EXPECT_EQ(1, bits1.count());
@@ -61,8 +59,7 @@ TEST(BitVectorTest, InsertFirstBit)
     EXPECT_EQ(1, bits2.size());
 }
 
-TEST(BitVectorTest, EraseLastBit)
-{
+TEST(BitVectorTest, EraseLastBit) {
     bitmap bits1;
     bits1.insert(0, true);
     auto b1 = bits1.erase(0);
@@ -78,24 +75,21 @@ TEST(BitVectorTest, EraseLastBit)
     EXPECT_FALSE(b2);
 }
 
-TEST(BitVectorTest, InsertMoreBits)
-{
+TEST(BitVectorTest, InsertMoreBits) {
     bitmap bits;
     construct_bitmap(bits);
     EXPECT_EQ(6, bits.count());
     EXPECT_EQ(12, bits.size());
 }
 
-TEST(BitVectorTest, EraseMoreBit)
-{
+TEST(BitVectorTest, EraseMoreBit) {
     bitmap bits;
     construct_bitmap_with_erasure(bits);
     EXPECT_EQ(4, bits.count());
     EXPECT_EQ(6, bits.size());
 }
 
-TEST(BitVectorTest, AccessBitsAfterInsertion)
-{
+TEST(BitVectorTest, AccessBitsAfterInsertion) {
     bitmap bits;
     construct_bitmap(bits);
     EXPECT_TRUE(bits[0]);
@@ -112,8 +106,7 @@ TEST(BitVectorTest, AccessBitsAfterInsertion)
     EXPECT_FALSE(bits[11]);
 }
 
-TEST(BitVectorTest, AccessBitsAfterErasure)
-{
+TEST(BitVectorTest, AccessBitsAfterErasure) {
     bitmap bits;
     construct_bitmap_with_erasure(bits);
     EXPECT_FALSE(bits[0]);
@@ -124,8 +117,7 @@ TEST(BitVectorTest, AccessBitsAfterErasure)
     EXPECT_TRUE(bits[5]);
 }
 
-TEST(BitVectorTest, SetAndReset)
-{
+TEST(BitVectorTest, SetAndReset) {
     bitmap bits;
     construct_bitmap(bits);
 
@@ -150,8 +142,7 @@ TEST(BitVectorTest, SetAndReset)
     EXPECT_EQ(12, bits.size());
 }
 
-TEST(BitVectorTest, RankBits)
-{
+TEST(BitVectorTest, RankBits) {
     bitmap bits;
     construct_bitmap(bits);
 
@@ -182,8 +173,7 @@ TEST(BitVectorTest, RankBits)
     EXPECT_EQ(6, bits.rank(11, false));
 }
 
-TEST(BitVectorTest, RankAndAccessBits)
-{
+TEST(BitVectorTest, RankAndAccessBits) {
     bitmap bits;
     construct_bitmap(bits);
 
@@ -202,8 +192,7 @@ TEST(BitVectorTest, RankAndAccessBits)
     EXPECT_EQ(br_pair(false, 6), bits.access_and_rank(11));
 }
 
-TEST(BitVectorTest, SelectBits)
-{
+TEST(BitVectorTest, SelectBits) {
     bitmap bits;
     construct_bitmap(bits);
 

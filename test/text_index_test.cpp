@@ -14,26 +14,23 @@
 #include <desa/with_csa.hpp>
 #include <desa/with_lcp.hpp>
 
-using text_index = ::desa::text_index
-    <
-        ::desa::with_csa,
-        ::desa::with_lcp<>::policy
-    >;
+using text_index = ::desa::text_index<
+    ::desa::with_csa,
+    ::desa::with_lcp<>::policy
+>;
 
-void insert(text_index &ti, ::std::initializer_list<text_index::term_type> seq)
-{
+// NOLINTNEXTLINE(runtime/references)
+void insert(text_index &ti, ::std::initializer_list<text_index::term_type> seq) {
     ti.insert(seq);
 }
 
-TEST(SuffixArrayTest, EmptyArray)
-{
+TEST(SuffixArrayTest, EmptyArray) {
     text_index ti;
     EXPECT_EQ(0, ti.num_seqs());
     EXPECT_EQ(0, ti.num_terms());
 }
 
-TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray)
-{
+TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray) {
     text_index ti;
     insert(ti, {5});
 
@@ -62,8 +59,7 @@ TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray)
     EXPECT_EQ(0, ti.lcp(1));
 }
 
-TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyArray)
-{
+TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyArray) {
     text_index ti;
     insert(ti, {1, 3, 1, 3, 2, 1});
 
@@ -127,8 +123,7 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyArray)
     EXPECT_EQ(1, ti.lcp(6));
 }
 
-TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyArray)
-{
+TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyArray) {
     text_index ti;
     insert(ti, {1, 3, 1, 3, 2, 1});
     insert(ti, {1, 3, 2});
@@ -221,8 +216,7 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyArray)
     EXPECT_EQ(2, ti.lcp(10));
 }
 
-TEST(SuffixArrayTest, InsertMultipleSequences)
-{
+TEST(SuffixArrayTest, InsertMultipleSequences) {
     text_index ti;
     insert(ti, {3});
     insert(ti, {1});

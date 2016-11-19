@@ -12,31 +12,28 @@
 
 using ::desa::internal::permutation;
 
-void construct_permutation(permutation &pi)
-{
-    pi.insert(0, 0); // [0]
-    pi.insert(1, 0); //  1  [0]
-    pi.insert(0, 1); // [1]  2   0
-    pi.insert(3, 3); //  1   2   0  [3]
-    pi.insert(2, 0); //  2   3  [0]  1   4
-    pi.insert(0, 5); // [5]  2   3   0   1   4
+// NOLINTNEXTLINE(runtime/references)
+void construct_permutation(permutation &pi) {
+    pi.insert(0, 0);  // [0]
+    pi.insert(1, 0);  //  1  [0]
+    pi.insert(0, 1);  // [1]  2   0
+    pi.insert(3, 3);  //  1   2   0  [3]
+    pi.insert(2, 0);  //  2   3  [0]  1   4
+    pi.insert(0, 5);  // [5]  2   3   0   1   4
 }
 
-TEST(PermutationTest, Empty)
-{
+TEST(PermutationTest, Empty) {
     permutation pi;
     EXPECT_EQ(0, pi.size());
 }
 
-TEST(PermutationTest, Insert)
-{
+TEST(PermutationTest, Insert) {
     permutation pi;
     construct_permutation(pi);
     EXPECT_EQ(6, pi.size());
 }
 
-TEST(PermutationTest, Erase)
-{
+TEST(PermutationTest, Erase) {
     permutation pi;
     construct_permutation(pi);
     pi.erase(1);
@@ -44,8 +41,7 @@ TEST(PermutationTest, Erase)
     EXPECT_EQ(4, pi.size());
 }
 
-TEST(PermutationTest, AccessAfterInsertion)
-{
+TEST(PermutationTest, AccessAfterInsertion) {
     permutation pi;
     construct_permutation(pi);
     EXPECT_EQ(5, pi[0]);
@@ -56,8 +52,7 @@ TEST(PermutationTest, AccessAfterInsertion)
     EXPECT_EQ(4, pi[5]);
 }
 
-TEST(PermutationTest, AccessAfterErasure)
-{
+TEST(PermutationTest, AccessAfterErasure) {
     permutation pi;
     construct_permutation(pi);
     pi.erase(1);
@@ -68,8 +63,7 @@ TEST(PermutationTest, AccessAfterErasure)
     EXPECT_EQ(2, pi[3]);
 }
 
-TEST(PermutationTest, RankAfterInsertion)
-{
+TEST(PermutationTest, RankAfterInsertion) {
     permutation pi;
     construct_permutation(pi);
     EXPECT_EQ(3, pi.rank(0));
@@ -80,8 +74,7 @@ TEST(PermutationTest, RankAfterInsertion)
     EXPECT_EQ(0, pi.rank(5));
 }
 
-TEST(PermutationTest, RankAfterErasure)
-{
+TEST(PermutationTest, RankAfterErasure) {
     permutation pi;
     construct_permutation(pi);
     pi.erase(1);
@@ -92,8 +85,7 @@ TEST(PermutationTest, RankAfterErasure)
     EXPECT_EQ(0, pi.rank(3));
 }
 
-TEST(PermutationTest, Move)
-{
+TEST(PermutationTest, Move) {
     permutation pi;
     construct_permutation(pi);
     pi.move(3, 1);

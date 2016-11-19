@@ -16,77 +16,72 @@
 #include "internal/text_index_trait.hpp"
 #include "internal/wavelet_tree.hpp"
 
-namespace desa
-{
+namespace desa {
 
 /************************************************
  * Declaration: class text_index<UPs...>
  ************************************************/
 
 template <template <typename, typename> class... UpdatingPolicies>
-class text_index : public internal::chained_updater<UpdatingPolicies...>::template updater
-    <
+class text_index : public internal::chained_updater<UpdatingPolicies...>
+    ::template updater<
         text_index<UpdatingPolicies...>,
         internal::text_index_trait
-    >
-{
-public: // Public Type(s)
+    > {
+ public:  // Public Type(s)
     using size_type = internal::text_index_trait::size_type;
     using term_type = internal::text_index_trait::term_type;
 
-public: // Public Method(s)
-    text_index(void);
+ public:  // Public Method(s)
+    text_index();
 
     template <typename Sequence>
     void insert(Sequence const &s);
 
-    bool empty(void) const;
-    size_type num_seqs(void) const;
-    size_type num_terms(void) const;
+    bool empty() const;
+    size_type num_seqs() const;
+    size_type num_terms() const;
 
     term_type f(size_type i) const;
     term_type bwt(size_type i) const;
     size_type psi(size_type i) const;
     size_type lf(size_type i) const;
 
-private: // Private Type(s)
+ private:  // Private Type(s)
     using event = internal::text_index_trait::event;
-    using updating_policies = typename internal::chained_updater<UpdatingPolicies...>::template updater
-        <
+    using updating_policies = typename internal::chained_updater<UpdatingPolicies...>
+        ::template updater<
             text_index,
             internal::text_index_trait
         >;
 
-private: // Private Property(ies)
+ private:  // Private Property(ies)
     internal::wavelet_tree<term_type> wt_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
     size_type num_seqs_;
-}; // class text_index<UPs...>
+};  // class text_index<UPs...>
 
 /************************************************
  * Implementation: class text_index<UPs...>
  ************************************************/
 
 template <template <typename, typename> class... UPs>
-inline text_index<UPs...>::text_index(void)
-    : updating_policies(wt_), sentinel_pos_(0), sentinel_rank_(0), num_seqs_(0)
-{
+inline text_index<UPs...>::text_index()
+    : updating_policies(wt_), sentinel_pos_(0), sentinel_rank_(0), num_seqs_(0) {
     // do nothing
 }
 
 template <template <typename, typename> class... UPs>
 template <typename Sequence>
-void text_index<UPs...>::insert(Sequence const &s)
-{
+void text_index<UPs...>::insert(Sequence const &s) {
     auto seq_it = ::std::rbegin(s);
     auto seq_end = ::std::rend(s);
     if (seq_it == seq_end) { return; }
 
     size_type num_inserted = 0;
     decltype(lf(0)) kp, psi_kp;
-    if (empty())
-    {
+    if (empty()) {
         // insert first sampled point at last position
         assert(*seq_it != 0);
         wt_.insert(0, *seq_it);
@@ -97,16 +92,13 @@ void text_index<UPs...>::insert(Sequence const &s)
         psi_kp = 0;
         ++seq_it;
         ++num_inserted;
-    }
-    else
-    {
+    } else {
         psi_kp = sentinel_pos_;
         kp = wt_.lf(sentinel_pos_) + 1;
         if (kp <= psi_kp) { ++psi_kp; }
     }
 
-    while (seq_it != seq_end)
-    {
+    while (seq_it != seq_end) {
         assert(*seq_it != 0);
         wt_.insert(kp, *seq_it);
 
@@ -138,38 +130,32 @@ void text_index<UPs...>::insert(Sequence const &s)
 }
 
 template <template <typename, typename> class... UPs>
-inline bool text_index<UPs...>::empty(void) const
-{
+inline bool text_index<UPs...>::empty() const {
     return num_seqs_ == 0;
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::size_type text_index<UPs...>::num_seqs(void) const
-{
+inline typename text_index<UPs...>::size_type text_index<UPs...>::num_seqs() const {
     return num_seqs_;
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::size_type text_index<UPs...>::num_terms(void) const
-{
+inline typename text_index<UPs...>::size_type text_index<UPs...>::num_terms() const {
     return wt_.size();
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::term_type text_index<UPs...>::f(size_type i) const
-{
+inline typename text_index<UPs...>::term_type text_index<UPs...>::f(size_type i) const {
     return wt_.search(i + 1);
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::term_type text_index<UPs...>::bwt(size_type i) const
-{
+inline typename text_index<UPs...>::term_type text_index<UPs...>::bwt(size_type i) const {
     return wt_[i];
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::size_type text_index<UPs...>::psi(size_type i) const
-{
+inline typename text_index<UPs...>::size_type text_index<UPs...>::psi(size_type i) const {
     if (i == 0) { return sentinel_pos_; }
 
     return i < sentinel_rank_
@@ -178,14 +164,13 @@ inline typename text_index<UPs...>::size_type text_index<UPs...>::psi(size_type 
 }
 
 template <template <typename, typename> class... UPs>
-inline typename text_index<UPs...>::size_type text_index<UPs...>::lf(size_type i) const
-{
+inline typename text_index<UPs...>::size_type text_index<UPs...>::lf(size_type i) const {
     if (i == sentinel_pos_) { return 0; }
 
     auto pair = wt_.access_and_lf(i);
     return (pair.first == 0 && i < sentinel_pos_) + pair.second;
 }
 
-} // namespace desa
+}  // namespace desa
 
-#endif // DESA_TEXT_INDEX_HPP_
+#endif  // DESA_TEXT_INDEX_HPP_

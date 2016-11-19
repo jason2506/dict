@@ -12,28 +12,26 @@
 #include "internal/bit_vector.hpp"
 #include "internal/permutation.hpp"
 
-namespace desa
-{
+namespace desa {
 
 /************************************************
  * Declaration: class with_csa<TI, T>
  ************************************************/
 
 template <typename TextIndex, typename Trait>
-class with_csa
-{
-public: // Public Type(s)
+class with_csa {
+ public:  // Public Type(s)
     using host_type = TextIndex;
     using size_type = typename Trait::size_type;
     using value_type = typename Trait::size_type;
     using term_type = typename Trait::term_type;
 
-private: // Private Types(s)
+ private:  // Private Types(s)
     using wt_type = typename Trait::wt_type;
     using event = typename Trait::event;
 
-public: // Public Method(s)
-    with_csa(wt_type const &wt);
+ public:  // Public Method(s)
+    explicit with_csa(wt_type const &wt);
 
     value_type at(size_type i) const;
     size_type rank(value_type j) const;
@@ -41,7 +39,7 @@ public: // Public Method(s)
 
     value_type operator[](size_type i) const;
 
-protected: // Protected Method(s)
+ protected:  // Protected Method(s)
     template <typename Sequence>
     void update(typename event::template after_inserting_first_term<Sequence>);
     template <typename Sequence>
@@ -49,20 +47,20 @@ protected: // Protected Method(s)
     template <typename Sequence>
     void update(typename event::template after_inserting_sequence<Sequence>);
 
-private: // Private Method(s)
+ private:  // Private Method(s)
     void insert_term(size_type i, bool is_sampled);
     void add_samples(value_type j);
 
-private: // Private Static Property(ies)
+ private:  // Private Static Property(ies)
     static constexpr size_type MAX_SAMPLE_DISTANCE = 100;
     static constexpr size_type BIT_BLOCK_SIZE = 64;
 
-private: // Private Property(ies)
+ private:  // Private Property(ies)
     wt_type const &wt_;
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
-}; // class with_csa<TI, T>
+};  // class with_csa<TI, T>
 
 /************************************************
  * Implementation: class with_csa<TI, T>
@@ -70,17 +68,14 @@ private: // Private Property(ies)
 
 template <typename TI, typename T>
 inline with_csa<TI, T>::with_csa(wt_type const &wt)
-    : wt_(wt)
-{
+    : wt_(wt) {
     // do nothing
 }
 
 template <typename TI, typename T>
-typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
-{
+typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     size_type off = 0;
-    while (!sa_samples_[i])
-    {
+    while (!sa_samples_[i]) {
         i = static_cast<host_type const *>(this)->lf(i);
         ++off;
     }
@@ -94,25 +89,20 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const
 }
 
 template <typename TI, typename T>
-typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const
-{
+typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
     auto br_pair = isa_samples_.access_and_rank(j, true);
     auto b = br_pair.first;
     auto r = br_pair.second;
-    if (b)
-    {
+    if (b) {
         // retrieve a value at a sampled position
         auto i = pi_.rank(r - 1);
         return sa_samples_.select(i, true);
-    }
-    else
-    {
+    } else {
         // retrieve a value at a unsampled position
         auto off = isa_samples_.select(r, true) - j;
         auto i = pi_.rank(r);
         auto v = sa_samples_.select(i, true);
-        for (decltype(off) t = 0; t < off; ++t)
-        {
+        for (decltype(off) t = 0; t < off; ++t) {
             v = static_cast<host_type const *>(this)->lf(v);
         }
 
@@ -121,49 +111,42 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const
 }
 
 template <typename TI, typename T>
-inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const
-{
+inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const {
     return wt_.search(rank(j) + 1);
 }
 
 template <typename TI, typename T>
-inline typename with_csa<TI, T>::value_type with_csa<TI, T>::operator[](size_type i) const
-{
+inline typename with_csa<TI, T>::value_type with_csa<TI, T>::operator[](size_type i) const {
     return at(i);
 }
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_first_term<Sequence>)
-{
+inline void with_csa<TI, T>::update(typename event::template after_inserting_first_term<Sequence>) {
     insert_term(0, true);
     pi_.insert(0, 0);
 }
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_term<Sequence> info)
-{
+inline void with_csa<TI, T>::update(typename event::template after_inserting_term<Sequence> info) {
     insert_term(info.pos, false);
 }
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_sequence<Sequence>)
-{
+inline void with_csa<TI, T>::update(typename event::template after_inserting_sequence<Sequence>) {
     add_samples(0);
 }
 
 template <typename TI, typename T>
-inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled)
-{
+inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
     sa_samples_.insert(i, is_sampled);
     isa_samples_.insert(0, is_sampled);
 }
 
 template <typename TI, typename T>
-void with_csa<TI, T>::add_samples(value_type j)
-{
+void with_csa<TI, T>::add_samples(value_type j) {
     auto n = static_cast<host_type const *>(this)->num_terms();
     if (j + 1 == n) { return; }
 
@@ -172,8 +155,7 @@ void with_csa<TI, T>::add_samples(value_type j)
     auto right_sample_pos = isa_samples_.select(r, true);
 
     auto p = right_sample_pos;
-    while (p > left_sample_pos + MAX_SAMPLE_DISTANCE)
-    {
+    while (p > left_sample_pos + MAX_SAMPLE_DISTANCE) {
         p -= MAX_SAMPLE_DISTANCE + 1;
 
         auto i = rank(p);
@@ -184,6 +166,6 @@ void with_csa<TI, T>::add_samples(value_type j)
     }
 }
 
-} // namespace desa
+}  // namespace desa
 
-#endif // DESA_WITH_CSA_HPP_
+#endif  // DESA_WITH_CSA_HPP_

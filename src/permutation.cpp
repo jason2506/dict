@@ -8,18 +8,15 @@
 
 #include <desa/internal/permutation.hpp>
 
-namespace desa
-{
+namespace desa {
 
-namespace internal
-{
+namespace internal {
 
 /************************************************
  * Implementation: class permutation
  ************************************************/
 
-void permutation::insert(size_type i, size_type j)
-{
+void permutation::insert(size_type i, size_type j) {
     link_and_rank a, b;
 
     auto it = find_node(static_cast<bstree const &>(tree_).root(), i).unconst();
@@ -35,8 +32,7 @@ void permutation::insert(size_type i, size_type j)
     size_++;
 }
 
-void permutation::erase(size_type i)
-{
+void permutation::erase(size_type i) {
     auto it = find_node(static_cast<bstree const &>(tree_).root(), i).unconst();
     auto inv_it = it->link;
 
@@ -45,8 +41,7 @@ void permutation::erase(size_type i)
     size_--;
 }
 
-void permutation::move(size_type from, size_type to)
-{
+void permutation::move(size_type from, size_type to) {
     auto from_it = find_node(static_cast<bstree const &>(tree_).root(), from).unconst();
     auto v = *from_it;
     v.rank = 1;
@@ -63,14 +58,14 @@ void permutation::move(size_type from, size_type to)
     new_it->link->link = new_it;
 }
 
-typename permutation::bstree::const_iterator permutation::find_node(typename bstree::const_iterator it, size_type i)
-{
-    while (it)
-    {
-        if (i < it->rank - 1)       { it.go_left(); }
-        else if (i == it->rank - 1) { break; }
-        else
-        {
+typename permutation::bstree::const_iterator
+permutation::find_node(typename bstree::const_iterator it, size_type i) {
+    while (it) {
+        if (i < it->rank - 1) {
+            it.go_left();
+        } else if (i == it->rank - 1) {
+            break;
+        } else {
             i -= it->rank;
             it.go_right();
         }
@@ -79,16 +74,13 @@ typename permutation::bstree::const_iterator permutation::find_node(typename bst
     return it;
 }
 
-permutation::size_type permutation::access(typename bstree::const_iterator it, size_type i)
-{
+permutation::size_type permutation::access(typename bstree::const_iterator it, size_type i) {
     it = find_node(it, i);
     auto linked_it = it->link;
     auto rank = linked_it->rank - 1;
     auto parent = linked_it.parent();
-    while (parent)
-    {
-        if (linked_it == parent.right())
-        {
+    while (parent) {
+        if (linked_it == parent.right()) {
             rank += parent->rank;
         }
 
@@ -99,17 +91,13 @@ permutation::size_type permutation::access(typename bstree::const_iterator it, s
     return rank;
 }
 
-void permutation::update_ranks(typename bstree::iterator it)
-{
-    while (it)
-    {
+void permutation::update_ranks(typename bstree::iterator it) {
+    while (it) {
         it->rank = 1;
-        if (it.has_left())
-        {
+        if (it.has_left()) {
             auto left_it = it.left();
             it->rank += left_it->rank;
-            while (left_it.has_right())
-            {
+            while (left_it.has_right()) {
                 left_it.go_right();
                 it->rank += left_it->rank;
             }
@@ -119,6 +107,6 @@ void permutation::update_ranks(typename bstree::iterator it)
     }
 }
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace desa
+}  // namespace desa

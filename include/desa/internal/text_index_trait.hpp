@@ -11,33 +11,27 @@
 
 #include "wavelet_tree.hpp"
 
-namespace desa
-{
+namespace desa {
 
-namespace internal
-{
+namespace internal {
 
 /************************************************
  * Declaration: struct text_index_trait
  ************************************************/
 
-struct text_index_trait
-{
+struct text_index_trait {
     using size_type = ::std::size_t;
     using term_type = ::std::uint16_t;
     using wt_type = wavelet_tree<term_type>;
 
-    struct event
-    {
+    struct event {
         template <typename Sequence>
-        struct after_inserting_first_term
-        {
+        struct after_inserting_first_term {
             Sequence const &s;
         };
 
         template <typename Sequence>
-        struct after_inserting_term
-        {
+        struct after_inserting_term {
             Sequence const &s;
             size_type num_inserted;
 
@@ -47,15 +41,14 @@ struct text_index_trait
         };
 
         template <typename Sequence>
-        struct after_inserting_sequence
-        {
+        struct after_inserting_sequence {
             Sequence const &s;
         };
     };
-}; // class text_index_trait
+};  // class text_index_trait
 
-} // namespace internal
+}  // namespace internal
 
-} // namespace desa
+}  // namespace desa
 
-#endif // DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
+#endif  // DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_

@@ -14,15 +14,15 @@
 
 using partial_sum = ::desa::internal::partial_sum<char, ::std::size_t>;
 
-void construct_partial_sum_with_more_counts(partial_sum &ps)
-{
+// NOLINTNEXTLINE(runtime/references)
+void construct_partial_sum_with_more_counts(partial_sum &ps) {
     ps.increase('B', 7);
     ps.increase('A', 9);
     ps.increase('D', 3);
 }
 
-void construct_partial_sum_with_large_amount_of_counts(partial_sum &ps)
-{
+// NOLINTNEXTLINE(runtime/references)
+void construct_partial_sum_with_large_amount_of_counts(partial_sum &ps) {
     ps.increase('A', 1);    ps.increase('I', 9);    ps.increase('S', 19);
     ps.increase('P', 16);   ps.increase('E', 5);    ps.increase('F', 6);
     ps.increase('J', 10);   ps.increase('M', 13);   ps.increase('R', 18);
@@ -34,14 +34,12 @@ void construct_partial_sum_with_large_amount_of_counts(partial_sum &ps)
     ps.increase('T', 20);   ps.increase('U', 21);
 }
 
-TEST(PartialSumTest, PartialSumWithoutKey)
-{
+TEST(PartialSumTest, PartialSumWithoutKey) {
     partial_sum ps;
     EXPECT_EQ(0, ps.sum());
 }
 
-TEST(PartialSumTest, IncreaseSingleCount)
-{
+TEST(PartialSumTest, IncreaseSingleCount) {
     partial_sum ps;
     ps.increase('B', 5);
 
@@ -49,8 +47,7 @@ TEST(PartialSumTest, IncreaseSingleCount)
     EXPECT_EQ(5, ps.sum());
 }
 
-TEST(PartialSumTest, IncreaseSingleCountTwice)
-{
+TEST(PartialSumTest, IncreaseSingleCountTwice) {
     partial_sum ps;
     ps.increase('B', 5);
     ps.increase('B', 8);
@@ -59,8 +56,7 @@ TEST(PartialSumTest, IncreaseSingleCountTwice)
     EXPECT_EQ(13, ps.sum());
 }
 
-TEST(PartialSumTest, DecreaseSingleCount)
-{
+TEST(PartialSumTest, DecreaseSingleCount) {
     partial_sum ps;
     ps.increase('B', 5);
     ps.decrease('B', 2);
@@ -69,8 +65,7 @@ TEST(PartialSumTest, DecreaseSingleCount)
     EXPECT_EQ(3, ps.sum());
 }
 
-TEST(PartialSumTest, SumWithNonExistedKey)
-{
+TEST(PartialSumTest, SumWithNonExistedKey) {
     partial_sum ps;
     EXPECT_EQ(0, ps.sum('B'));
 
@@ -80,8 +75,7 @@ TEST(PartialSumTest, SumWithNonExistedKey)
     EXPECT_EQ(5, ps.sum('C'));
 }
 
-TEST(PartialSumTest, IncreaseMoreCounts)
-{
+TEST(PartialSumTest, IncreaseMoreCounts) {
     partial_sum ps;
     construct_partial_sum_with_more_counts(ps);
 
@@ -93,8 +87,7 @@ TEST(PartialSumTest, IncreaseMoreCounts)
     EXPECT_EQ(19, ps.sum());
 }
 
-TEST(PartialSumTest, DecreaseMoreCounts)
-{
+TEST(PartialSumTest, DecreaseMoreCounts) {
     partial_sum ps;
     construct_partial_sum_with_more_counts(ps);
 
@@ -109,8 +102,7 @@ TEST(PartialSumTest, DecreaseMoreCounts)
     EXPECT_EQ(16, ps.sum());
 }
 
-TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
-{
+TEST(PartialSumTest, IncreaseLargeAmountOfCounts) {
     partial_sum ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
@@ -130,8 +122,7 @@ TEST(PartialSumTest, IncreaseLargeAmountOfCounts)
     EXPECT_EQ(351, ps.sum());
 }
 
-TEST(PartialSumTest, SearchOnLargeAmountOfCounts)
-{
+TEST(PartialSumTest, SearchOnLargeAmountOfCounts) {
     partial_sum ps;
     construct_partial_sum_with_large_amount_of_counts(ps);
 
