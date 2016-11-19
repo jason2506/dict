@@ -56,8 +56,8 @@ class rbtree {
     class node;
     using weak_node_ptr = node *;
     using weak_const_node_ptr = node const *;
-    using node_ptr = ::std::unique_ptr<node>;
-    using const_node_ptr = ::std::unique_ptr<node const>;
+    using node_ptr = std::unique_ptr<node>;
+    using const_node_ptr = std::unique_ptr<node const>;
 
  private:  // Private Method(s)
     template <typename Update>
@@ -128,8 +128,8 @@ template <typename T>
 template <bool IsConst>
 class rbtree<T>::tree_iterator {
  public:  // Public Type(s)
-    using iterator_category = ::std::bidirectional_iterator_tag;
-    using value_type = typename ::std::conditional<
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = typename std::conditional<
         IsConst,
         rbtree<T>::value_type const,
         rbtree<T>::value_type
@@ -138,7 +138,7 @@ class rbtree<T>::tree_iterator {
     using reference = value_type &;
     using difference_type = ptrdiff_t;
 
-    using node_ptr = typename ::std::conditional<
+    using node_ptr = typename std::conditional<
         IsConst,
         weak_const_node_ptr,
         weak_node_ptr
@@ -333,7 +333,7 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
                 parent->set_right(next_ptr_parent->move_left());
             }
 
-            next_ptr_parent->set_left(::std::move(child_uptr));
+            next_ptr_parent->set_left(std::move(child_uptr));
             parent = next_ptr_parent;
         }
     } else {
@@ -348,11 +348,11 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
         // replace current node with its child
         child = child_uptr.get();
         if (!parent) {
-            root_ = ::std::move(child_uptr);
+            root_ = std::move(child_uptr);
         } else if (ptr == parent->get_left()) {
-            parent->set_left(::std::move(child_uptr));
+            parent->set_left(std::move(child_uptr));
         } else {
-            parent->set_right(::std::move(child_uptr));
+            parent->set_right(std::move(child_uptr));
         }
     }
 
@@ -504,14 +504,14 @@ void rbtree<T>::rotate_left(weak_node_ptr ptr, Update const &update) {
 
     ptr->set_right(right->move_left());
     if (!parent) {
-        right->set_left(::std::move(root_));
-        root_ = ::std::move(right);
+        right->set_left(std::move(root_));
+        root_ = std::move(right);
     } else if (ptr == parent->get_left()) {
         right->set_left(parent->move_left());
-        parent->set_left(::std::move(right));
+        parent->set_left(std::move(right));
     } else {
         right->set_left(parent->move_right());
-        parent->set_right(::std::move(right));
+        parent->set_right(std::move(right));
     }
 
     if (ptr->get_right()) {
@@ -531,14 +531,14 @@ void rbtree<T>::rotate_right(weak_node_ptr ptr, Update const &update) {
 
     ptr->set_left(left->move_right());
     if (!parent) {
-        left->set_right(::std::move(root_));
-        root_ = ::std::move(left);
+        left->set_right(std::move(root_));
+        root_ = std::move(left);
     } else if (ptr == parent->get_left()) {
         left->set_right(parent->move_left());
-        parent->set_left(::std::move(left));
+        parent->set_left(std::move(left));
     } else {
         left->set_right(parent->move_right());
-        parent->set_right(::std::move(left));
+        parent->set_right(std::move(left));
     }
 
     if (ptr->get_left()) {
@@ -649,12 +649,12 @@ inline void rbtree<T>::node::set_left(weak_node_ptr left) {
 
 template <typename T>
 inline void rbtree<T>::node::set_left(node_ptr &&left) {
-    left_ = ::std::move(left);
+    left_ = std::move(left);
 }
 
 template <typename T>
 inline typename rbtree<T>::node_ptr rbtree<T>::node::move_left() {
-    return ::std::move(left_);
+    return std::move(left_);
 }
 
 template <typename T>
@@ -674,12 +674,12 @@ inline void rbtree<T>::node::set_right(weak_node_ptr right) {
 
 template <typename T>
 inline void rbtree<T>::node::set_right(node_ptr &&right) {
-    right_ = ::std::move(right);
+    right_ = std::move(right);
 }
 
 template <typename T>
 inline typename rbtree<T>::node_ptr rbtree<T>::node::move_right() {
-    return ::std::move(right_);
+    return std::move(right_);
 }
 
 template <typename T>

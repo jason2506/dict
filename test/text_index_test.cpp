@@ -14,13 +14,13 @@
 #include <desa/with_csa.hpp>
 #include <desa/with_lcp.hpp>
 
-using text_index = ::desa::text_index<
-    ::desa::with_csa,
-    ::desa::with_lcp<>::policy
+using text_index = desa::text_index<
+    desa::with_csa,
+    desa::with_lcp<>::policy
 >;
 
 // NOLINTNEXTLINE(runtime/references)
-void insert(text_index &ti, ::std::initializer_list<text_index::term_type> seq) {
+void insert(text_index &ti, std::initializer_list<text_index::term_type> seq) {
     ti.insert(seq);
 }
 

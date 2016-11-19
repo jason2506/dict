@@ -24,11 +24,11 @@ namespace internal {
  * Declaration: class wavelet_tree<T, N>
  ************************************************/
 
-template <typename T, ::std::size_t N = sizeof(T) * CHAR_BIT>
+template <typename T, std::size_t N = sizeof(T) * CHAR_BIT>
 class wavelet_tree {
  public:  // Public Type(s)
     using value_type = T;
-    using size_type = ::std::size_t;
+    using size_type = std::size_t;
 
  public:  // Public Method(s)
     void insert(size_type i, value_type c);
@@ -38,11 +38,11 @@ class wavelet_tree {
 
     size_type sum(value_type c) const;
     value_type search(size_type i) const;
-    ::std::pair<value_type, size_type> access_and_rank(size_type i) const;
+    std::pair<value_type, size_type> access_and_rank(size_type i) const;
     size_type rank(size_type i, value_type c) const;
     size_type select(size_type j, value_type c) const;
 
-    ::std::pair<value_type, size_type> access_and_lf(size_type i) const;
+    std::pair<value_type, size_type> access_and_lf(size_type i) const;
     size_type lf(size_type i) const;
     size_type psi(size_type i) const;
 
@@ -56,7 +56,7 @@ class wavelet_tree {
 
  private:  // Private Type(s)
     using bitmap = bit_vector<BITMAP_BLOCK_SIZE>;
-    using tree_level = ::std::pair<size_type, bitmap>;
+    using tree_level = std::pair<size_type, bitmap>;
 
  private:  // Private Method(s)
     void increase_num_zeros(size_type l);
@@ -67,7 +67,7 @@ class wavelet_tree {
     size_type select_at(size_type j, value_type c) const;
 
  private:  // Private Property(ies)
-    ::std::array<tree_level, N> levels_;
+    std::array<tree_level, N> levels_;
     partial_sum<value_type, size_type> sums_;
 };  // class wavelet_tree<T, N>
 
@@ -75,7 +75,7 @@ class wavelet_tree {
  * Implementation: class wavelet_tree<T, N>
  ************************************************/
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 void wavelet_tree<T, N>::insert(size_type i, value_type c) {
     sums_.increase(c, 1);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
@@ -91,7 +91,7 @@ void wavelet_tree<T, N>::insert(size_type i, value_type c) {
     }
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::erase(size_type i) {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l) {
@@ -110,31 +110,31 @@ typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::erase(size_type i) {
     return c;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::size() const {
     auto const &bits = level_bits(0);
     return bits.size();
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::sum(value_type c) const {
     return (c > 0) ? sums_.sum(c - 1) : 0;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::search(size_type i) const {
     return sums_.search(i);
 }
 
-template <typename T, ::std::size_t N>
-inline ::std::pair<typename wavelet_tree<T, N>::value_type, typename wavelet_tree<T, N>::size_type>
+template <typename T, std::size_t N>
+inline std::pair<typename wavelet_tree<T, N>::value_type, typename wavelet_tree<T, N>::size_type>
 wavelet_tree<T, N>::access_and_rank(size_type i) const {
     auto pair = access_and_lf(i);
     auto ps = sum(pair.first);
-    return ::std::make_pair(pair.first, pair.second + 1 - ps);
+    return std::make_pair(pair.first, pair.second + 1 - ps);
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::rank(size_type i, value_type c) const {
     auto ps = sum(c);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
@@ -153,14 +153,14 @@ typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::rank(size_type i, val
     return i + 1 - ps;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type
 wavelet_tree<T, N>::select(size_type j, value_type c) const {
     return select_at(j + sum(c), c);
 }
 
-template <typename T, ::std::size_t N>
-::std::pair<typename wavelet_tree<T, N>::value_type, typename wavelet_tree<T, N>::size_type>
+template <typename T, std::size_t N>
+std::pair<typename wavelet_tree<T, N>::value_type, typename wavelet_tree<T, N>::size_type>
 wavelet_tree<T, N>::access_and_lf(size_type i) const {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l) {
@@ -170,57 +170,57 @@ wavelet_tree<T, N>::access_and_lf(size_type i) const {
         i = (br_pair.first ? num_zeros(l) : 0) + br_pair.second - 1;
     }
 
-    return ::std::make_pair(c, i);
+    return std::make_pair(c, i);
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::lf(size_type i) const {
     return access_and_lf(i).second;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::psi(size_type i) const {
     auto c = sums_.search(i + 1);
     return select_at(i, c);
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::at(size_type i) const {
     return access_and_lf(i).first;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::value_type wavelet_tree<T, N>::operator[](size_type i) const {
     return at(i);
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline void wavelet_tree<T, N>::increase_num_zeros(size_type l) {
     levels_[l].first++;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline void wavelet_tree<T, N>::decrease_num_zeros(size_type l) {
     levels_[l].first--;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::size_type wavelet_tree<T, N>::num_zeros(size_type l) const {
     return levels_[l].first;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::bitmap &wavelet_tree<T, N>::level_bits(size_type l) {
     return levels_[l].second;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 inline typename wavelet_tree<T, N>::bitmap const &
 wavelet_tree<T, N>::level_bits(size_type l) const {
     return levels_[l].second;
 }
 
-template <typename T, ::std::size_t N>
+template <typename T, std::size_t N>
 typename wavelet_tree<T, N>::size_type
 wavelet_tree<T, N>::select_at(size_type j, value_type c) const {
     for (auto l = HEIGHT; l > 0; --l) {

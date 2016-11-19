@@ -12,7 +12,7 @@
 
 #include <desa/internal/bit_vector.hpp>
 
-using bitmap = ::desa::internal::bit_vector<2>;
+using bitmap = desa::internal::bit_vector<2>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_bitmap(bitmap &bits) {

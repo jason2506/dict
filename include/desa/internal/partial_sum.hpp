@@ -38,7 +38,7 @@ class partial_sum {
     value_type sum() const;
     value_type sum(key_type k) const;
     key_type search(value_type x) const;
-    ::std::pair<key_type, value_type> search_and_sum(value_type x) const;
+    std::pair<key_type, value_type> search_and_sum(value_type x) const;
 
  private:  // Private Type(s)
     struct key_and_sum;
@@ -74,12 +74,12 @@ inline partial_sum<K, T>::~partial_sum() {
 
 template <typename K, typename T>
 inline void partial_sum<K, T>::increase(key_type k, value_type x) {
-    update(k, x, ::std::plus<T>());
+    update(k, x, std::plus<T>());
 }
 
 template <typename K, typename T>
 inline void partial_sum<K, T>::decrease(key_type k, value_type x) {
-    update(k, x, ::std::minus<T>());
+    update(k, x, std::minus<T>());
 }
 
 template <typename K, typename T>
@@ -121,7 +121,7 @@ typename partial_sum<K, T>::key_type partial_sum<K, T>::search(value_type x) con
 }
 
 template <typename K, typename T>
-::std::pair<typename partial_sum<K, T>::key_type, typename partial_sum<K, T>::value_type>
+std::pair<typename partial_sum<K, T>::key_type, typename partial_sum<K, T>::value_type>
 partial_sum<K, T>::search_and_sum(value_type x) const {
     auto it = tree_.root();
 
@@ -141,10 +141,10 @@ partial_sum<K, T>::search_and_sum(value_type x) const {
     }
 
     if (!found) {
-        throw ::std::invalid_argument("not found");
+        throw std::invalid_argument("not found");
     }
 
-    return ::std::make_pair(key, sum);
+    return std::make_pair(key, sum);
 }
 
 template <typename K, typename T>

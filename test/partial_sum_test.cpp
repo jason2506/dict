@@ -12,7 +12,7 @@
 
 #include <desa/internal/partial_sum.hpp>
 
-using partial_sum = ::desa::internal::partial_sum<char, ::std::size_t>;
+using partial_sum = desa::internal::partial_sum<char, std::size_t>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_partial_sum_with_more_counts(partial_sum &ps) {
@@ -134,5 +134,5 @@ TEST(PartialSumTest, SearchOnLargeAmountOfCounts) {
     EXPECT_EQ('X', ps.search(300));
     EXPECT_EQ('Y', ps.search(301));
     EXPECT_EQ('Z', ps.search(351));
-    EXPECT_THROW(ps.search(352), ::std::invalid_argument);
+    EXPECT_THROW(ps.search(352), std::invalid_argument);
 }

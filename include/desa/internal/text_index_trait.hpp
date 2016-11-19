@@ -20,8 +20,8 @@ namespace internal {
  ************************************************/
 
 struct text_index_trait {
-    using size_type = ::std::size_t;
-    using term_type = ::std::uint16_t;
+    using size_type = std::size_t;
+    using term_type = std::uint16_t;
     using wt_type = wavelet_tree<term_type>;
 
     struct event {

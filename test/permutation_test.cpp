@@ -10,7 +10,7 @@
 
 #include <desa/internal/permutation.hpp>
 
-using ::desa::internal::permutation;
+using desa::internal::permutation;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_permutation(permutation &pi) {

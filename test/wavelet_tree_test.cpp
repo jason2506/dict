@@ -10,7 +10,7 @@
 
 #include <desa/internal/wavelet_tree.hpp>
 
-using wt_t = ::desa::internal::wavelet_tree<char>;
+using wt_t = desa::internal::wavelet_tree<char>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_wavelet_tree(wt_t &wt) {

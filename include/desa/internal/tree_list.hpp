@@ -24,8 +24,8 @@ class tree_list {
     template <bool IsConst> class tree_iterator;
 
  public:  // Public Type(s)
-    using value_type = ::std::size_t;
-    using size_type = ::std::size_t;
+    using value_type = std::size_t;
+    using size_type = std::size_t;
     using reference = value_type &;
     using const_reference = value_type const &;
 
@@ -73,8 +73,8 @@ class tree_list {
 template <bool IsConst>
 class tree_list::tree_iterator {
  public:  // Public Type(s)
-    using iterator_category = ::std::bidirectional_iterator_tag;
-    using value_type = typename ::std::conditional<
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type = typename std::conditional<
         IsConst,
         tree_list::value_type const,
         tree_list::value_type
@@ -83,7 +83,7 @@ class tree_list::tree_iterator {
     using reference = value_type &;
     using difference_type = ptrdiff_t;
 
-    using rbtree_iterator = typename ::std::conditional<
+    using rbtree_iterator = typename std::conditional<
         IsConst,
         tree::const_iterator,
         tree::iterator

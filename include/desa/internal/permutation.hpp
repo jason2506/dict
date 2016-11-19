@@ -21,8 +21,8 @@ namespace internal {
 
 class permutation {
  public:  // Public Type(s)
-    using size_type = ::std::size_t;
-    using value_type = ::std::size_t;
+    using size_type = std::size_t;
+    using value_type = std::size_t;
 
  public:  // Public Method(s)
     permutation();

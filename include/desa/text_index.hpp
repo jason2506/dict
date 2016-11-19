@@ -75,8 +75,8 @@ inline text_index<UPs...>::text_index()
 template <template <typename, typename> class... UPs>
 template <typename Sequence>
 void text_index<UPs...>::insert(Sequence const &s) {
-    auto seq_it = ::std::rbegin(s);
-    auto seq_end = ::std::rend(s);
+    auto seq_it = std::rbegin(s);
+    auto seq_end = std::rend(s);
     if (seq_it == seq_end) { return; }
 
     size_type num_inserted = 0;

@@ -10,7 +10,7 @@
 
 #include <desa/internal/tree_list.hpp>
 
-using ::desa::internal::tree_list;
+using desa::internal::tree_list;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_tree(tree_list &tree, tree_list::iterator its[9]) {
@@ -53,7 +53,7 @@ TEST(LcpArrayTest, InsertMultipleValues) {
     EXPECT_EQ(9, tree.size());
 
     auto it = tree.begin();
-    for (::std::size_t i = 0; i < 9; ++i, ++it) {
+    for (std::size_t i = 0; i < 9; ++i, ++it) {
         EXPECT_EQ(it, tree.find(i));
         EXPECT_EQ(i, tree[i]);
         EXPECT_EQ(i, *it);

@@ -24,10 +24,10 @@ namespace internal {
  * Declaration: class bit_vector<N>
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 class bit_vector {
  public:  // Public Type(s)
-    using size_type = ::std::size_t;
+    using size_type = std::size_t;
     using value_type = bool;
 
  private:  // Private Static Property(ies)
@@ -39,7 +39,7 @@ class bit_vector {
             : 0.9 * MAX_BLOCK_SIZE;
 
  private:  // Private Type(s) - Part 1
-    using bitset = ::std::bitset<MAX_BLOCK_SIZE>;
+    using bitset = std::bitset<MAX_BLOCK_SIZE>;
 
  public:  // Public Method(s)
     ~bit_vector();
@@ -49,8 +49,8 @@ class bit_vector {
     void insert(size_type i, value_type b);
     value_type erase(size_type i);
 
-    ::std::pair<value_type, size_type> access_and_rank(size_type i) const;
-    ::std::pair<value_type, size_type> access_and_rank(size_type i, value_type b) const;
+    std::pair<value_type, size_type> access_and_rank(size_type i) const;
+    std::pair<value_type, size_type> access_and_rank(size_type i, value_type b) const;
     size_type rank(size_type i, value_type b) const;
     size_type select(size_type i, value_type b) const;
     size_type count() const;
@@ -83,7 +83,7 @@ class bit_vector {
  * Declaration: struct bit_vector<N>::block
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 struct bit_vector<N>::block {
     block();
 
@@ -97,12 +97,12 @@ struct bit_vector<N>::block {
  * Implementation: class bit_vector<N>
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 inline bit_vector<N>::~bit_vector() {
     // do nothing
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline bit_vector<N> &bit_vector<N>::set(size_type i, value_type b) {
     size_type pos = 0, rank = 0;
     auto it = find_block(i, pos, rank);
@@ -113,12 +113,12 @@ inline bit_vector<N> &bit_vector<N>::set(size_type i, value_type b) {
     return *this;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline bit_vector<N> &bit_vector<N>::reset(size_type i) {
     return set(i, false);
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 void bit_vector<N>::insert(size_type i, value_type b) {
     if (!tree_.root()) {
         block bb;
@@ -140,8 +140,8 @@ void bit_vector<N>::insert(size_type i, value_type b) {
     }
 
     if (it->num_bits == MAX_BLOCK_SIZE) {
-        auto prev_it = ::std::prev(it);
-        auto next_it = ::std::next(it);
+        auto prev_it = std::prev(it);
+        auto next_it = std::next(it);
         if (prev_it &&
                 prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1) &&
                 (!next_it || prev_it->num_bits < next_it->num_bits)) {
@@ -196,7 +196,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
     update_counters(it);
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
     size_type pos = 0, rank = 0;
     auto it = find_block(i, pos, rank);
@@ -222,8 +222,8 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
     if (it->num_bits == 0) {
         tree_.erase(it, update_counters);
     } else if (it->num_bits < MIN_BLOCK_SIZE) {
-        auto prev_it = ::std::prev(it);
-        auto next_it = ::std::next(it);
+        auto prev_it = std::prev(it);
+        auto next_it = std::next(it);
         if (prev_it && (!next_it || prev_it->num_bits < next_it->num_bits)) {
             if (prev_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                 merge_blocks(*prev_it, *it);
@@ -250,31 +250,31 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
     return b;
 }
 
-template <::std::size_t N>
-inline ::std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
+template <std::size_t N>
+inline std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
 bit_vector<N>::access_and_rank(size_type i) const {
     size_type pos = 0, rank = 0;
     auto it = find_bit(i, pos, rank);
     auto b = it->bits[i];
     auto r = b ? rank : i + pos + 1 - rank;
-    return ::std::make_pair(b, r);
+    return std::make_pair(b, r);
 }
 
-template <::std::size_t N>
-inline ::std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
+template <std::size_t N>
+inline std::pair<typename bit_vector<N>::value_type, typename bit_vector<N>::size_type>
     bit_vector<N>::access_and_rank(size_type i, value_type b) const {
     size_type pos = 0, rank = 0;
     auto it = find_bit(i, pos, rank);
     auto r = b ? rank : i + pos + 1 - rank;
-    return ::std::make_pair(it->bits[i], r);
+    return std::make_pair(it->bits[i], r);
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::rank(size_type i, value_type b) const {
     return access_and_rank(i, b).second;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type b) const {
     size_type pos = 0;
 
@@ -316,26 +316,26 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
     return pos - 1;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::count() const {
     auto root = tree_.root();
     return root ? root->num_sub_set_bits : 0;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::size() const {
     auto root = tree_.root();
     return root ? tree_.root()->num_sub_bits : 0;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::value_type bit_vector<N>::operator[](size_type i) const {
     size_type pos = 0, rank = 0;
     auto it = find_block(i, pos, rank);
     return it->bits[i - pos];
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::bstree::iterator  // NOLINTNEXTLINE(runtime/references)
 bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) {
     auto const &that = *this;
@@ -343,7 +343,7 @@ bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) {
     return it.unconst();
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 typename bit_vector<N>::bstree::const_iterator  // NOLINTNEXTLINE(runtime/references)
 bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) const {
     auto it = tree_.root();
@@ -378,7 +378,7 @@ bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) const {
     return it;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 inline typename bit_vector<N>::bstree::const_iterator  // NOLINTNEXTLINE(runtime/references)
 bit_vector<N>::find_bit(size_type &i, size_type &pos, size_type &rank) const {
     auto it = find_block(i, pos, rank);
@@ -387,7 +387,7 @@ bit_vector<N>::find_bit(size_type &i, size_type &pos, size_type &rank) const {
     return it;
 }
 
-template <::std::size_t N>  // NOLINTNEXTLINE(runtime/references)
+template <std::size_t N>  // NOLINTNEXTLINE(runtime/references)
 void bit_vector<N>::equalize_blocks(block &p, block &q) {
     auto num_bits = (p.num_bits + q.num_bits) / 2;
     if (p.num_bits > q.num_bits) {
@@ -409,7 +409,7 @@ void bit_vector<N>::equalize_blocks(block &p, block &q) {
     }
 }
 
-template <::std::size_t N>  // NOLINTNEXTLINE(runtime/references)
+template <std::size_t N>  // NOLINTNEXTLINE(runtime/references)
 void bit_vector<N>::merge_blocks(block &p, block &q) {
     p.bits |= q.bits << p.num_bits;
     q.bits.reset();
@@ -418,7 +418,7 @@ void bit_vector<N>::merge_blocks(block &p, block &q) {
     q.num_bits = 0;
 }
 
-template <::std::size_t N>
+template <std::size_t N>
 void bit_vector<N>::update_counters(typename bstree::iterator it) {
     while (it) {
         it->num_sub_bits = it->num_bits;
@@ -444,7 +444,7 @@ void bit_vector<N>::update_counters(typename bstree::iterator it) {
  * Implementation: struct bit_vector<N>::block
  ************************************************/
 
-template <::std::size_t N>
+template <std::size_t N>
 bit_vector<N>::block::block()
     : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
     // do nothing
