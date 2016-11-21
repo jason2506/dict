@@ -33,7 +33,7 @@ class DesaConan(ConanFile):
 
     def requirements(self):
         if self.options.build_tests:
-            self.requires('gtest/1.7.0@lasote/stable')
+            self.requires('gtest/1.8.0@lasote/stable')
 
     def build(self):
         cmake = CMake(self.settings)
