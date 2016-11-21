@@ -39,27 +39,19 @@ class DesaConan(ConanFile):
 
     def build(self):
         cmake = CMake(self.settings)
-        self.run(
-            'cmake "%s" %s'
-            ' -DENABLE_CONAN=%s'
-            ' -DBUILD_SHARED_LIBS=%s'
-            ' -DBUILD_TESTING=%s' % (
-                self.conanfile_directory,
-                cmake.command_line,
-                self.options.enable_conan,
-                self.options.shared,
-                self.options.build_tests,
-            )
-        )
-        self.run('cmake --build . %s' % cmake.build_config)
 
-    def package(self):
-        self.copy('*.cmake', dst='', src='cmake')
-        self.copy('*.hpp', dst='include', src='include')
-        self.copy('*.a', dst='lib', src='lib')
-        self.copy('*.lib', dst='lib', src='lib')
-        self.copy('*.so*', dst='lib', src='lib')
-        self.copy('*.dylib*', dst='lib', src='lib')
+        args = []
+        args.append('-DENABLE_CONAN=%s' % self.options.enable_conan)
+        args.append('-DBUILD_SHARED_LIBS=%s' % self.options.shared)
+        args.append('-DBUILD_TESTING=%s' % self.options.build_tests)
+        args.append('-DCMAKE_INSTALL_PREFIX="%s"' % self.package_folder)
+
+        self.run('cmake "%s" %s %s' % (
+            self.conanfile_directory,
+            cmake.command_line,
+            ' '.join(args)
+        ))
+        self.run('cmake --build . --target install %s' % cmake.build_config)
 
     def package_info(self):
         self.cpp_info.libs = ['desa']
