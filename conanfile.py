@@ -12,11 +12,13 @@ class DesaConan(ConanFile):
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
     options = {
+        'enable_conan': [True, False],
         'shared': [True, False],
         'build_tests': [True, False],
     }
     default_options = (
         'gtest:shared=False',
+        'enable_conan=True',
         'shared=False',
         'build_tests=True',
     )
@@ -37,12 +39,18 @@ class DesaConan(ConanFile):
 
     def build(self):
         cmake = CMake(self.settings)
-        self.run('cmake "%s" %s -DBUILD_SHARED_LIBS=%s -DBUILD_TESTING=%s' % (
-            self.conanfile_directory,
-            cmake.command_line,
-            self.options.shared,
-            self.options.build_tests,
-        ))
+        self.run(
+            'cmake "%s" %s'
+            ' -DENABLE_CONAN=%s'
+            ' -DBUILD_SHARED_LIBS=%s'
+            ' -DBUILD_TESTING=%s' % (
+                self.conanfile_directory,
+                cmake.command_line,
+                self.options.enable_conan,
+                self.options.shared,
+                self.options.build_tests,
+            )
+        )
         self.run('cmake --build . %s' % cmake.build_config)
 
     def package(self):
