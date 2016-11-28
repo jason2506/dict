@@ -1,4 +1,5 @@
 find_package(GTest REQUIRED)
+include(${PROJECT_SOURCE_DIR}/cmake/PatchFindGTest.cmake)
 
 set(${PROJECT_NAME}_TESTS
     rbtree_test
