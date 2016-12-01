@@ -6,6 +6,8 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
+#include <sstream>
+#include <vector>
 #include <initializer_list>
 
 #include <gtest/gtest.h>
@@ -24,253 +26,108 @@ void insert(text_index &ti, std::initializer_list<text_index::term_type> seq) {
     ti.insert(seq);
 }
 
-TEST(SuffixArrayTest, EmptyArray) {
-    text_index ti;
-    EXPECT_EQ(0, ti.num_seqs());
-    EXPECT_EQ(0, ti.num_terms());
+void test(text_index const &ti,
+          text_index::size_type num_seqs,
+          text_index::size_type num_terms,
+          std::vector<text_index::term_type> f,
+          std::vector<text_index::term_type> bwt,
+          std::vector<text_index::size_type> psi,
+          std::vector<text_index::size_type> lf,
+          std::vector<text_index::value_type> sa,
+          std::vector<text_index::size_type> isa,
+          std::vector<text_index::term_type> terms,
+          std::vector<text_index::size_type> lcpa) {
+    EXPECT_EQ(num_seqs, ti.num_seqs());
+    EXPECT_EQ(num_terms, ti.num_terms());
+
+    for (text_index::size_type i = 0; i < num_terms; i++) {
+        std::ostringstream ss;
+        ss << "i = " << i;
+        SCOPED_TRACE(ss.str());
+
+        EXPECT_EQ(f[i],     ti.f(i));
+        EXPECT_EQ(bwt[i],   ti.bwt(i));
+        EXPECT_EQ(psi[i],   ti.psi(i));
+        EXPECT_EQ(lf[i],    ti.lf(i));
+        EXPECT_EQ(sa[i],    ti.at(i));
+        EXPECT_EQ(isa[i],   ti.rank(i));
+        EXPECT_EQ(terms[i], ti.term(i));
+        EXPECT_EQ(lcpa[i],  ti.lcp(i));
+    }
 }
 
-TEST(SuffixArrayTest, InsertSingleValueIntoEmptyArray) {
+TEST(SuffixArrayTest, EmptyArray) {
+    text_index ti;
+    test(ti, 0, 0,
+        {},   // f
+        {},   // bwt
+        {},   // psi
+        {},   // lf
+        {},   // sa
+        {},   // isa
+        {},   // terms
+        {});  // lcpa
+}
+
+TEST(SuffixArrayTest, InsertSingleValueIntoEmptyIndex) {
     text_index ti;
     insert(ti, {5});
 
-    EXPECT_EQ(1, ti.num_seqs());
-    EXPECT_EQ(2, ti.num_terms());
-
-    EXPECT_EQ(1, ti.lf(0));
-    EXPECT_EQ(0, ti.lf(1));
-
-    EXPECT_EQ(1, ti.psi(0));
-    EXPECT_EQ(0, ti.psi(1));
-
-    EXPECT_EQ(1, ti[0]);
-    EXPECT_EQ(0, ti[1]);
-
-    EXPECT_EQ(1, ti.rank(0));
-    EXPECT_EQ(0, ti.rank(1));
-
-    EXPECT_EQ(5, ti.bwt(0));
-    EXPECT_EQ(0, ti.bwt(1));
-
-    EXPECT_EQ(5, ti.term(0));
-    EXPECT_EQ(0, ti.term(1));
-
-    EXPECT_EQ(0, ti.lcp(0));
-    EXPECT_EQ(0, ti.lcp(1));
+    test(ti, 1, 2,
+        {0, 5},   // f
+        {5, 0},   // bwt
+        {1, 0},   // psi
+        {1, 0},   // lf
+        {1, 0},   // sa
+        {1, 0},   // isa
+        {5, 0},   // terms
+        {0, 0});  // lcpa
 }
 
-TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyArray) {
+TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyIndex) {
     text_index ti;
     insert(ti, {1, 3, 1, 3, 2, 1});
 
-    EXPECT_EQ(1, ti.num_seqs());
-    EXPECT_EQ(7, ti.num_terms());
-
-    EXPECT_EQ(1, ti.lf(0));
-    EXPECT_EQ(4, ti.lf(1));
-    EXPECT_EQ(0, ti.lf(2));
-    EXPECT_EQ(5, ti.lf(3));
-    EXPECT_EQ(6, ti.lf(4));
-    EXPECT_EQ(2, ti.lf(5));
-    EXPECT_EQ(3, ti.lf(6));
-
-    EXPECT_EQ(2, ti.psi(0));
-    EXPECT_EQ(0, ti.psi(1));
-    EXPECT_EQ(5, ti.psi(2));
-    EXPECT_EQ(6, ti.psi(3));
-    EXPECT_EQ(1, ti.psi(4));
-    EXPECT_EQ(3, ti.psi(5));
-    EXPECT_EQ(4, ti.psi(6));
-
-    EXPECT_EQ(6, ti[0]);
-    EXPECT_EQ(5, ti[1]);
-    EXPECT_EQ(0, ti[2]);
-    EXPECT_EQ(2, ti[3]);
-    EXPECT_EQ(4, ti[4]);
-    EXPECT_EQ(1, ti[5]);
-    EXPECT_EQ(3, ti[6]);
-
-    EXPECT_EQ(2, ti.rank(0));
-    EXPECT_EQ(5, ti.rank(1));
-    EXPECT_EQ(3, ti.rank(2));
-    EXPECT_EQ(6, ti.rank(3));
-    EXPECT_EQ(4, ti.rank(4));
-    EXPECT_EQ(1, ti.rank(5));
-    EXPECT_EQ(0, ti.rank(6));
-
-    EXPECT_EQ(1, ti.bwt(0));
-    EXPECT_EQ(2, ti.bwt(1));
-    EXPECT_EQ(0, ti.bwt(2));
-    EXPECT_EQ(3, ti.bwt(3));
-    EXPECT_EQ(3, ti.bwt(4));
-    EXPECT_EQ(1, ti.bwt(5));
-    EXPECT_EQ(1, ti.bwt(6));
-
-    EXPECT_EQ(1, ti.term(0));
-    EXPECT_EQ(3, ti.term(1));
-    EXPECT_EQ(1, ti.term(2));
-    EXPECT_EQ(3, ti.term(3));
-    EXPECT_EQ(2, ti.term(4));
-    EXPECT_EQ(1, ti.term(5));
-    EXPECT_EQ(0, ti.term(6));
-
-    EXPECT_EQ(0, ti.lcp(0));
-    EXPECT_EQ(0, ti.lcp(1));
-    EXPECT_EQ(1, ti.lcp(2));
-    EXPECT_EQ(2, ti.lcp(3));
-    EXPECT_EQ(0, ti.lcp(4));
-    EXPECT_EQ(0, ti.lcp(5));
-    EXPECT_EQ(1, ti.lcp(6));
+    test(ti, 1, 7,
+        {0, 1, 1, 1, 2, 3, 3},   // f
+        {1, 2, 0, 3, 3, 1, 1},   // bwt
+        {2, 0, 5, 6, 1, 3, 4},   // psi
+        {1, 4, 0, 5, 6, 2, 3},   // lf
+        {6, 5, 0, 2, 4, 1, 3},   // sa
+        {2, 5, 3, 6, 4, 1, 0},   // isa
+        {1, 3, 1, 3, 2, 1, 0},   // terms
+        {0, 0, 1, 2, 0, 0, 1});  // lcpa
 }
 
-TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyArray) {
+TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyIndex) {
     text_index ti;
     insert(ti, {1, 3, 1, 3, 2, 1});
     insert(ti, {1, 3, 2});
 
-    EXPECT_EQ(2, ti.num_seqs());
-    EXPECT_EQ(11, ti.num_terms());
-
-    EXPECT_EQ(2, ti.lf(0));
-    EXPECT_EQ(6, ti.lf(1));
-    EXPECT_EQ(7, ti.lf(2));
-    EXPECT_EQ(1, ti.lf(3));
-    EXPECT_EQ(0, ti.lf(4));
-    EXPECT_EQ(8, ti.lf(5));
-    EXPECT_EQ(9, ti.lf(6));
-    EXPECT_EQ(10, ti.lf(7));
-    EXPECT_EQ(3, ti.lf(8));
-    EXPECT_EQ(4, ti.lf(9));
-    EXPECT_EQ(5, ti.lf(10));
-
-    EXPECT_EQ(4, ti.psi(0));
-    EXPECT_EQ(3, ti.psi(1));
-    EXPECT_EQ(0, ti.psi(2));
-    EXPECT_EQ(8, ti.psi(3));
-    EXPECT_EQ(9, ti.psi(4));
-    EXPECT_EQ(10, ti.psi(5));
-    EXPECT_EQ(1, ti.psi(6));
-    EXPECT_EQ(2, ti.psi(7));
-    EXPECT_EQ(5, ti.psi(8));
-    EXPECT_EQ(6, ti.psi(9));
-    EXPECT_EQ(7, ti.psi(10));
-
-    EXPECT_EQ(10, ti[0]);
-    EXPECT_EQ(3, ti[1]);
-    EXPECT_EQ(9, ti[2]);
-    EXPECT_EQ(4, ti[3]);
-    EXPECT_EQ(0, ti[4]);
-    EXPECT_EQ(6, ti[5]);
-    EXPECT_EQ(2, ti[6]);
-    EXPECT_EQ(8, ti[7]);
-    EXPECT_EQ(5, ti[8]);
-    EXPECT_EQ(1, ti[9]);
-    EXPECT_EQ(7, ti[10]);
-
-    EXPECT_EQ(4, ti.rank(0));
-    EXPECT_EQ(9, ti.rank(1));
-    EXPECT_EQ(6, ti.rank(2));
-    EXPECT_EQ(1, ti.rank(3));
-    EXPECT_EQ(3, ti.rank(4));
-    EXPECT_EQ(8, ti.rank(5));
-    EXPECT_EQ(5, ti.rank(6));
-    EXPECT_EQ(10, ti.rank(7));
-    EXPECT_EQ(7, ti.rank(8));
-    EXPECT_EQ(2, ti.rank(9));
-    EXPECT_EQ(0, ti.rank(10));
-
-    EXPECT_EQ(1, ti.bwt(0));
-    EXPECT_EQ(2, ti.bwt(1));
-    EXPECT_EQ(2, ti.bwt(2));
-    EXPECT_EQ(0, ti.bwt(3));
-    EXPECT_EQ(0, ti.bwt(4));
-    EXPECT_EQ(3, ti.bwt(5));
-    EXPECT_EQ(3, ti.bwt(6));
-    EXPECT_EQ(3, ti.bwt(7));
-    EXPECT_EQ(1, ti.bwt(8));
-    EXPECT_EQ(1, ti.bwt(9));
-    EXPECT_EQ(1, ti.bwt(10));
-
-    EXPECT_EQ(1, ti.term(0));
-    EXPECT_EQ(3, ti.term(1));
-    EXPECT_EQ(2, ti.term(2));
-    EXPECT_EQ(0, ti.term(3));
-    EXPECT_EQ(1, ti.term(4));
-    EXPECT_EQ(3, ti.term(5));
-    EXPECT_EQ(1, ti.term(6));
-    EXPECT_EQ(3, ti.term(7));
-    EXPECT_EQ(2, ti.term(8));
-    EXPECT_EQ(1, ti.term(9));
-    EXPECT_EQ(0, ti.term(10));
-
-    EXPECT_EQ(0, ti.lcp(0));
-    EXPECT_EQ(0, ti.lcp(1));
-    EXPECT_EQ(0, ti.lcp(2));
-    EXPECT_EQ(1, ti.lcp(3));
-    EXPECT_EQ(2, ti.lcp(4));
-    EXPECT_EQ(3, ti.lcp(5));
-    EXPECT_EQ(0, ti.lcp(6));
-    EXPECT_EQ(1, ti.lcp(7));
-    EXPECT_EQ(0, ti.lcp(8));
-    EXPECT_EQ(1, ti.lcp(9));
-    EXPECT_EQ(2, ti.lcp(10));
+    test(ti, 2, 11,
+        {0, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3},   // f
+        {1, 2, 2, 0, 0, 3, 3, 3, 1, 1, 1},   // bwt
+        {4, 3, 0, 8, 9, 10, 1, 2, 5, 6, 7},  // psi
+        {2, 6, 7, 1, 0, 8, 9, 10, 3, 4, 5},  // lf
+        {10, 3, 9, 4, 0, 6, 2, 8, 5, 1, 7},  // sa
+        {4, 9, 6, 1, 3, 8, 5, 10, 7, 2, 0},  // isa
+        {1, 3, 2, 0, 1, 3, 1, 3, 2, 1, 0},   // terms
+        {0, 0, 0, 1, 2, 3, 0, 1, 0, 1, 2});  // lcpa
 }
 
 TEST(SuffixArrayTest, InsertMultipleSequences) {
     text_index ti;
-    insert(ti, {3});
-    insert(ti, {1});
-    insert(ti, {2});
+    insert(ti, {2, 1, 3});
+    insert(ti, {2, 1});
+    insert(ti, {1, 3, 2});
 
-    EXPECT_EQ(3, ti.num_seqs());
-    EXPECT_EQ(6, ti.num_terms());
-
-    EXPECT_EQ(5, ti.lf(0));
-    EXPECT_EQ(4, ti.lf(1));
-    EXPECT_EQ(3, ti.lf(2));
-    EXPECT_EQ(1, ti.lf(3));
-    EXPECT_EQ(0, ti.lf(4));
-    EXPECT_EQ(2, ti.lf(5));
-
-    EXPECT_EQ(4, ti.psi(0));
-    EXPECT_EQ(3, ti.psi(1));
-    EXPECT_EQ(5, ti.psi(2));
-    EXPECT_EQ(2, ti.psi(3));
-    EXPECT_EQ(1, ti.psi(4));
-    EXPECT_EQ(0, ti.psi(5));
-
-    EXPECT_EQ(5, ti[0]);
-    EXPECT_EQ(1, ti[1]);
-    EXPECT_EQ(3, ti[2]);
-    EXPECT_EQ(2, ti[3]);
-    EXPECT_EQ(0, ti[4]);
-    EXPECT_EQ(4, ti[5]);
-
-    EXPECT_EQ(4, ti.rank(0));
-    EXPECT_EQ(1, ti.rank(1));
-    EXPECT_EQ(3, ti.rank(2));
-    EXPECT_EQ(2, ti.rank(3));
-    EXPECT_EQ(5, ti.rank(4));
-    EXPECT_EQ(0, ti.rank(5));
-
-    EXPECT_EQ(3, ti.bwt(0));
-    EXPECT_EQ(2, ti.bwt(1));
-    EXPECT_EQ(1, ti.bwt(2));
-    EXPECT_EQ(0, ti.bwt(3));
-    EXPECT_EQ(0, ti.bwt(4));
-    EXPECT_EQ(0, ti.bwt(5));
-
-    EXPECT_EQ(2, ti.term(0));
-    EXPECT_EQ(0, ti.term(1));
-    EXPECT_EQ(1, ti.term(2));
-    EXPECT_EQ(0, ti.term(3));
-    EXPECT_EQ(3, ti.term(4));
-    EXPECT_EQ(0, ti.term(5));
-
-    EXPECT_EQ(0, ti.lcp(0));
-    EXPECT_EQ(0, ti.lcp(1));
-    EXPECT_EQ(0, ti.lcp(2));
-    EXPECT_EQ(0, ti.lcp(3));
-    EXPECT_EQ(0, ti.lcp(4));
-    EXPECT_EQ(0, ti.lcp(5));
+    test(ti, 3, 11,
+        {0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3},   // f
+        {3, 2, 1, 2, 2, 0, 3, 0, 0, 1, 1},   // bwt
+        {5, 7, 8, 2, 9, 10, 1, 3, 4, 0, 6},  // psi
+        {9, 6, 3, 7, 8, 0, 10, 1, 2, 4, 5},  // lf
+        {10, 3, 6, 5, 8, 0, 2, 4, 7, 9, 1},  // sa
+        {5, 10, 6, 1, 7, 3, 2, 8, 4, 9, 0},  // isa
+        {1, 3, 2, 0, 2, 1, 0, 2, 1, 3, 0},   // terms
+        {0, 0, 0, 0, 1, 2, 0, 1, 2, 0, 1});  // lcpa
 }
