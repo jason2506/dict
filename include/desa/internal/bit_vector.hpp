@@ -30,17 +30,6 @@ class bit_vector {
     using size_type = std::size_t;
     using value_type = bool;
 
- private:  // Private Static Property(ies)
-    static constexpr size_type MAX_BLOCK_SIZE = 2 * N;
-    static constexpr size_type MIN_BLOCK_SIZE = 0.25 * MAX_BLOCK_SIZE;
-    static constexpr size_type MAX_MERGE_SIZE =
-        MAX_BLOCK_SIZE - 1 < 0.9 * MAX_BLOCK_SIZE
-            ? MAX_BLOCK_SIZE - 1
-            : 0.9 * MAX_BLOCK_SIZE;
-
- private:  // Private Type(s) - Part 1
-    using bitset = std::bitset<MAX_BLOCK_SIZE>;
-
  public:  // Public Method(s)
     ~bit_vector();
 
@@ -58,9 +47,18 @@ class bit_vector {
 
     value_type operator[](size_type i) const;
 
- private:  // Private Type(s) - Part 2
+ private:  // Private Static Property(ies)
+    static constexpr size_type MAX_BLOCK_SIZE = 2 * N;
+    static constexpr size_type MIN_BLOCK_SIZE = 0.25 * MAX_BLOCK_SIZE;
+    static constexpr size_type MAX_MERGE_SIZE =
+        MAX_BLOCK_SIZE - 1 < 0.9 * MAX_BLOCK_SIZE
+            ? MAX_BLOCK_SIZE - 1
+            : 0.9 * MAX_BLOCK_SIZE;
+
+ private:  // Private Type(s)
     struct block;
     using bstree = rbtree<block>;
+    using bitset = std::bitset<MAX_BLOCK_SIZE>;
 
  private:  // Private Static Method(s)
     static void equalize_blocks(block &p, block &q);    // NOLINT(runtime/references)
