@@ -20,11 +20,11 @@ void permutation::insert(size_type i, size_type j) {
     link_and_rank a, b;
 
     auto it = find_node(static_cast<bstree const &>(tree_).root(), i).unconst();
-    it = tree_.insert_before(it, a, update_ranks);
+    it = tree_.template insert_before<ranks_updater>(it, a);
     update_ranks(it);
 
     auto inv_it = find_node(static_cast<bstree const &>(inv_tree_).root(), j).unconst();
-    inv_it = inv_tree_.insert_before(inv_it, b, update_ranks);
+    inv_it = inv_tree_.template insert_before<ranks_updater>(inv_it, b);
     update_ranks(inv_it);
 
     it->link = inv_it;
@@ -36,8 +36,8 @@ void permutation::erase(size_type i) {
     auto it = find_node(static_cast<bstree const &>(tree_).root(), i).unconst();
     auto inv_it = it->link;
 
-    tree_.erase(it, update_ranks);
-    inv_tree_.erase(inv_it, update_ranks);
+    tree_.template erase<ranks_updater>(it);
+    inv_tree_.template erase<ranks_updater>(inv_it);
     size_--;
 }
 
@@ -48,11 +48,11 @@ void permutation::move(size_type from, size_type to) {
 
     from_it->rank--;
     update_ranks(from_it.parent());
-    auto next_it = tree_.erase(from_it, update_ranks);
+    auto next_it = tree_.template erase<ranks_updater>(from_it);
     update_ranks(next_it);
 
     auto to_it = find_node(static_cast<bstree const &>(tree_).root(), to).unconst();
-    auto new_it = tree_.insert_before(to_it, v, update_ranks);
+    auto new_it = tree_.template insert_before<ranks_updater>(to_it, v);
     update_ranks(new_it);
 
     new_it->link->link = new_it;

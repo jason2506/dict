@@ -40,6 +40,7 @@ class permutation {
 
  private:  // Private Type(s)
     struct link_and_rank;
+    struct ranks_updater;
     using bstree = rbtree<link_and_rank>;
 
  private:  // Private Static Method(s)
@@ -58,11 +59,23 @@ class permutation {
  ************************************************/
 
 struct permutation::link_and_rank {
-    link_and_rank();
+    link_and_rank() : rank(1) {
+        // do nothing
+    }
 
     bstree::iterator link;
     size_type rank;
 };  // struct permutation::link_and_rank
+
+/************************************************
+ * Declaration: struct permutation::ranks_updater
+ ************************************************/
+
+struct permutation::ranks_updater {
+    void operator()(typename bstree::iterator it) const {
+        update_ranks(it);
+    }
+};  // struct permutation::ranks_updater
 
 /************************************************
  * Implementation: class permutation
@@ -91,15 +104,6 @@ inline permutation::size_type permutation::rank(size_type j) const {
 
 inline permutation::size_type permutation::operator[](size_type i) const {
     return at(i);
-}
-
-/************************************************
- * Implementation: struct permutation::link_and_rank
- ************************************************/
-
-inline permutation::link_and_rank::link_and_rank()
-    : rank(1) {
-    // do nothing
 }
 
 }  // namespace internal

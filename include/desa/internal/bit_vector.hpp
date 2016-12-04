@@ -57,13 +57,14 @@ class bit_vector {
 
  private:  // Private Type(s)
     struct block;
+    struct counts_updater;
     using bstree = rbtree<block>;
     using bitset = std::bitset<MAX_BLOCK_SIZE>;
 
  private:  // Private Static Method(s)
     static void equalize_blocks(block &p, block &q);    // NOLINT(runtime/references)
     static void merge_blocks(block &p, block &q);       // NOLINT(runtime/references)
-    static void update_counters(typename bstree::iterator it);
+    static void update_counts(typename bstree::iterator it);
 
  private:  // Private Method(s)
     // NOLINTNEXTLINE(runtime/references)
@@ -83,13 +84,26 @@ class bit_vector {
 
 template <std::size_t N>
 struct bit_vector<N>::block {
-    block();
+    block() : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
+        // do nothing
+    }
 
     size_type num_bits;
     size_type num_sub_bits;
     size_type num_sub_set_bits;
     bitset bits;
 };  // class bit_vector<N>::block
+
+/************************************************
+ * Declaration: struct bit_vector<N>::counts_updater
+ ************************************************/
+
+template <std::size_t N>
+struct bit_vector<N>::counts_updater {
+    void operator()(typename bstree::iterator it) const {
+        update_counts(it);
+    }
+};  // class bit_vector<N>::counts_updater
 
 /************************************************
  * Implementation: class bit_vector<N>
@@ -107,7 +121,7 @@ inline bit_vector<N> &bit_vector<N>::set(size_type i, value_type b) {
     i -= pos;
 
     it->bits[i] = b;
-    update_counters(it);
+    update_counts(it);
     return *this;
 }
 
@@ -123,7 +137,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
         bb.num_bits = bb.num_sub_bits = 1;
         bb.num_sub_set_bits = (b ? 1 : 0);
         bb.bits[i] = b;
-        tree_.insert_before(tree_.end(), bb, update_counters);
+        tree_.template insert_before<counts_updater>(tree_.end(), bb);
         return;
     }
 
@@ -145,8 +159,8 @@ void bit_vector<N>::insert(size_type i, value_type b) {
                 (!next_it || prev_it->num_bits < next_it->num_bits)) {
             i += prev_it->num_bits;
             equalize_blocks(*prev_it, *it);
-            update_counters(prev_it);
-            update_counters(it);
+            update_counts(prev_it);
+            update_counts(it);
 
             if (i >= prev_it->num_bits) {
                 i -= prev_it->num_bits;
@@ -156,8 +170,8 @@ void bit_vector<N>::insert(size_type i, value_type b) {
         } else if (next_it &&
                 next_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
             equalize_blocks(*it, *next_it);
-            update_counters(it);
-            update_counters(next_it);
+            update_counts(it);
+            update_counts(next_it);
 
             if (i >= it->num_bits) {
                 i -= it->num_bits;
@@ -166,9 +180,9 @@ void bit_vector<N>::insert(size_type i, value_type b) {
         } else {
             block bb;
             equalize_blocks(bb, *it);
-            update_counters(it);
-            auto new_it = tree_.insert_before(it, bb, update_counters);
-            update_counters(new_it);
+            update_counts(it);
+            auto new_it = tree_.template insert_before<counts_updater>(it, bb);
+            update_counts(new_it);
 
             if (i >= new_it->num_bits) {
                 i -= new_it->num_bits;
@@ -191,7 +205,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
 
     // update counters
     it->num_bits++;
-    update_counters(it);
+    update_counts(it);
 }
 
 template <std::size_t N>
@@ -214,33 +228,33 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
 
     // update counters
     it->num_bits--;
-    update_counters(it);
+    update_counts(it);
 
     // delete or merge small blocks
     if (it->num_bits == 0) {
-        tree_.erase(it, update_counters);
+        tree_.template erase<counts_updater>(it);
     } else if (it->num_bits < MIN_BLOCK_SIZE) {
         auto prev_it = std::prev(it);
         auto next_it = std::next(it);
         if (prev_it && (!next_it || prev_it->num_bits < next_it->num_bits)) {
             if (prev_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                 merge_blocks(*prev_it, *it);
-                update_counters(it);
-                tree_.erase(it, update_counters);
+                update_counts(it);
+                tree_.template erase<counts_updater>(it);
             } else if (prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
                 equalize_blocks(*prev_it, *it);
-                update_counters(it);
-                update_counters(next_it);
+                update_counts(it);
+                update_counts(next_it);
             }
         } else if (next_it) {
             if (next_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                merge_blocks(*it, *next_it);
-               update_counters(it);
-               tree_.erase(next_it, update_counters);
+               update_counts(it);
+               tree_.template erase<counts_updater>(next_it);
             } else if (next_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
                equalize_blocks(*it, *next_it);
-               update_counters(it);
-               update_counters(next_it);
+               update_counts(it);
+               update_counts(next_it);
             }
         }
     }
@@ -408,7 +422,7 @@ void bit_vector<N>::equalize_blocks(block &p, block &q) {
 }
 
 template <std::size_t N>  // NOLINTNEXTLINE(runtime/references)
-void bit_vector<N>::merge_blocks(block &p, block &q) {
+inline void bit_vector<N>::merge_blocks(block &p, block &q) {
     p.bits |= q.bits << p.num_bits;
     q.bits.reset();
 
@@ -417,7 +431,7 @@ void bit_vector<N>::merge_blocks(block &p, block &q) {
 }
 
 template <std::size_t N>
-void bit_vector<N>::update_counters(typename bstree::iterator it) {
+void bit_vector<N>::update_counts(typename bstree::iterator it) {
     while (it) {
         it->num_sub_bits = it->num_bits;
         it->num_sub_set_bits = it->bits.count();
@@ -436,16 +450,6 @@ void bit_vector<N>::update_counters(typename bstree::iterator it) {
 
         it.go_parent();
     }
-}
-
-/************************************************
- * Implementation: struct bit_vector<N>::block
- ************************************************/
-
-template <std::size_t N>
-bit_vector<N>::block::block()
-    : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
-    // do nothing
 }
 
 }  // namespace internal

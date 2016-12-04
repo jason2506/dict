@@ -46,10 +46,10 @@ class rbtree {
     const_iterator end() const;
     const_iterator cend() const;
 
-    template <typename Update>
-    iterator insert_before(iterator pos, value_type const &data, Update const &update);
-    template <typename Update>
-    iterator erase(iterator pos, Update const &update);
+    template <typename Updater>
+    iterator insert_before(iterator pos, value_type const &data, Updater const &update = Updater());
+    template <typename Updater>
+    iterator erase(iterator pos, Updater const &update = Updater());
 
  private:  // Private Type(s) - Part 2
     enum class color: bool {red, black};
@@ -60,15 +60,15 @@ class rbtree {
     using const_node_ptr = std::unique_ptr<node const>;
 
  private:  // Private Method(s)
-    template <typename Update>
-    void rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr parent, Update const &update);
-    template <typename Update>
-    void rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent, Update const &update);
+    template <typename Updater>
+    void rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
+    template <typename Updater>
+    void rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
 
-    template <typename Update>
-    void rotate_left(weak_node_ptr weak_ptr, Update const &update);
-    template <typename Update>
-    void rotate_right(weak_node_ptr weak_ptr, Update const &update);
+    template <typename Updater>
+    void rotate_left(weak_node_ptr weak_ptr, Updater const &update);
+    template <typename Updater>
+    void rotate_right(weak_node_ptr weak_ptr, Updater const &update);
 
     weak_node_ptr next_node(weak_node_ptr ptr) const;
     weak_node_ptr prev_node(weak_node_ptr ptr) const;
@@ -239,9 +239,9 @@ inline typename rbtree<T>::const_iterator rbtree<T>::cend() const {
 }
 
 template <typename T>
-template <typename Update>
+template <typename Updater>
 typename rbtree<T>::iterator rbtree<T>::insert_before(
-        iterator pos, value_type const &data, Update const &update) {
+        iterator pos, value_type const &data, Updater const &update) {
     auto new_node = new node(data);
     auto ptr = pos.get_node_ptr();
     if (ptr) {
@@ -279,8 +279,8 @@ typename rbtree<T>::iterator rbtree<T>::insert_before(
 }
 
 template <typename T>
-template <typename Update>
-typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update) {
+template <typename Updater>
+typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Updater const &update) {
     auto ptr = pos.get_node_ptr();
     if (first_ == ptr && last_ == ptr) {
         // current node is at the root of the tree
@@ -376,9 +376,9 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Update const &update
 }
 
 template <typename T>
-template <typename Update>
+template <typename Updater>
 void rbtree<T>::rebalance_after_insertion(
-        weak_node_ptr ptr, weak_node_ptr parent, Update const &update) {
+        weak_node_ptr ptr, weak_node_ptr parent, Updater const &update) {
     while (is_red_node(parent)) {
         auto grandparent = parent->get_parent();
         auto uncle = grandparent
@@ -422,9 +422,9 @@ void rbtree<T>::rebalance_after_insertion(
 }
 
 template <typename T>
-template <typename Update>
+template <typename Updater>
 void rbtree<T>::rebalance_after_erasure(
-        weak_node_ptr ptr, weak_node_ptr parent, Update const &update) {
+        weak_node_ptr ptr, weak_node_ptr parent, Updater const &update) {
     while (parent && is_black_node(ptr)) {
         auto sibling = (ptr == parent->get_left())
             ? parent->get_right()
@@ -495,8 +495,8 @@ void rbtree<T>::rebalance_after_erasure(
 }
 
 template <typename T>
-template <typename Update>
-void rbtree<T>::rotate_left(weak_node_ptr ptr, Update const &update) {
+template <typename Updater>
+void rbtree<T>::rotate_left(weak_node_ptr ptr, Updater const &update) {
     auto parent = ptr->get_parent();
     auto right = ptr->move_right();
     right->set_parent(parent);
@@ -522,8 +522,8 @@ void rbtree<T>::rotate_left(weak_node_ptr ptr, Update const &update) {
 }
 
 template <typename T>
-template <typename Update>
-void rbtree<T>::rotate_right(weak_node_ptr ptr, Update const &update) {
+template <typename Updater>
+void rbtree<T>::rotate_right(weak_node_ptr ptr, Updater const &update) {
     auto parent = ptr->get_parent();
     auto left = ptr->move_left();
     left->set_parent(parent);

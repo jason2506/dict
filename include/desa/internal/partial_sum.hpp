@@ -42,6 +42,7 @@ class partial_sum {
 
  private:  // Private Type(s)
     struct key_and_sum;
+    struct sums_updater;
     using bstree = rbtree<key_and_sum>;
 
  private:  // Private Static Method(s)
@@ -61,7 +62,18 @@ template <typename K, typename T>
 struct partial_sum<K, T>::key_and_sum {
     key_type key;
     value_type sum;
-};  // struct partial_sum<K, T>::sum
+};  // struct partial_sum<K, T>::key_and_sum
+
+/************************************************
+ * Declaration: struct partial_sum<K, T>::sums_updater
+ ************************************************/
+
+template <typename K, typename T>
+struct partial_sum<K, T>::sums_updater {
+    void operator()(typename bstree::iterator it) const {
+        update_sums(it);
+    }
+};  // struct partial_sum<K, T>::sums_updater
 
 /************************************************
  * Implementation: class partial_sum<K, T>
@@ -152,7 +164,7 @@ template <typename Op>
 void partial_sum<K, T>::update(key_type k, value_type x, Op op) {
     auto it = tree_.root();
     if (!it) {
-        tree_.insert_before(it, {k, op(0, x)}, update_sums);
+        tree_.template insert_before<sums_updater>(it, {k, op(0, x)});
         return;
     }
 
@@ -165,14 +177,14 @@ void partial_sum<K, T>::update(key_type k, value_type x, Op op) {
             if (it.has_left()) {
                 it.go_left();
             } else {
-                tree_.insert_before(it, {k, op(0, x)}, update_sums);
+                tree_.template insert_before<sums_updater>(it, {k, op(0, x)});
                 break;
             }
         } else {
             if (it.has_right()) {
                 it.go_right();
             } else {
-                tree_.insert_before(++it, {k, op(0, x)}, update_sums);
+                tree_.template insert_before<sums_updater>(++it, {k, op(0, x)});
                 break;
             }
         }

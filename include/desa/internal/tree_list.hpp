@@ -57,6 +57,7 @@ class tree_list {
 
  private:  // Private Type(s) - Part 2
     struct data;
+    struct sizes_updater;
     using tree = rbtree<data>;
 
  private:  // Private Static Method(s)
@@ -118,11 +119,23 @@ class tree_list::tree_iterator {
  ************************************************/
 
 struct tree_list::data {
-    explicit data(value_type x);
+    explicit data(value_type x) : val(x), size(1) {
+        // do nothing
+    }
 
     value_type val;
     size_type size;
 };  // struct tree_list::data
+
+/************************************************
+ * Declaration: struct tree_list::sizes_updater
+ ************************************************/
+
+struct tree_list::sizes_updater {
+    void operator()(typename tree::iterator it) const {
+        update_sizes(it);
+    }
+};  // struct tree_list::sizes_updater
 
 /************************************************
  * Implementation: class tree_list
@@ -133,13 +146,14 @@ inline tree_list::~tree_list() {
 }
 
 inline tree_list::iterator tree_list::insert(iterator it, value_type val) {
-    auto tree_it = tree_.insert_before(it.get_tree_iterator(), tree::value_type(val), update_sizes);
+    auto tree_it = tree_.template insert_before<sizes_updater>(
+        it.get_tree_iterator(), tree::value_type(val));
     update_sizes(tree_it);
     return decltype(insert(it, val))(tree_it);
 }
 
 inline tree_list::iterator tree_list::erase(iterator it) {
-    auto tree_it = tree_.erase(it.get_tree_iterator(), update_sizes);
+    auto tree_it = tree_.template erase<sizes_updater>(it.get_tree_iterator());
     update_sizes(tree_it);
     return decltype(erase(it))(tree_it);
 }
@@ -314,15 +328,6 @@ inline bool tree_list::tree_iterator<B>::operator!() const {
 template <bool B>
 inline tree_list::tree_iterator<B>::operator bool() const {
     return static_cast<bool>(it_);
-}
-
-/************************************************
- * Implementation: struct tree_list::data
- ************************************************/
-
-inline tree_list::data::data(value_type x)
-    : val(x), size(1) {
-    // do nothing
 }
 
 }  // namespace internal
