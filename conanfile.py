@@ -9,18 +9,18 @@ class DesaConan(ConanFile):
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
+    dev_requires = 'gtest/1.8.0@lasote/stable'
+
     settings = 'os', 'compiler', 'build_type', 'arch'
-    generators = 'cmake'
+    generators = ('cmake', 'txt', 'env')
     options = {
         'enable_conan': [True, False],
         'shared': [True, False],
-        'build_tests': [True, False],
     }
     default_options = (
         'gtest:shared=False',
         'enable_conan=True',
         'shared=False',
-        'build_tests=True',
     )
 
     exports = (
@@ -33,17 +33,13 @@ class DesaConan(ConanFile):
         'test/*.cpp',
     )
 
-    def requirements(self):
-        if self.options.build_tests:
-            self.requires('gtest/1.8.0@lasote/stable')
-
     def build(self):
         cmake = CMake(self.settings)
 
         args = []
         args.append('-DENABLE_CONAN=%s' % self.options.enable_conan)
         args.append('-DBUILD_SHARED_LIBS=%s' % self.options.shared)
-        args.append('-DBUILD_TESTING=%s' % self.options.build_tests)
+        args.append('-DBUILD_TESTING=%s' % bool(self.scope.dev and self.scope.build_tests))
         args.append('-DCMAKE_INSTALL_PREFIX="%s"' % self.package_folder)
 
         self.run('cmake "%s" %s %s' % (
