@@ -5,7 +5,7 @@ set(${PROJECT_NAME}_TESTS
     rbtree_test
     bit_vector_test
     partial_sum_test
-    wavelet_tree_test
+    wavelet_matrix_test
     permutation_test
     tree_list_test
     text_index_test

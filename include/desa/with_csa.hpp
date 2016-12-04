@@ -27,11 +27,11 @@ class with_csa {
     using term_type = typename Trait::term_type;
 
  private:  // Private Types(s)
-    using wt_type = typename Trait::wt_type;
+    using wm_type = typename Trait::wm_type;
     using event = typename Trait::event;
 
  public:  // Public Method(s)
-    explicit with_csa(wt_type const &wt);
+    explicit with_csa(wm_type const &wt);
 
     value_type at(size_type i) const;
     size_type rank(value_type j) const;
@@ -56,7 +56,7 @@ class with_csa {
     static constexpr size_type BIT_BLOCK_SIZE = 64;
 
  private:  // Private Property(ies)
-    wt_type const &wt_;
+    wm_type const &wm_;
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
@@ -67,8 +67,8 @@ class with_csa {
  ************************************************/
 
 template <typename TI, typename T>
-inline with_csa<TI, T>::with_csa(wt_type const &wt)
-    : wt_(wt) {
+inline with_csa<TI, T>::with_csa(wm_type const &wt)
+    : wm_(wt) {
     // do nothing
 }
 
@@ -112,7 +112,7 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
 
 template <typename TI, typename T>
 inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const {
-    return wt_.search(rank(j) + 1);
+    return wm_.search(rank(j) + 1);
 }
 
 template <typename TI, typename T>

@@ -9,7 +9,7 @@
 #ifndef DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
 #define DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
 
-#include "wavelet_tree.hpp"
+#include "wavelet_matrix.hpp"
 
 namespace desa {
 
@@ -22,7 +22,7 @@ namespace internal {
 struct text_index_trait {
     using size_type = std::size_t;
     using term_type = std::uint16_t;
-    using wt_type = wavelet_tree<term_type>;
+    using wm_type = wavelet_matrix<term_type>;
 
     struct event {
         template <typename Sequence>

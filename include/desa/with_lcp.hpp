@@ -40,7 +40,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
     using size_type = typename Trait::size_type;
 
  private:  // Private Types(s)
-    using wt_type = typename Trait::wt_type;
+    using wm_type = typename Trait::wm_type;
     using event = typename Trait::event;
 
     using lcp_trait = internal::lcp_trait<Trait>;
@@ -48,7 +48,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
         ::template updater<policy, lcp_trait>;
 
  public:  // Public Method(s)
-    policy(wt_type const &wt);
+    policy(wm_type const &wt);
 
     size_type lcp(size_type i) const;
 
@@ -61,7 +61,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
     void update(typename event::template after_inserting_sequence<Sequence>);
 
  private:  // Private Property(ies)
-    wt_type const &wt_;
+    wm_type const &wm_;
     internal::tree_list lcpa_;
     size_type lcp_;
 };  // class with_lcp<UPs...>::policy<TI, T>
@@ -72,8 +72,8 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
 
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
-inline with_lcp<UPs...>::policy<TI, T>::policy(wt_type const &wt)
-    : wt_(wt), lcp_(0) {
+inline with_lcp<UPs...>::policy<TI, T>::policy(wm_type const &wt)
+    : wm_(wt), lcp_(0) {
     // do nothing
 }
 
@@ -105,11 +105,11 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
 
     auto psi = [&](size_type x) {
-        return x == 0 ? pos : wt_.psi(x - (x < lf_pos));
+        return x == 0 ? pos : wm_.psi(x - (x < lf_pos));
     };
 
     auto term_at_f = [&](size_type x) {
-        return x == 0 ? 0 : wt_.search(x + 1 - (x < lf_pos));
+        return x == 0 ? 0 : wm_.search(x + 1 - (x < lf_pos));
     };
 
     // calculate LCP[pos]
