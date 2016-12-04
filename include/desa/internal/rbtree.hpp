@@ -28,6 +28,7 @@ class rbtree {
     template <bool IsConst> class tree_iterator;
 
  public:  // Public Type(s)
+    using size_type = std::size_t;
     using value_type = T;
 
     using iterator = tree_iterator<false>;
@@ -54,10 +55,12 @@ class rbtree {
  private:  // Private Type(s) - Part 2
     enum class color: bool {red, black};
     class node;
+    class node_pool;
+    struct node_deleter;
+
     using weak_node_ptr = node *;
     using weak_const_node_ptr = node const *;
-    using node_ptr = std::unique_ptr<node>;
-    using const_node_ptr = std::unique_ptr<node const>;
+    using node_ptr = std::unique_ptr<node, node_deleter>;
 
  private:  // Private Method(s)
     template <typename Updater>
@@ -75,6 +78,10 @@ class rbtree {
 
     static bool is_red_node(weak_const_node_ptr ptr);
     static bool is_black_node(weak_const_node_ptr ptr);
+
+ private:  // Private Static Property(ies)
+    constexpr static size_type INITIAL_POOL_SIZE = 1024;
+    static node_pool pool_;
 
  private:  // Private Property(ies)
     node_ptr root_;
@@ -119,6 +126,48 @@ class rbtree<T>::node {
     color color_;
     value_type data_;
 };  // class rbtree<T>::node
+
+/************************************************
+ * Declaration: class rbtree<T>::node_pool
+ ************************************************/
+
+template <typename T>
+class rbtree<T>::node_pool {
+ public:  // Public Method(s)
+    explicit node_pool(size_type size);
+    node_pool(node_pool const &) = delete;
+    ~node_pool();
+
+    node_pool &operator=(node_pool const &) = delete;
+
+    weak_node_ptr new_node(value_type const &data);
+    void delete_node(weak_node_ptr p);
+
+ private:  // Private Type(s)
+    union block {
+        block()    { /* do nothing */ }
+        ~block()   { /* do nothing */ }
+
+        node data;
+        block *next;
+    };
+
+ private:  // Private Property(ies)
+    size_type next_size_;
+    block *chunks_head_;
+    block *free_list_head_;
+};  // class rbtree<T>::node_pool
+
+/************************************************
+ * Declaration: struct rbtree<T>::node_deleter
+ ************************************************/
+
+template <typename T>
+struct rbtree<T>::node_deleter {
+    void operator()(weak_node_ptr p) const {
+        pool_.delete_node(p);
+    }
+};  // struct rbtree<T>::node_deleter
 
 /************************************************
  * Declaration: class rbtree<T>::tree_iterator<B>
@@ -189,6 +238,9 @@ class rbtree<T>::tree_iterator {
  ************************************************/
 
 template <typename T>
+typename rbtree<T>::node_pool rbtree<T>::pool_(INITIAL_POOL_SIZE);
+
+template <typename T>
 inline rbtree<T>::rbtree() : first_(nullptr), last_(nullptr) {
     // do nothing
 }
@@ -242,7 +294,7 @@ template <typename T>
 template <typename Updater>
 typename rbtree<T>::iterator rbtree<T>::insert_before(
         iterator pos, value_type const &data, Updater const &update) {
-    auto new_node = new node(data);
+    auto new_node = pool_.new_node(data);
     auto ptr = pos.get_node_ptr();
     if (ptr) {
         if (ptr->get_left()) {
@@ -700,6 +752,53 @@ inline T const &rbtree<T>::node::data() const {
 template <typename T>
 inline T &rbtree<T>::node::data() {
     return data_;
+}
+
+/************************************************
+ * Implementation: class rbtree<T>::node_pool
+ ************************************************/
+
+template <typename T>
+inline rbtree<T>::node_pool::node_pool(size_type size)
+    : next_size_(size), chunks_head_(nullptr), free_list_head_(nullptr) {
+    // do nothing
+}
+
+template <typename T>
+inline rbtree<T>::node_pool::~node_pool() {
+    auto chunk = chunks_head_;
+    while (chunk != nullptr) {
+        auto next_chunk = chunk[0].next;
+        delete [] chunk;
+        chunk = next_chunk;
+    }
+}
+
+template <typename T>
+typename rbtree<T>::weak_node_ptr rbtree<T>::node_pool::new_node(value_type const &data) {
+    if (free_list_head_ == nullptr) {
+        auto chunk = new block[next_size_ + 1];
+        chunk[0].next = chunks_head_;
+        chunks_head_ = chunk;
+        free_list_head_ = chunk + 1;
+        for (size_type i = 1; i < next_size_; i++) {
+            chunk[i].next = &chunk[i + 1];
+        }
+
+        chunk[next_size_].next = nullptr;
+        next_size_ <<= 1;
+    }
+
+    auto p = &(free_list_head_->data);
+    free_list_head_ = free_list_head_->next;
+    return new(p) node(data);
+}
+
+template <typename T>
+inline void rbtree<T>::node_pool::delete_node(weak_node_ptr p) {
+    p->~node();
+    reinterpret_cast<block *>(p)->next = free_list_head_;
+    free_list_head_ = reinterpret_cast<block *>(p);
 }
 
 /************************************************
