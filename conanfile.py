@@ -9,10 +9,6 @@ class DesaConan(ConanFile):
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
-    dev_requires = (
-        'gtest/1.8.0@lasote/stable',
-    )
-
     settings = ('os', 'compiler', 'build_type', 'arch')
     generators = ('cmake', 'txt', 'env')
     options = {
@@ -34,6 +30,10 @@ class DesaConan(ConanFile):
         'test/CMakeLists.txt',
         'test/*.cpp',
     )
+
+    def requirements(self):
+        if self.scope.dev and self.scope.build_tests:
+            self.requires('gtest/1.8.0@lasote/stable', private=True)
 
     def build(self):
         extra_opts = []
