@@ -2,7 +2,7 @@
  *  bit_vector_test.cpp
  *  DICT
  *
- *  Copyright (c) 2015-2016, Chi-En Wu
+ *  Copyright (c) 2015-2017, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 

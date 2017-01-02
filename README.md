@@ -107,6 +107,6 @@ $ cmake --build _build --target test
 
 ## License
 
-Copyright (c) 2015-2016, Chi-En Wu.
+Copyright (c) 2015-2017, Chi-En Wu.
 
 Distributed under [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause).
