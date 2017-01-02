@@ -1,20 +1,20 @@
 /************************************************
  *  rbtree.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_RBTREE_HPP_
-#define DESA_INTERNAL_RBTREE_HPP_
+#ifndef DICT_INTERNAL_RBTREE_HPP_
+#define DICT_INTERNAL_RBTREE_HPP_
 
 #include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -979,6 +979,6 @@ rbtree<T>::tree_iterator<B>::get_node_ptr() {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_RBTREE_HPP_
+#endif  // DICT_INTERNAL_RBTREE_HPP_

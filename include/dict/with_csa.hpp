@@ -1,18 +1,18 @@
 /************************************************
  *  with_csa.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_WITH_CSA_HPP_
-#define DESA_WITH_CSA_HPP_
+#ifndef DICT_WITH_CSA_HPP_
+#define DICT_WITH_CSA_HPP_
 
 #include "internal/bit_vector.hpp"
 #include "internal/permutation.hpp"
 
-namespace desa {
+namespace dict {
 
 /************************************************
  * Declaration: class with_csa<TI, T>
@@ -166,6 +166,6 @@ void with_csa<TI, T>::add_samples(value_type j) {
     }
 }
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_WITH_CSA_HPP_
+#endif  // DICT_WITH_CSA_HPP_

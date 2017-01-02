@@ -1,18 +1,18 @@
 /************************************************
  *  with_lcp.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_WITH_LCP_HPP_
-#define DESA_WITH_LCP_HPP_
+#ifndef DICT_WITH_LCP_HPP_
+#define DICT_WITH_LCP_HPP_
 
 #include "internal/lcp_trait.hpp"
 #include "internal/tree_list.hpp"
 
-namespace desa {
+namespace dict {
 
 /************************************************
  * Declaration: class with_lcp<UPs...>
@@ -172,6 +172,6 @@ inline void with_lcp<UPs...>::policy<TI, T>::update(
     // do nothing
 }
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_WITH_LCP_HPP_
+#endif  // DICT_WITH_LCP_HPP_

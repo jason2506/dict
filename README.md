@@ -1,4 +1,4 @@
-# Desa
+# DICT - Dynamic Indexing for Collection of Text
 
 
 ## Instructions
@@ -10,12 +10,12 @@
 
 ### Installing with Conan (and CMake)
 
-The recommended way to use _Desa_ package in your project is to install the package with Conan.
+The recommended way to use _DICT_ package in your project is to install the package with Conan.
 
 Assume that your project is built with CMake, you can just execute the following command in your __build directory__:
 
 ```sh
-$ conan install desa/0.1.0@jason2506/testing -b outdated -g cmake
+$ conan install dict/0.1.0@jason2506/testing -b outdated -g cmake
 ```
 
 The `install` command will download the package (together with its dependencies) and generate `conanbuildinfo.cmake` file in the current directory.
@@ -35,11 +35,11 @@ This will setup necessary CMake variables for finding installed libraries and re
 Now, you can use `find_package()` and `target_link_libraries()` commands to locate and link the package. For example,
 
 ```cmake
-find_package(desa)
+find_package(dict)
 
-if(desa_FOUND)
+if(dict_FOUND)
     add_executable(myexec mycode.cpp)
-    target_link_libraries(myexec desa)
+    target_link_libraries(myexec dict)
 endif()
 ```
 

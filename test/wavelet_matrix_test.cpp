@@ -1,6 +1,6 @@
 /************************************************
  *  wavelet_matrix_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/wavelet_matrix.hpp>
+#include <dict/internal/wavelet_matrix.hpp>
 
-using wm_t = desa::internal::wavelet_matrix<char>;
+using wm_t = dict::internal::wavelet_matrix<char>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_wavelet_matrix(wm_t &wt) {

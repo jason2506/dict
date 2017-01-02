@@ -1,13 +1,13 @@
 /************************************************
  *  partial_sum.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_PARTIAL_SUM_HPP_
-#define DESA_INTERNAL_PARTIAL_SUM_HPP_
+#ifndef DICT_INTERNAL_PARTIAL_SUM_HPP_
+#define DICT_INTERNAL_PARTIAL_SUM_HPP_
 
 #include <functional>
 #include <stdexcept>
@@ -15,7 +15,7 @@
 
 #include "rbtree.hpp"
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -204,6 +204,6 @@ inline void partial_sum<K, T>::update_sums(typename bstree::iterator it) {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_PARTIAL_SUM_HPP_
+#endif  // DICT_INTERNAL_PARTIAL_SUM_HPP_

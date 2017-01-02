@@ -1,6 +1,6 @@
 /************************************************
  *  idx_tree_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/tree_list.hpp>
+#include <dict/internal/tree_list.hpp>
 
-using desa::internal::tree_list;
+using dict::internal::tree_list;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_tree(tree_list &tree, tree_list::iterator its[9]) {

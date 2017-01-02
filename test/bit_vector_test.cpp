@@ -1,6 +1,6 @@
 /************************************************
  *  bit_vector_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/bit_vector.hpp>
+#include <dict/internal/bit_vector.hpp>
 
-using bitmap = desa::internal::bit_vector<2>;
+using bitmap = dict::internal::bit_vector<2>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_bitmap(bitmap &bits) {

@@ -1,6 +1,6 @@
 /************************************************
  *  text_index_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -12,13 +12,13 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/text_index.hpp>
-#include <desa/with_csa.hpp>
-#include <desa/with_lcp.hpp>
+#include <dict/text_index.hpp>
+#include <dict/with_csa.hpp>
+#include <dict/with_lcp.hpp>
 
-using text_index = desa::text_index<
-    desa::with_csa,
-    desa::with_lcp<>::policy
+using text_index = dict::text_index<
+    dict::with_csa,
+    dict::with_lcp<>::policy
 >;
 
 // NOLINTNEXTLINE(runtime/references)

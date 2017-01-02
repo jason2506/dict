@@ -1,6 +1,6 @@
 /************************************************
  *  rbtree_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -11,7 +11,7 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/rbtree.hpp>
+#include <dict/internal/rbtree.hpp>
 
 // TODO(jason2506) there should be a better way for testing insertion/erasure operation
 
@@ -36,7 +36,7 @@
         check_rbtree_property(tree); \
     }
 
-using desa::internal::rbtree;
+using dict::internal::rbtree;
 using rbtree_node_ptr = decltype(std::declval<typename rbtree<int>::iterator>().get_node_ptr());
 using rbtree_node_color = decltype(rbtree_node_ptr()->get_color());
 

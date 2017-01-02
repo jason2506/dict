@@ -1,6 +1,6 @@
 /************************************************
  *  permutation_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/permutation.hpp>
+#include <dict/internal/permutation.hpp>
 
-using desa::internal::permutation;
+using dict::internal::permutation;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_permutation(permutation &pi) {

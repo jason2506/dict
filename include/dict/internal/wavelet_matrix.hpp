@@ -1,13 +1,13 @@
 /************************************************
  *  wavelet_matrix.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_WAVELET_MATRIX_HPP_
-#define DESA_INTERNAL_WAVELET_MATRIX_HPP_
+#ifndef DICT_INTERNAL_WAVELET_MATRIX_HPP_
+#define DICT_INTERNAL_WAVELET_MATRIX_HPP_
 
 #include <climits>
 #include <array>
@@ -16,7 +16,7 @@
 #include "bit_vector.hpp"
 #include "partial_sum.hpp"
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -235,6 +235,6 @@ wavelet_matrix<T, N>::select_at(size_type j, value_type c) const {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_WAVELET_MATRIX_HPP_
+#endif  // DICT_INTERNAL_WAVELET_MATRIX_HPP_

@@ -1,14 +1,14 @@
 /************************************************
  *  permutation.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#include <desa/internal/permutation.hpp>
+#include <dict/internal/permutation.hpp>
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -109,4 +109,4 @@ void permutation::update_ranks(typename bstree::iterator it) {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict

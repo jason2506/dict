@@ -1,17 +1,17 @@
 /************************************************
  *  text_index_trait.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
-#define DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
+#ifndef DICT_INTERNAL_TEXT_INDEX_TRAIT_HPP_
+#define DICT_INTERNAL_TEXT_INDEX_TRAIT_HPP_
 
 #include "wavelet_matrix.hpp"
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -49,6 +49,6 @@ struct text_index_trait {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_TEXT_INDEX_TRAIT_HPP_
+#endif  // DICT_INTERNAL_TEXT_INDEX_TRAIT_HPP_

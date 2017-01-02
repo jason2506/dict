@@ -1,17 +1,17 @@
 /************************************************
  *  chained_updater.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_CHAINED_UPDATER_HPP_
-#define DESA_INTERNAL_CHAINED_UPDATER_HPP_
+#ifndef DICT_INTERNAL_CHAINED_UPDATER_HPP_
+#define DICT_INTERNAL_CHAINED_UPDATER_HPP_
 
 #include <utility>
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -123,6 +123,6 @@ inline void chained_updater<>::updater<Args...>::update(Event) {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_CHAINED_UPDATER_HPP_
+#endif  // DICT_INTERNAL_CHAINED_UPDATER_HPP_

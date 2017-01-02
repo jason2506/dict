@@ -1,13 +1,13 @@
 /************************************************
  *  text_index.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_TEXT_INDEX_HPP_
-#define DESA_TEXT_INDEX_HPP_
+#ifndef DICT_TEXT_INDEX_HPP_
+#define DICT_TEXT_INDEX_HPP_
 
 #include <cassert>
 #include <iterator>
@@ -16,7 +16,7 @@
 #include "internal/text_index_trait.hpp"
 #include "internal/wavelet_matrix.hpp"
 
-namespace desa {
+namespace dict {
 
 /************************************************
  * Declaration: class text_index<UPs...>
@@ -171,6 +171,6 @@ inline typename text_index<UPs...>::size_type text_index<UPs...>::lf(size_type i
     return (pair.first == 0 && i < sentinel_pos_) + pair.second;
 }
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_TEXT_INDEX_HPP_
+#endif  // DICT_TEXT_INDEX_HPP_

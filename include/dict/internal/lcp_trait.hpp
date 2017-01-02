@@ -1,15 +1,15 @@
 /************************************************
  *  lcp_trait.hpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
-#ifndef DESA_INTERNAL_LCP_TRAIT_HPP_
-#define DESA_INTERNAL_LCP_TRAIT_HPP_
+#ifndef DICT_INTERNAL_LCP_TRAIT_HPP_
+#define DICT_INTERNAL_LCP_TRAIT_HPP_
 
-namespace desa {
+namespace dict {
 
 namespace internal {
 
@@ -36,6 +36,6 @@ struct lcp_trait {
 
 }  // namespace internal
 
-}  // namespace desa
+}  // namespace dict
 
-#endif  // DESA_INTERNAL_LCP_TRAIT_HPP_
+#endif  // DICT_INTERNAL_LCP_TRAIT_HPP_

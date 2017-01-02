@@ -1,11 +1,11 @@
 from conans import ConanFile, CMake
 
 
-class DesaConan(ConanFile):
+class DictConan(ConanFile):
 
-    name = 'desa'
+    name = 'dict'
     version = '0.1.0'
-    url = 'https://github.com/jason2506/desa'
+    url = 'https://github.com/jason2506/dict'
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
@@ -62,4 +62,4 @@ class DesaConan(ConanFile):
         self.run('cmake --build . --target install')
 
     def package_info(self):
-        self.cpp_info.libs = ['desa']
+        self.cpp_info.libs = ['dict']

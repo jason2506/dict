@@ -1,6 +1,6 @@
 /************************************************
  *  partial_sum_test.cpp
- *  DESA
+ *  DICT
  *
  *  Copyright (c) 2015-2016, Chi-En Wu
  *  Distributed under The BSD 3-Clause License
@@ -10,9 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <desa/internal/partial_sum.hpp>
+#include <dict/internal/partial_sum.hpp>
 
-using partial_sum = desa::internal::partial_sum<char, std::size_t>;
+using partial_sum = dict::internal::partial_sum<char, std::size_t>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_partial_sum_with_more_counts(partial_sum &ps) {
