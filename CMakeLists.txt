@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(dict
+project(DICT
     VERSION 0.1.0
     LANGUAGES C CXX
 )
@@ -27,4 +27,4 @@ if(BUILD_TESTING)
     add_subdirectory(test)
 endif(BUILD_TESTING)
 
-include(cmake/dictPackage.cmake)
+include(cmake/DICTPackage.cmake)

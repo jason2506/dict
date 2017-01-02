@@ -35,11 +35,11 @@ This will setup necessary CMake variables for finding installed libraries and re
 Now, you can use `find_package()` and `target_link_libraries()` commands to locate and link the package. For example,
 
 ```cmake
-find_package(dict)
+find_package(DICT)
 
-if(dict_FOUND)
+if(DICT_FOUND)
     add_executable(myexec mycode.cpp)
-    target_link_libraries(myexec dict)
+    target_link_libraries(myexec DICT::DICT)
 endif()
 ```
 
