@@ -8,10 +8,12 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:include>
 )
 
+string(TOLOWER ${PROJECT_NAME} OUTPUT_NAME)
+
 set_target_properties(${PROJECT_NAME}
     PROPERTIES
         VERSION ${PROJECT_VERSION}
-        OUTPUT_NAME ${PROJECT_NAME}
+        OUTPUT_NAME ${OUTPUT_NAME}
         CLEAN_DIRECT_OUTPUT 1
 )
 
