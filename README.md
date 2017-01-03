@@ -10,7 +10,7 @@
 
 ### Installing with Conan (and CMake)
 
-The recommended way to use _DICT_ package in your project is to install the package with Conan.
+The recommended way to use _DICT_ package in your project is to install the package with [Conan](https://conan.io).
 
 Assume that your project is built with CMake, you can just execute the following command in your __build directory__:
 
@@ -50,7 +50,7 @@ $ cmake [SOURCE_DIR] -DCMAKE_BUILD_TYPE=Release
 $ cmake --build .
 ```
 
-Please check [conan docs](http://docs.conan.io/en/latest/) for more details about how to use conan packages, generators and much more.
+Please check [Conan Docs](http://docs.conan.io/en/latest/) for more details about how to use conan packages, generators and much more.
 
 ### Installing without Conan
 
