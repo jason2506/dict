@@ -9,6 +9,10 @@ class DictConan(ConanFile):
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
 
+    requires = (
+        'msgpack/0.1.0@jason2506/testing',
+    )
+
     settings = ('os', 'compiler', 'build_type', 'arch')
     generators = ('cmake', 'txt', 'env')
     options = {
@@ -16,6 +20,9 @@ class DictConan(ConanFile):
         'shared': [True, False],
     }
     default_options = (
+        'msgpack:enable_shared=False',
+        'msgpack:version=2.1.0',
+        'msgpack:use_cxx11=True',
         'gtest:shared=False',
         'enable_conan=True',
         'shared=False',

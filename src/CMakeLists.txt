@@ -1,7 +1,10 @@
+find_package(MsgPack 2.1.0 REQUIRED)
+
 add_library(${PROJECT_NAME}
     permutation.cpp
 )
 
+target_link_libraries(${PROJECT_NAME} PRIVATE MsgPack::MsgPack)
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<BUILD_INTERFACE:${${PROJECT_NAME}_INCLUDE_DIR}>
