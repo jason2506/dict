@@ -68,8 +68,8 @@ class rbtree {
     void rotate_left(weak_node_ptr weak_ptr, Updater const &update);
     void rotate_right(weak_node_ptr weak_ptr, Updater const &update);
 
-    weak_node_ptr next_node(weak_node_ptr ptr) const;
-    weak_node_ptr prev_node(weak_node_ptr ptr) const;
+    weak_node_ptr next_node(weak_const_node_ptr ptr) const;
+    weak_node_ptr prev_node(weak_const_node_ptr ptr) const;
 
     static bool is_red_node(weak_const_node_ptr ptr);
     static bool is_black_node(weak_const_node_ptr ptr);
@@ -585,7 +585,7 @@ void rbtree<T, U>::rotate_right(weak_node_ptr ptr, U const &update) {
 }
 
 template <typename T, typename U>
-typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::next_node(weak_node_ptr ptr) const {
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::next_node(weak_const_node_ptr ptr) const {
     if (!ptr) {
         ptr = first_;
     } else if (ptr == last_) {
@@ -603,11 +603,11 @@ typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::next_node(weak_node_ptr ptr) 
         ptr = ptr->get_parent();
     }
 
-    return ptr;
+    return const_cast<weak_node_ptr>(ptr);
 }
 
 template <typename T, typename U>
-typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::prev_node(weak_node_ptr ptr) const {
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::prev_node(weak_const_node_ptr ptr) const {
     if (!ptr) {
         ptr = last_;
     } else if (ptr == first_) {
@@ -625,7 +625,7 @@ typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::prev_node(weak_node_ptr ptr) 
         ptr = ptr->get_parent();
     }
 
-    return ptr;
+    return const_cast<weak_node_ptr>(ptr);
 }
 
 template <typename T, typename U>
