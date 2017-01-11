@@ -127,7 +127,10 @@ inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::search(si
 }
 
 template <typename T, std::size_t N>
-inline std::pair<typename wavelet_matrix<T, N>::value_type, typename wavelet_matrix<T, N>::size_type>
+inline std::pair<
+    typename wavelet_matrix<T, N>::value_type,
+    typename wavelet_matrix<T, N>::size_type
+>
 wavelet_matrix<T, N>::access_and_rank(size_type i) const {
     auto pair = access_and_lf(i);
     auto ps = sum(pair.first);
@@ -135,7 +138,8 @@ wavelet_matrix<T, N>::access_and_rank(size_type i) const {
 }
 
 template <typename T, std::size_t N>
-typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::rank(size_type i, value_type c) const {
+typename wavelet_matrix<T, N>::size_type
+wavelet_matrix<T, N>::rank(size_type i, value_type c) const {
     auto ps = sum(c);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
         auto &bits = level_bits(l);
@@ -160,7 +164,10 @@ wavelet_matrix<T, N>::select(size_type j, value_type c) const {
 }
 
 template <typename T, std::size_t N>
-std::pair<typename wavelet_matrix<T, N>::value_type, typename wavelet_matrix<T, N>::size_type>
+std::pair<
+    typename wavelet_matrix<T, N>::value_type,
+    typename wavelet_matrix<T, N>::size_type
+>
 wavelet_matrix<T, N>::access_and_lf(size_type i) const {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l) {
@@ -190,7 +197,8 @@ inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::at(size_t
 }
 
 template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::operator[](size_type i) const {
+inline typename wavelet_matrix<T, N>::value_type
+wavelet_matrix<T, N>::operator[](size_type i) const {
     return at(i);
 }
 
