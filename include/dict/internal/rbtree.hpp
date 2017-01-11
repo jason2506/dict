@@ -36,7 +36,6 @@ class rbtree {
 
  public:  // Public Method(s)
     rbtree();
-    ~rbtree();
 
     iterator root();
     const_iterator root() const;
@@ -96,7 +95,6 @@ template <typename T>
 class rbtree<T>::node {
  public:  // Public Method(s)
     explicit node(value_type const &data);
-    ~node();
 
     weak_const_node_ptr get_parent() const;
     weak_node_ptr get_parent();
@@ -145,8 +143,8 @@ class rbtree<T>::node_pool {
 
  private:  // Private Type(s)
     union block {
-        block()    { /* do nothing */ }
-        ~block()   { /* do nothing */ }
+        block()     { /* do nothing */ }
+        ~block()    { /* do nothing */ }
 
         node data;
         block *next;
@@ -198,7 +196,6 @@ class rbtree<T>::tree_iterator {
     explicit tree_iterator(rbtree const *tree);
     tree_iterator(rbtree const *tree, node_ptr ptr);
     tree_iterator(rbtree const *tree, typename rbtree<T>::node_ptr const &ptr);
-    ~tree_iterator();
 
     bool has_parent();
     bool has_left();
@@ -242,11 +239,6 @@ typename rbtree<T>::node_pool rbtree<T>::pool_(INITIAL_POOL_SIZE);
 
 template <typename T>
 inline rbtree<T>::rbtree() : first_(nullptr), last_(nullptr) {
-    // do nothing
-}
-
-template <typename T>
-inline rbtree<T>::~rbtree() {
     // do nothing
 }
 
@@ -665,11 +657,6 @@ inline rbtree<T>::node::node(T const &data)
 }
 
 template <typename T>
-inline rbtree<T>::node::~node() {
-    // do nothing
-}
-
-template <typename T>
 inline typename rbtree<T>::weak_const_node_ptr rbtree<T>::node::get_parent() const {
     return parent_;
 }
@@ -831,12 +818,6 @@ template <bool B>
 inline rbtree<T>::tree_iterator<B>::tree_iterator(
         rbtree const *tree, typename rbtree<T>::node_ptr const &ptr)
     : tree_(tree), ptr_(ptr.get()) {
-    // do nothing
-}
-
-template <typename T>
-template <bool B>
-inline rbtree<T>::tree_iterator<B>::~tree_iterator() {
     // do nothing
 }
 
