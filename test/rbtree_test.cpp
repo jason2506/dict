@@ -20,7 +20,7 @@
         ss << "After inserting: " << i; \
         SCOPED_TRACE(ss.str()); \
         auto inserted_it = in_it; \
-        auto new_it = tree.insert_before(inserted_it, i, noop); \
+        auto new_it = tree.insert_before(inserted_it, i); \
         out_it = new_it++; \
         EXPECT_EQ(inserted_it, new_it); \
         check_rbtree_property(tree); \
@@ -31,16 +31,20 @@
         ss << "After erasing: " << *it; \
         SCOPED_TRACE(ss.str()); \
         auto deleted_it = it++; \
-        auto next_it = tree.erase(deleted_it, noop); \
+        auto next_it = tree.erase(deleted_it); \
         EXPECT_EQ(it, next_it); \
         check_rbtree_property(tree); \
     }
 
-using dict::internal::rbtree;
-using rbtree_node_ptr = decltype(std::declval<typename rbtree<int>::iterator>().get_node_ptr());
+struct noop;
+using rbtree = dict::internal::rbtree<int, noop>;
+using rbtree_node_ptr = decltype(std::declval<typename rbtree::iterator>().get_node_ptr());
 using rbtree_node_color = decltype(rbtree_node_ptr()->get_color());
 
-auto noop = [](rbtree<int>::iterator){};
+struct noop {
+    void operator()(typename rbtree::iterator) const
+        { /* do nothing */ }
+};  // struct noop
 
 bool is_black_node(rbtree_node_ptr ptr, rbtree_node_color black) {
     // all leaves (null) are black
@@ -76,7 +80,7 @@ void check_subtree_property(  // NOLINTNEXTLINE(runtime/references)
 }
 
 // NOLINTNEXTLINE(runtime/references)
-void check_rbtree_property(rbtree<int> &tree) {
+void check_rbtree_property(rbtree &tree) {
     // NOTE: we assume that the tree satisfies all properties is correct
     auto root = tree.root().get_node_ptr();
     if (root == nullptr) { return; }
@@ -87,22 +91,22 @@ void check_rbtree_property(rbtree<int> &tree) {
 }
 
 template <std::size_t N>  // NOLINTNEXTLINE(runtime/references)
-void construct_tree(rbtree<int> &tree, rbtree<int>::iterator its[N]) {
+void construct_tree(rbtree &tree, rbtree::iterator its[N]) {
     for (decltype(N) i = 0; i < N; ++i) {
-        its[i] = tree.insert_before(tree.end(), i, noop);
+        its[i] = tree.insert_before(tree.end(), i);
     }
 }
 
 TEST(RBTreeTest, EmptyTree) {
-    rbtree<int> tree;
+    rbtree tree;
     EXPECT_EQ(0, tree.size());
     EXPECT_EQ(tree.end(), tree.root());
     EXPECT_EQ(tree.end(), tree.begin());
 }
 
 TEST(RBTreeTest, InsertFirstNode) {
-    rbtree<int> tree;
-    auto it = tree.insert_before(tree.end(), 9, noop);
+    rbtree tree;
+    auto it = tree.insert_before(tree.end(), 9);
     EXPECT_EQ(1, tree.size());
     EXPECT_EQ(tree.root(), it);
     EXPECT_EQ(tree.begin(), it);
@@ -113,8 +117,8 @@ TEST(RBTreeTest, InsertFirstNode) {
 TEST(RBTreeTest, InsertAtBegin) {
     constexpr std::size_t N = 9;
 
-    rbtree<int> tree;
-    rbtree<int>::iterator it;
+    rbtree tree;
+    rbtree::iterator it;
     for (auto i = N; i > 0; --i) {
         INSERT_CHECK(tree, it, it, i);
         EXPECT_EQ(tree.begin(), it);
@@ -134,8 +138,8 @@ TEST(RBTreeTest, InsertAtBegin) {
 TEST(RBTreeTest, InsertAtEnd) {
     constexpr std::size_t N = 9;
 
-    rbtree<int> tree;
-    rbtree<int>::iterator it;
+    rbtree tree;
+    rbtree::iterator it;
     for (auto i = N; i > 0; --i) {
         INSERT_CHECK(tree, tree.end(), it, i);
         EXPECT_EQ(--tree.end(), it);
@@ -153,9 +157,9 @@ TEST(RBTreeTest, InsertAtEnd) {
 }
 
 TEST(RBTreeTest, InsertInShuffleOrder) {
-    rbtree<int> tree;
+    rbtree tree;
 
-    rbtree<int>::iterator its[9];
+    rbtree::iterator its[9];
     INSERT_CHECK(tree, tree.end(), its[5], 5);  // 5
     INSERT_CHECK(tree, its[5], its[3], 3);      // 3 5
     INSERT_CHECK(tree, tree.end(), its[7], 7);  // 3 5 7
@@ -180,8 +184,8 @@ TEST(RBTreeTest, InsertInShuffleOrder) {
 TEST(RBTreeTest, EraseAtBegin) {
     constexpr std::size_t N = 9;
 
-    rbtree<int> tree;
-    rbtree<int>::iterator its[N];
+    rbtree tree;
+    rbtree::iterator its[N];
     construct_tree<N>(tree, its);
 
     // check values stored in the tree
@@ -198,8 +202,8 @@ TEST(RBTreeTest, EraseAtBegin) {
 TEST(RBTreeTest, EraseAtEnd) {
     constexpr std::size_t N = 9;
 
-    rbtree<int> tree;
-    rbtree<int>::iterator its[N];
+    rbtree tree;
+    rbtree::iterator its[N];
     construct_tree<N>(tree, its);
 
     // check values stored in the tree
@@ -216,8 +220,8 @@ TEST(RBTreeTest, EraseAtEnd) {
 TEST(RBTreeTest, EraseInShuffleOrder) {
     constexpr std::size_t N = 9;
 
-    rbtree<int> tree;
-    rbtree<int>::iterator its[N];
+    rbtree tree;
+    rbtree::iterator its[N];
     construct_tree<N>(tree, its);
 
     ERASE_CHECK(tree, its[3]);  // 0 1 2 4 5 6 7 8

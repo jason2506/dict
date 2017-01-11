@@ -43,7 +43,7 @@ class partial_sum {
  private:  // Private Type(s)
     struct key_and_sum;
     struct sums_updater;
-    using bstree = rbtree<key_and_sum>;
+    using bstree = rbtree<key_and_sum, sums_updater>;
 
  private:  // Private Static Method(s)
     template <typename Op>
@@ -164,7 +164,7 @@ template <typename Op>
 void partial_sum<K, T>::update(key_type k, value_type x, Op op) {
     auto it = tree_.root();
     if (!it) {
-        tree_.template insert_before<sums_updater>(it, {k, op(0, x)});
+        tree_.insert_before(it, {k, op(0, x)});
         return;
     }
 
@@ -177,14 +177,14 @@ void partial_sum<K, T>::update(key_type k, value_type x, Op op) {
             if (it.has_left()) {
                 it.go_left();
             } else {
-                tree_.template insert_before<sums_updater>(it, {k, op(0, x)});
+                tree_.insert_before(it, {k, op(0, x)});
                 break;
             }
         } else {
             if (it.has_right()) {
                 it.go_right();
             } else {
-                tree_.template insert_before<sums_updater>(++it, {k, op(0, x)});
+                tree_.insert_before(++it, {k, op(0, x)});
                 break;
             }
         }

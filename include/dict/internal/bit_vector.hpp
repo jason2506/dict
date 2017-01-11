@@ -58,7 +58,7 @@ class bit_vector {
  private:  // Private Type(s)
     struct block;
     struct counts_updater;
-    using bstree = rbtree<block>;
+    using bstree = rbtree<block, counts_updater>;
     using bitset = std::bitset<MAX_BLOCK_SIZE>;
 
  private:  // Private Static Method(s)
@@ -137,7 +137,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
         bb.num_bits = bb.num_sub_bits = 1;
         bb.num_sub_set_bits = (b ? 1 : 0);
         bb.bits[i] = b;
-        tree_.template insert_before<counts_updater>(tree_.end(), bb);
+        tree_.insert_before(tree_.end(), bb);
         return;
     }
 
@@ -181,7 +181,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
             block bb;
             equalize_blocks(bb, *it);
             update_counts(it);
-            auto new_it = tree_.template insert_before<counts_updater>(it, bb);
+            auto new_it = tree_.insert_before(it, bb);
             update_counts(new_it);
 
             if (i >= new_it->num_bits) {
@@ -232,7 +232,7 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
 
     // delete or merge small blocks
     if (it->num_bits == 0) {
-        tree_.template erase<counts_updater>(it);
+        tree_.erase(it);
     } else if (it->num_bits < MIN_BLOCK_SIZE) {
         auto prev_it = std::prev(it);
         auto next_it = std::next(it);
@@ -240,7 +240,7 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
             if (prev_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                 merge_blocks(*prev_it, *it);
                 update_counts(it);
-                tree_.template erase<counts_updater>(it);
+                tree_.erase(it);
             } else if (prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
                 equalize_blocks(*prev_it, *it);
                 update_counts(it);
@@ -250,7 +250,7 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
             if (next_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                merge_blocks(*it, *next_it);
                update_counts(it);
-               tree_.template erase<counts_updater>(next_it);
+               tree_.erase(next_it);
             } else if (next_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
                equalize_blocks(*it, *next_it);
                update_counts(it);

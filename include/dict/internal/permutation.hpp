@@ -41,7 +41,7 @@ class permutation {
  private:  // Private Type(s)
     struct link_and_rank;
     struct ranks_updater;
-    using bstree = rbtree<link_and_rank>;
+    using bstree = rbtree<link_and_rank, ranks_updater>;
 
  private:  // Private Static Method(s)
     static typename bstree::const_iterator
