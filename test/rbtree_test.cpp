@@ -95,6 +95,7 @@ void construct_tree(rbtree<int> &tree, rbtree<int>::iterator its[N]) {
 
 TEST(RBTreeTest, EmptyTree) {
     rbtree<int> tree;
+    EXPECT_EQ(0, tree.size());
     EXPECT_EQ(tree.end(), tree.root());
     EXPECT_EQ(tree.end(), tree.begin());
 }
@@ -102,6 +103,7 @@ TEST(RBTreeTest, EmptyTree) {
 TEST(RBTreeTest, InsertFirstNode) {
     rbtree<int> tree;
     auto it = tree.insert_before(tree.end(), 9, noop);
+    EXPECT_EQ(1, tree.size());
     EXPECT_EQ(tree.root(), it);
     EXPECT_EQ(tree.begin(), it);
     EXPECT_EQ(--tree.end(), it);
@@ -117,6 +119,8 @@ TEST(RBTreeTest, InsertAtBegin) {
         INSERT_CHECK(tree, it, it, i);
         EXPECT_EQ(tree.begin(), it);
     }
+
+    EXPECT_EQ(N, tree.size());
 
     // check values stored in the tree
     it = tree.begin();
@@ -136,6 +140,8 @@ TEST(RBTreeTest, InsertAtEnd) {
         INSERT_CHECK(tree, tree.end(), it, i);
         EXPECT_EQ(--tree.end(), it);
     }
+
+    EXPECT_EQ(N, tree.size());
 
     // check values stored in the tree
     it = tree.begin();
@@ -160,6 +166,8 @@ TEST(RBTreeTest, InsertInShuffleOrder) {
     INSERT_CHECK(tree, its[2], its[1], 1);      // 1 2 3 4 5 6 7 8
     INSERT_CHECK(tree, its[1], its[0], 0);      // 0 1 2 3 4 5 6 7 8
 
+    EXPECT_EQ(9, tree.size());
+
     // check values stored in the tree
     auto it = tree.begin();
     for (std::size_t i = 0; i < 9; ++i, ++it) {
@@ -181,6 +189,8 @@ TEST(RBTreeTest, EraseAtBegin) {
         ERASE_CHECK(tree, its[i]);
     }
 
+    EXPECT_EQ(0, tree.size());
+
     EXPECT_EQ(tree.end(), tree.root());
     EXPECT_EQ(tree.end(), tree.begin());
 }
@@ -196,6 +206,8 @@ TEST(RBTreeTest, EraseAtEnd) {
     for (auto i = N; i > 0; --i) {
         ERASE_CHECK(tree, its[i - 1]);
     }
+
+    EXPECT_EQ(0, tree.size());
 
     EXPECT_EQ(tree.end(), tree.root());
     EXPECT_EQ(tree.end(), tree.begin());
@@ -218,6 +230,7 @@ TEST(RBTreeTest, EraseInShuffleOrder) {
     ERASE_CHECK(tree, its[1]);  // 4
     ERASE_CHECK(tree, its[4]);
 
+    EXPECT_EQ(0, tree.size());
     EXPECT_EQ(tree.end(), tree.begin());
     EXPECT_EQ(tree.end(), tree.begin());
 }

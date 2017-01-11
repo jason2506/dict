@@ -51,6 +51,8 @@ class rbtree {
     template <typename Updater>
     iterator erase(iterator pos, Updater const &update = Updater());
 
+    size_type size() const;
+
  private:  // Private Type(s) - Part 2
     enum class color: bool {red, black};
     class node;
@@ -117,6 +119,8 @@ class rbtree<T>::node {
 
     value_type const &data() const;
     value_type &data();
+
+    size_type size() const;
 
  private:  // Private Property(ies)
     weak_node_ptr parent_;
@@ -646,6 +650,11 @@ inline bool rbtree<T>::is_black_node(weak_const_node_ptr ptr) {
     return !is_red_node(ptr);
 }
 
+template <typename T>
+inline typename rbtree<T>::size_type rbtree<T>::size() const {
+    return root_ ? root_->size() : 0;
+}
+
 /************************************************
  * Implementation: struct rbtree<T>::node
  ************************************************/
@@ -739,6 +748,13 @@ inline T const &rbtree<T>::node::data() const {
 template <typename T>
 inline T &rbtree<T>::node::data() {
     return data_;
+}
+
+template <typename T>
+inline typename rbtree<T>::size_type rbtree<T>::node::size() const {
+    return 1
+        + (left_ ? left_->size() : 0)
+        + (right_ ? right_->size() : 0);
 }
 
 /************************************************
