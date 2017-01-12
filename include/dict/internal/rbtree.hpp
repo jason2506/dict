@@ -10,9 +10,12 @@
 #define DICT_INTERNAL_RBTREE_HPP_
 
 #include <cstddef>
+
 #include <memory>
 #include <type_traits>
 #include <utility>
+
+#include <msgpack.hpp>
 
 namespace dict {
 
@@ -965,5 +968,78 @@ rbtree<T, U>::tree_iterator<B>::get_node_ptr() {
 }  // namespace internal
 
 }  // namespace dict
+
+namespace msgpack {
+
+MSGPACK_API_VERSION_NAMESPACE(MSGPACK_DEFAULT_API_NS) {
+
+namespace adaptor {
+
+/************************************************
+ * Serialization: class rbtree<T, U>
+ ************************************************/
+
+template <typename T, typename U>
+struct convert<typename dict::internal::rbtree<T, U>> {
+    msgpack::object const &operator()(msgpack::object const &o,
+                                      // NOLINTNEXTLINE(runtime/references)
+                                      typename dict::internal::rbtree<T, U> &v) const {
+        using value_type = typename dict::internal::rbtree<T, U>::value_type;
+
+        if (o.type != msgpack::type::ARRAY) {
+            throw msgpack::type_error();
+        }
+
+        auto ptr = o.via.array.ptr;
+        auto ptr_end = ptr + o.via.array.size;
+        while (ptr < ptr_end) {
+            v.insert_before(v.end(), ptr->as<value_type>());
+            ++ptr;
+        }
+
+        return o;
+    }
+};
+
+template <typename T, typename U>
+struct pack<typename dict::internal::rbtree<T, U>> {
+    template <typename Stream>
+    packer<Stream> &operator()(msgpack::packer<Stream> &o,  // NOLINT(runtime/references)
+                               typename dict::internal::rbtree<T, U> const &v) const {
+        using value_type = typename dict::internal::rbtree<T, U>::value_type;
+
+        o.pack_array(v.size());
+        for (value_type const &data : v) {
+            o.pack(data);
+        }
+
+        return o;
+    }
+};
+
+template <typename T, typename U>
+struct object_with_zone<typename dict::internal::rbtree<T, U>> {
+    void operator()(msgpack::object::with_zone &o,  // NOLINT(runtime/references)
+                    typename dict::internal::rbtree<T, U> const &v) const {
+        using value_type = typename dict::internal::rbtree<T, U>::value_type;
+
+        o.type = type::ARRAY;
+        o.via.array.size = v.size();
+        o.via.array.ptr = static_cast<msgpack::object*>(
+            o.zone.allocate_align(sizeof(msgpack::object) * o.via.array.size));
+
+        auto ptr = o.via.array.ptr;
+        for (value_type const &data : v) {
+            *ptr = msgpack::object(data, o.zone);
+            ++ptr;
+        }
+    }
+};
+
+}  // namespace adaptor
+
+}  // MSGPACK_API_VERSION_NAMESPACE(MSGPACK_DEFAULT_API_NS)
+
+}  // namespace msgpack
 
 #endif  // DICT_INTERNAL_RBTREE_HPP_

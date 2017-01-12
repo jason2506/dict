@@ -10,6 +10,7 @@
 #include <utility>
 
 #include <gtest/gtest.h>
+#include <msgpack.hpp>
 
 #include <dict/internal/rbtree.hpp>
 
@@ -237,4 +238,33 @@ TEST(RBTreeTest, EraseInShuffleOrder) {
     EXPECT_EQ(0, tree.size());
     EXPECT_EQ(tree.end(), tree.begin());
     EXPECT_EQ(tree.end(), tree.begin());
+}
+
+TEST(RBTreeTest, PackAndUnpack) {
+    constexpr std::size_t N = 9;
+
+    rbtree tree;
+    rbtree::iterator its[N];
+    construct_tree<N>(tree, its);
+
+    // serialize
+    msgpack::sbuffer buf;
+    msgpack::pack(buf, tree);
+
+    // deserialize
+    msgpack::object_handle oh = msgpack::unpack(buf.data(), buf.size());
+    msgpack::object obj = oh.get();
+    rbtree new_tree;
+    obj.convert(new_tree);
+
+    auto it = tree.cbegin();
+    auto end = tree.cend();
+    auto new_it = new_tree.cbegin();
+    while (it != end) {
+        EXPECT_EQ(*it, *new_it);
+        ++it;
+        ++new_it;
+    }
+
+    EXPECT_EQ(new_tree.cend(), new_it);
 }
