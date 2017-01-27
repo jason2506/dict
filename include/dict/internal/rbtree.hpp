@@ -889,14 +889,16 @@ rbtree<T, U>::tree_iterator<B>::unconst() const {
 
 template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T, U>::template tree_iterator<B> &rbtree<T, U>::tree_iterator<B>::operator++() {
+inline typename rbtree<T, U>::template tree_iterator<B> &
+rbtree<T, U>::tree_iterator<B>::operator++() {
     ptr_ = tree_->next_node(ptr_);
     return *this;
 }
 
 template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_iterator<B>::operator++(int) {
+inline typename rbtree<T, U>::template tree_iterator<B>
+rbtree<T, U>::tree_iterator<B>::operator++(int) {
     tree_iterator it(tree_, ptr_);
     operator++();
     return it;
@@ -904,14 +906,16 @@ inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_itera
 
 template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T, U>::template tree_iterator<B> &rbtree<T, U>::tree_iterator<B>::operator--() {
+inline typename rbtree<T, U>::template tree_iterator<B> &
+rbtree<T, U>::tree_iterator<B>::operator--() {
     ptr_ = tree_->prev_node(ptr_);
     return *this;
 }
 
 template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_iterator<B>::operator--(int) {
+inline typename rbtree<T, U>::template tree_iterator<B>
+rbtree<T, U>::tree_iterator<B>::operator--(int) {
     tree_iterator it(tree_, ptr_);
     operator--();
     return it;
