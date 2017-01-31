@@ -224,6 +224,8 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
         auto mask = (it->bits >> i) << i;
         it->bits ^= mask;
         it->bits |= mask >> 1;
+    } else {
+        it->bits.reset(i);
     }
 
     // update counters
