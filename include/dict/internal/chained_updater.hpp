@@ -63,7 +63,7 @@ class chained_updater<FirstUpdater, RestUpdaters...>::updater
 
  protected:  // Protected Method(s)
     template <typename Event>
-    void update(Event info);
+    void update(Event const &info);
 
  private:  // Private Type(s)
     using first_updater = FirstUpdater<Args...>;
@@ -82,7 +82,7 @@ class chained_updater<>::updater {
 
  protected:  // Protected Method(s)
     template <typename Event>
-    void update(Event);
+    void update(Event const &info);
 };  // class chained_updater<>::updater<Args...>
 
 /************************************************
@@ -100,7 +100,7 @@ inline chained_updater<U, Us...>::updater<Args...>::updater(ConstructorArgs cons
 template <template <typename...> class U, template <typename...> class... Us>
 template <typename... Args>
 template <typename Event>
-inline void chained_updater<U, Us...>::updater<Args...>::update(Event info) {
+inline void chained_updater<U, Us...>::updater<Args...>::update(Event const &info) {
     first_updater::update(info);
     rest_updaters::update(info);
 }
@@ -117,7 +117,7 @@ inline chained_updater<>::updater<Args...>::updater(ConstructorArgs const &... a
 
 template <typename... Args>
 template <typename Event>
-inline void chained_updater<>::updater<Args...>::update(Event) {
+inline void chained_updater<>::updater<Args...>::update(Event const &) {
     // do nothing
 }
 

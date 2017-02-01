@@ -41,11 +41,11 @@ class with_csa {
 
  protected:  // Protected Method(s)
     template <typename Sequence>
-    void update(typename event::template after_inserting_first_term<Sequence>);
+    void update(typename event::template after_inserting_first_term<Sequence> const &);
     template <typename Sequence>
-    void update(typename event::template after_inserting_term<Sequence> info);
+    void update(typename event::template after_inserting_term<Sequence> const &info);
     template <typename Sequence>
-    void update(typename event::template after_inserting_sequence<Sequence>);
+    void update(typename event::template after_inserting_sequence<Sequence> const &);
 
  private:  // Private Method(s)
     void insert_term(size_type i, bool is_sampled);
@@ -122,20 +122,23 @@ inline typename with_csa<TI, T>::value_type with_csa<TI, T>::operator[](size_typ
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_first_term<Sequence>) {
+inline void with_csa<TI, T>::update(
+        typename event::template after_inserting_first_term<Sequence> const &) {
     insert_term(0, true);
     pi_.insert(0, 0);
 }
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_term<Sequence> info) {
+inline void with_csa<TI, T>::update(
+        typename event::template after_inserting_term<Sequence> const &info) {
     insert_term(info.pos, false);
 }
 
 template <typename TI, typename T>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(typename event::template after_inserting_sequence<Sequence>) {
+inline void with_csa<TI, T>::update(
+        typename event::template after_inserting_sequence<Sequence> const &) {
     add_samples(0);
 }
 

@@ -54,11 +54,11 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
 
  protected:  // Protected Method(s)
     template <typename Sequence>
-    void update(typename event::template after_inserting_first_term<Sequence> info);
+    void update(typename event::template after_inserting_first_term<Sequence> const &info);
     template <typename Sequence>
-    void update(typename event::template after_inserting_term<Sequence> info);
+    void update(typename event::template after_inserting_term<Sequence> const &info);
     template <typename Sequence>
-    void update(typename event::template after_inserting_sequence<Sequence>);
+    void update(typename event::template after_inserting_sequence<Sequence> const &);
 
  private:  // Private Property(ies)
     wm_type const &wm_;
@@ -88,7 +88,7 @@ template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 template <typename Sequence>
 inline void with_lcp<UPs...>::policy<TI, T>::update(
-        typename event::template after_inserting_first_term<Sequence> info) {
+        typename event::template after_inserting_first_term<Sequence> const &info) {
     // lcp_ = 0;
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
@@ -101,7 +101,7 @@ template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 template <typename Sequence>
 void with_lcp<UPs...>::policy<TI, T>::update(
-        typename event::template after_inserting_term<Sequence> info) {
+        typename event::template after_inserting_term<Sequence> const &info) {
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
 
     auto psi = [&](size_type x) {
@@ -168,7 +168,7 @@ template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 template <typename Sequence>
 inline void with_lcp<UPs...>::policy<TI, T>::update(
-        typename event::template after_inserting_sequence<Sequence>) {
+        typename event::template after_inserting_sequence<Sequence> const &) {
     // do nothing
 }
 
