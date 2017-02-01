@@ -100,13 +100,13 @@ class rbtree<T, U>::node {
     weak_node_ptr get_left();
     void set_left(weak_node_ptr left);
     void set_left(node_ptr &&left);
-    node_ptr move_left();
+    node_ptr &&move_left();
 
     weak_const_node_ptr get_right() const;
     weak_node_ptr get_right();
     void set_right(weak_node_ptr right);
     void set_right(node_ptr &&right);
-    node_ptr move_right();
+    node_ptr &&move_right();
 
     color get_color() const;
     void set_color(color c);
@@ -689,7 +689,7 @@ inline void rbtree<T, U>::node::set_left(node_ptr &&left) {
 }
 
 template <typename T, typename U>
-inline typename rbtree<T, U>::node_ptr rbtree<T, U>::node::move_left() {
+inline typename rbtree<T, U>::node_ptr &&rbtree<T, U>::node::move_left() {
     return std::move(left_);
 }
 
@@ -714,7 +714,7 @@ inline void rbtree<T, U>::node::set_right(node_ptr &&right) {
 }
 
 template <typename T, typename U>
-inline typename rbtree<T, U>::node_ptr rbtree<T, U>::node::move_right() {
+inline typename rbtree<T, U>::node_ptr &&rbtree<T, U>::node::move_right() {
     return std::move(right_);
 }
 
