@@ -47,6 +47,7 @@ class rbtree {
     const_iterator cend() const;
 
     iterator insert_before(iterator pos, value_type const &data, Updater const &update = Updater());
+    iterator insert_before(iterator pos, value_type &&data, Updater const &update = Updater());
     iterator erase(iterator pos, Updater const &update = Updater());
 
     size_type size() const;
@@ -62,6 +63,7 @@ class rbtree {
     using node_ptr = std::unique_ptr<node, node_deleter>;
 
  private:  // Private Method(s)
+    iterator insert_before(iterator pos, weak_node_ptr new_node_ptr, Updater const &update);
     void rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
     void rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
 
@@ -136,7 +138,8 @@ class rbtree<T, U>::node_pool {
 
     node_pool &operator=(node_pool const &) = delete;
 
-    weak_node_ptr new_node(value_type const &data);
+    template <typename ...Args>
+    weak_node_ptr new_node(Args &&...args);
     void delete_node(weak_node_ptr p);
 
  private:  // Private Type(s)
@@ -283,7 +286,20 @@ inline typename rbtree<T, U>::const_iterator rbtree<T, U>::cend() const {
 template <typename T, typename U>
 typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
         iterator pos, value_type const &data, U const &update) {
-    auto new_node = pool_.new_node(data);
+    auto new_node_ptr = pool_.new_node(data);
+    return insert_before(pos, new_node_ptr, update);
+}
+
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
+        iterator pos, value_type &&data, U const &update) {
+    auto new_node_ptr = pool_.new_node(std::move(data));
+    return insert_before(pos, new_node_ptr, update);
+}
+
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
+        iterator pos, weak_node_ptr new_node_ptr, U const &update) {
     auto ptr = pos.get_node_ptr();
     if (ptr) {
         if (ptr->get_left()) {
@@ -292,31 +308,31 @@ typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
                 ptr = ptr->get_right();
             }
 
-            ptr->set_right(new_node);
+            ptr->set_right(new_node_ptr);
         } else {
-            if (ptr == first_) { first_ = new_node; }
+            if (ptr == first_) { first_ = new_node_ptr; }
 
-            ptr->set_left(new_node);
+            ptr->set_left(new_node_ptr);
         }
 
-        new_node->set_parent(ptr);
-        new_node->set_color(color::red);
+        new_node_ptr->set_parent(ptr);
+        new_node_ptr->set_color(color::red);
     } else if (last_) {
         // insert after the last node
-        new_node->set_parent(last_);
-        new_node->set_color(color::red);
-        last_->set_right(new_node);
-        last_ = new_node;
+        new_node_ptr->set_parent(last_);
+        new_node_ptr->set_color(color::red);
+        last_->set_right(new_node_ptr);
+        last_ = new_node_ptr;
     } else {
         // current node is at the root of the tree
-        first_ = last_ = new_node;
-        root_.reset(new_node);
+        first_ = last_ = new_node_ptr;
+        root_.reset(new_node_ptr);
         root_->set_color(color::black);
         return iterator(this, root_);
     }
 
-    rebalance_after_insertion(new_node, new_node->get_parent(), update);
-    return iterator(this, new_node);
+    rebalance_after_insertion(new_node_ptr, new_node_ptr->get_parent(), update);
+    return iterator(this, new_node_ptr);
 }
 
 template <typename T, typename U>
@@ -766,7 +782,8 @@ inline rbtree<T, U>::node_pool::~node_pool() {
 }
 
 template <typename T, typename U>
-typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node_pool::new_node(value_type const &data) {
+template <typename ...Args>
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node_pool::new_node(Args &&...args) {
     if (free_list_head_ == nullptr) {
         auto chunk = new block[next_size_ + 1];
         chunk[0].next = chunks_head_;
@@ -782,7 +799,7 @@ typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node_pool::new_node(value_typ
 
     auto p = &(free_list_head_->data);
     free_list_head_ = free_list_head_->next;
-    return new(p) node(data);
+    return new(p) node(std::forward<Args>(args)...);
 }
 
 template <typename T, typename U>

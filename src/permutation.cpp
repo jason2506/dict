@@ -17,14 +17,12 @@ namespace internal {
  ************************************************/
 
 void permutation::insert(size_type i, size_type j) {
-    link_and_rank a, b;
-
     auto it = find_node(static_cast<bstree const &>(tree_).root(), i).unconst();
-    it = tree_.insert_before(it, a);
+    it = tree_.insert_before(it, link_and_rank());
     update_ranks(it);
 
     auto inv_it = find_node(static_cast<bstree const &>(inv_tree_).root(), j).unconst();
-    inv_it = inv_tree_.insert_before(inv_it, b);
+    inv_it = inv_tree_.insert_before(inv_it, link_and_rank());
     update_ranks(inv_it);
 
     it->link = inv_it;
