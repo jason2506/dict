@@ -39,6 +39,7 @@ class rbtree {
 
     iterator root();
     const_iterator root() const;
+    const_iterator croot() const;
     iterator begin();
     const_iterator begin() const;
     const_iterator cbegin() const;
@@ -250,6 +251,11 @@ inline typename rbtree<T, U>::iterator rbtree<T, U>::root() {
 
 template <typename T, typename U>
 inline typename rbtree<T, U>::const_iterator rbtree<T, U>::root() const {
+    return croot();
+}
+
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::croot() const {
     return const_iterator(this, root_);
 }
 
