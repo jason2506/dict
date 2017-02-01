@@ -26,7 +26,6 @@ class permutation {
 
  public:  // Public Method(s)
     permutation();
-    ~permutation();
 
     void insert(size_type i, size_type j);
     void erase(size_type i);
@@ -83,10 +82,6 @@ struct permutation::ranks_updater {
 
 inline permutation::permutation()
     : size_(0) {
-    // do nothing
-}
-
-inline permutation::~permutation() {
     // do nothing
 }
 
