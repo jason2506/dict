@@ -49,9 +49,9 @@ class rbtree {
     const_iterator end() const;
     const_iterator cend() const;
 
-    iterator insert_before(iterator pos, value_type const &data, Updater const &update = Updater());
-    iterator insert_before(iterator pos, value_type &&data, Updater const &update = Updater());
-    iterator erase(iterator pos, Updater const &update = Updater());
+    iterator insert_before(iterator it, value_type const &data, Updater const &update = Updater());
+    iterator insert_before(iterator it, value_type &&data, Updater const &update = Updater());
+    iterator erase(iterator it, Updater const &update = Updater());
 
     size_type size() const;
 
@@ -66,7 +66,7 @@ class rbtree {
     using node_ptr = std::unique_ptr<node, node_deleter>;
 
  private:  // Private Method(s)
-    iterator insert_before(iterator pos, weak_node_ptr new_node_ptr, Updater const &update);
+    iterator insert_before(iterator it, weak_node_ptr new_node_ptr, Updater const &update);
     void rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
     void rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
 
@@ -293,22 +293,22 @@ inline typename rbtree<T, U>::const_iterator rbtree<T, U>::cend() const {
 
 template <typename T, typename U>
 typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
-        iterator pos, value_type const &data, U const &update) {
+        iterator it, value_type const &data, U const &update) {
     auto new_node_ptr = pool_.new_node(data);
-    return insert_before(pos, new_node_ptr, update);
+    return insert_before(it, new_node_ptr, update);
 }
 
 template <typename T, typename U>
 typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
-        iterator pos, value_type &&data, U const &update) {
+        iterator it, value_type &&data, U const &update) {
     auto new_node_ptr = pool_.new_node(std::move(data));
-    return insert_before(pos, new_node_ptr, update);
+    return insert_before(it, new_node_ptr, update);
 }
 
 template <typename T, typename U>
 typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
-        iterator pos, weak_node_ptr new_node_ptr, U const &update) {
-    auto ptr = pos.get_node_ptr();
+        iterator it, weak_node_ptr new_node_ptr, U const &update) {
+    auto ptr = it.get_node_ptr();
     if (ptr) {
         if (ptr->get_left()) {
             ptr = ptr->get_left();
@@ -344,8 +344,8 @@ typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
 }
 
 template <typename T, typename U>
-typename rbtree<T, U>::iterator rbtree<T, U>::erase(iterator pos, U const &update) {
-    auto ptr = pos.get_node_ptr();
+typename rbtree<T, U>::iterator rbtree<T, U>::erase(iterator it, U const &update) {
+    auto ptr = it.get_node_ptr();
     if (first_ == ptr && last_ == ptr) {
         // current node is at the root of the tree
         root_.release();
@@ -353,11 +353,11 @@ typename rbtree<T, U>::iterator rbtree<T, U>::erase(iterator pos, U const &updat
         return end();
     }
 
-    auto parent_it = pos.parent();
-    ++pos;
-    auto next_parent_it = pos ? pos.parent() : end();
+    auto parent_it = it.parent();
+    ++it;
+    auto next_parent_it = it ? it.parent() : end();
 
-    auto next_ptr = pos.get_node_ptr();
+    auto next_ptr = it.get_node_ptr();
     if (ptr == first_)  { first_ = next_ptr; }
     if (ptr == last_)   { last_ = prev_node(ptr); }
 
@@ -425,8 +425,8 @@ typename rbtree<T, U>::iterator rbtree<T, U>::erase(iterator pos, U const &updat
     }
 
     if (ptr == next_parent_it.get_node_ptr()) {
-        update(pos);
-    } else if (pos && pos.parent() != next_parent_it) {
+        update(it);
+    } else if (it && it.parent() != next_parent_it) {
         update(next_parent_it);
     } else {
         update(parent_it);
