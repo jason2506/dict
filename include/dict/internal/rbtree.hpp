@@ -10,6 +10,8 @@
 #define DICT_INTERNAL_RBTREE_HPP_
 
 #include <cstddef>
+#include <cstdint>
+
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -54,7 +56,7 @@ class rbtree {
     size_type size() const;
 
  private:  // Private Type(s) - Part 2
-    enum class color: bool {red, black};
+    enum class color: std::uint8_t {red, black};
     class node;
     class node_pool;
     struct node_deleter;
