@@ -4,7 +4,7 @@ from conans import ConanFile, CMake
 class DictConan(ConanFile):
 
     name = 'dict'
-    version = '0.1.0'
+    version = '0.1.1'
     url = 'https://github.com/jason2506/dict'
     license = 'BSD 3-Clause'
     author = 'Chi-En Wu'
