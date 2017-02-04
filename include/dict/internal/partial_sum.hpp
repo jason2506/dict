@@ -48,7 +48,6 @@ class partial_sum {
  private:  // Private Static Method(s)
     template <typename Op>
     void update(key_type k, value_type x, Op op);
-    static void update_sums(typename bstree::iterator it);
 
  private:  // Private Property(ies)
     bstree tree_;
@@ -71,7 +70,13 @@ struct partial_sum<K, T>::key_and_sum {
 template <typename K, typename T>
 struct partial_sum<K, T>::sums_updater {
     void operator()(typename bstree::iterator it) const {
-        update_sums(it);
+        if (it.has_parent()) {
+            if (it == it.parent().left()) {
+                it.parent()->sum += it->sum;
+            } else {
+                it->sum -= it.parent()->sum;
+            }
+        }
     }
 };  // struct partial_sum<K, T>::sums_updater
 
@@ -187,17 +192,6 @@ void partial_sum<K, T>::update(key_type k, value_type x, Op op) {
                 tree_.insert_before(++it, {k, op(0, x)});
                 break;
             }
-        }
-    }
-}
-
-template <typename K, typename T>
-inline void partial_sum<K, T>::update_sums(typename bstree::iterator it) {
-    if (it.has_parent()) {
-        if (it == it.parent().left()) {
-            it.parent()->sum += it->sum;
-        } else {
-            it->sum -= it.parent()->sum;
         }
     }
 }
