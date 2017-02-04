@@ -69,9 +69,39 @@ TEST(LcpArrayTest, EraseValues) {
 
     tree.erase(tree.find(3));  // 0 1 2 4 5 6 7 8
     EXPECT_EQ(8, tree.size());
+    EXPECT_EQ(0, tree[0]);
+    EXPECT_EQ(1, tree[1]);
+    EXPECT_EQ(2, tree[2]);
     EXPECT_EQ(4, tree[3]);
+    EXPECT_EQ(5, tree[4]);
+    EXPECT_EQ(6, tree[5]);
+    EXPECT_EQ(7, tree[6]);
+    EXPECT_EQ(8, tree[7]);
 
     tree.erase(tree.find(5));  // 0 1 2 4 5 7 8
     EXPECT_EQ(7, tree.size());
+    EXPECT_EQ(0, tree[0]);
+    EXPECT_EQ(1, tree[1]);
+    EXPECT_EQ(2, tree[2]);
+    EXPECT_EQ(4, tree[3]);
+    EXPECT_EQ(5, tree[4]);
     EXPECT_EQ(7, tree[5]);
+    EXPECT_EQ(8, tree[6]);
+
+    tree.erase(tree.find(0));  // 1 2 4 5 7 8
+    EXPECT_EQ(6, tree.size());
+    EXPECT_EQ(1, tree[0]);
+    EXPECT_EQ(2, tree[1]);
+    EXPECT_EQ(4, tree[2]);
+    EXPECT_EQ(5, tree[3]);
+    EXPECT_EQ(7, tree[4]);
+    EXPECT_EQ(8, tree[5]);
+
+    tree.erase(tree.find(5));  // 1 2 4 5 7
+    EXPECT_EQ(5, tree.size());
+    EXPECT_EQ(1, tree[0]);
+    EXPECT_EQ(2, tree[1]);
+    EXPECT_EQ(4, tree[2]);
+    EXPECT_EQ(5, tree[3]);
+    EXPECT_EQ(7, tree[4]);
 }

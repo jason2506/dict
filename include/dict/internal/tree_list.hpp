@@ -156,8 +156,11 @@ inline tree_list::iterator tree_list::insert(iterator it, value_type val) {
 }
 
 inline tree_list::iterator tree_list::erase(iterator it) {
-    auto tree_it = tree_.erase(it.get_tree_iterator());
-    update_sizes(tree_it);
+    auto erased_it = it.get_tree_iterator();
+    erased_it->size--;
+    update_sizes(erased_it);
+
+    auto tree_it = tree_.erase(erased_it);
     return decltype(erase(it))(tree_it);
 }
 
