@@ -64,7 +64,6 @@ class bit_vector {
  private:  // Private Static Method(s)
     static void equalize_blocks(block &p, block &q);    // NOLINT(runtime/references)
     static void merge_blocks(block &p, block &q);       // NOLINT(runtime/references)
-    static void update_count(typename bstree::iterator it);
     static void update_counts(typename bstree::iterator it);
 
  private:  // Private Method(s)
@@ -102,9 +101,7 @@ struct bit_vector<N>::block {
 template <std::size_t N>
 struct bit_vector<N>::counts_updater {
     void operator()(typename bstree::iterator it) const {
-        update_count(it);
-        it.go_parent();
-        update_count(it);
+        update_counts(it);
     }
 };  // class bit_vector<N>::counts_updater
 
@@ -440,27 +437,23 @@ inline void bit_vector<N>::merge_blocks(block &p, block &q) {
 }
 
 template <std::size_t N>
-void bit_vector<N>::update_count(typename bstree::iterator it) {
-    it->num_sub_bits = it->num_bits;
-    it->num_sub_set_bits = it->bits.count();
-
-    if (it.has_left()) {
-        auto left = it.left();
-        it->num_sub_bits += left->num_sub_bits;
-        it->num_sub_set_bits += left->num_sub_set_bits;
-    }
-
-    if (it.has_right()) {
-        auto right = it.right();
-        it->num_sub_bits += right->num_sub_bits;
-        it->num_sub_set_bits += right->num_sub_set_bits;
-    }
-}
-
-template <std::size_t N>
 inline void bit_vector<N>::update_counts(typename bstree::iterator it) {
     do {
-        update_count(it);
+        it->num_sub_bits = it->num_bits;
+        it->num_sub_set_bits = it->bits.count();
+
+        if (it.has_left()) {
+            auto left = it.left();
+            it->num_sub_bits += left->num_sub_bits;
+            it->num_sub_set_bits += left->num_sub_set_bits;
+        }
+
+        if (it.has_right()) {
+            auto right = it.right();
+            it->num_sub_bits += right->num_sub_bits;
+            it->num_sub_set_bits += right->num_sub_set_bits;
+        }
+
         it.go_parent();
     } while (it);
 }

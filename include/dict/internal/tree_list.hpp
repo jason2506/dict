@@ -61,7 +61,6 @@ class tree_list {
     using tree = rbtree<data, sizes_updater>;
 
  private:  // Private Static Method(s)
-    static void update_size(typename tree::iterator it);
     static void update_sizes(typename tree::iterator it);
 
  private:  // Private Property(ies)
@@ -134,9 +133,7 @@ struct tree_list::data {
 
 struct tree_list::sizes_updater {
     void operator()(typename tree::iterator it) const {
-        update_size(it);
-        it.go_parent();
-        update_size(it);
+        update_sizes(it);
     }
 };  // struct tree_list::sizes_updater
 
@@ -157,9 +154,6 @@ inline tree_list::iterator tree_list::insert(iterator it, value_type val) {
 
 inline tree_list::iterator tree_list::erase(iterator it) {
     auto erased_it = it.get_tree_iterator();
-    erased_it->size--;
-    update_sizes(erased_it);
-
     auto tree_it = tree_.erase(erased_it);
     return decltype(erase(it))(tree_it);
 }
@@ -231,20 +225,17 @@ inline tree_list::const_reference tree_list::operator[](size_type i) const {
     return at(i);
 }
 
-inline void tree_list::update_size(typename tree::iterator it) {
-    it->size = 1;
-    if (it.has_left()) {
-        it->size += it.left()->size;
-    }
-
-    if (it.has_right()) {
-        it->size += it.right()->size;
-    }
-}
-
 inline void tree_list::update_sizes(typename tree::iterator it) {
     do {
-        update_size(it);
+        it->size = 1;
+        if (it.has_left()) {
+            it->size += it.left()->size;
+        }
+
+        if (it.has_right()) {
+            it->size += it.right()->size;
+        }
+
         it.go_parent();
     } while (it);
 }
