@@ -245,12 +245,12 @@ typename bit_vector<N>::value_type bit_vector<N>::erase(size_type i) {
         if (prev_it && (!next_it || prev_it->num_bits < next_it->num_bits)) {
             if (prev_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
                 merge_blocks(*prev_it, *it);
-                update_counts(it);
+                update_counts(prev_it);
                 tree_.erase(it);
             } else if (prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1)) {
                 equalize_blocks(*prev_it, *it);
+                update_counts(prev_it);
                 update_counts(it);
-                update_counts(next_it);
             }
         } else if (next_it) {
             if (next_it->num_bits + it->num_bits <= MAX_MERGE_SIZE) {
