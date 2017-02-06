@@ -343,7 +343,7 @@ inline typename bit_vector<N>::size_type bit_vector<N>::count() const {
 template <std::size_t N>
 inline typename bit_vector<N>::size_type bit_vector<N>::size() const {
     auto root = tree_.root();
-    return root ? tree_.root()->num_sub_bits : 0;
+    return root ? root->num_sub_bits : 0;
 }
 
 template <std::size_t N>
