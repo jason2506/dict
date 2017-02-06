@@ -98,7 +98,7 @@ typename wavelet_matrix<T, H>::value_type wavelet_matrix<T, H>::erase(size_type 
         auto &bits = level_bits(l);
         auto b = bits.erase(i);
         i = (i > 0) ? bits.rank(i - 1, b) : 0;
-        c |= b << l;
+        c |= b ? (1 << l) : 0;
         if (b) {
             i += num_zeros(l);
         } else {
