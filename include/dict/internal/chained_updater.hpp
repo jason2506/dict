@@ -9,8 +9,6 @@
 #ifndef DICT_INTERNAL_CHAINED_UPDATER_HPP_
 #define DICT_INTERNAL_CHAINED_UPDATER_HPP_
 
-#include <utility>
-
 namespace dict {
 
 namespace internal {
