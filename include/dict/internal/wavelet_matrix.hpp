@@ -21,10 +21,10 @@ namespace dict {
 namespace internal {
 
 /************************************************
- * Declaration: class wavelet_matrix<T, N>
+ * Declaration: class wavelet_matrix<T, H>
  ************************************************/
 
-template <typename T, std::size_t N = sizeof(T) * CHAR_BIT>
+template <typename T, std::size_t Height = sizeof(T) * CHAR_BIT>
 class wavelet_matrix {
  public:  // Public Type(s)
     using value_type = T;
@@ -51,7 +51,7 @@ class wavelet_matrix {
     value_type operator[](size_type i) const;
 
  private:  // Private Static Property(ies)
-    static constexpr size_type HEIGHT = N;
+    static constexpr size_type HEIGHT = Height;
     static constexpr size_type BITMAP_BLOCK_SIZE = 64;
 
  private:  // Private Type(s)
@@ -67,16 +67,16 @@ class wavelet_matrix {
     size_type select_at(size_type j, value_type c) const;
 
  private:  // Private Property(ies)
-    std::array<tree_level, N> levels_;
+    std::array<tree_level, Height> levels_;
     partial_sum<value_type, size_type> sums_;
-};  // class wavelet_matrix<T, N>
+};  // class wavelet_matrix<T, H>
 
 /************************************************
- * Implementation: class wavelet_matrix<T, N>
+ * Implementation: class wavelet_matrix<T, H>
  ************************************************/
 
-template <typename T, std::size_t N>
-void wavelet_matrix<T, N>::insert(size_type i, value_type c) {
+template <typename T, std::size_t H>
+void wavelet_matrix<T, H>::insert(size_type i, value_type c) {
     sums_.increase(c, 1);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
         auto &bits = level_bits(l);
@@ -91,14 +91,14 @@ void wavelet_matrix<T, N>::insert(size_type i, value_type c) {
     }
 }
 
-template <typename T, std::size_t N>
-typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::erase(size_type i) {
+template <typename T, std::size_t H>
+typename wavelet_matrix<T, H>::value_type wavelet_matrix<T, H>::erase(size_type i) {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l) {
         auto &bits = level_bits(l);
         auto b = bits.erase(i);
         i = (i > 0) ? bits.rank(i - 1, b) : 0;
-        c |= b << l;
+        c |= b ? (1 << l) : 0;
         if (b) {
             i += num_zeros(l);
         } else {
@@ -110,32 +110,36 @@ typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::erase(size_type 
     return c;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::size() const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::size() const {
     auto const &bits = level_bits(0);
     return bits.size();
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::sum(value_type c) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::sum(value_type c) const {
     return (c > 0) ? sums_.sum(c - 1) : 0;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::search(size_type i) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::value_type wavelet_matrix<T, H>::search(size_type i) const {
     return sums_.search(i);
 }
 
-template <typename T, std::size_t N>
-inline std::pair<typename wavelet_matrix<T, N>::value_type, typename wavelet_matrix<T, N>::size_type>
-wavelet_matrix<T, N>::access_and_rank(size_type i) const {
+template <typename T, std::size_t H>
+inline std::pair<
+    typename wavelet_matrix<T, H>::value_type,
+    typename wavelet_matrix<T, H>::size_type
+>
+wavelet_matrix<T, H>::access_and_rank(size_type i) const {
     auto pair = access_and_lf(i);
     auto ps = sum(pair.first);
     return std::make_pair(pair.first, pair.second + 1 - ps);
 }
 
-template <typename T, std::size_t N>
-typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::rank(size_type i, value_type c) const {
+template <typename T, std::size_t H>
+typename wavelet_matrix<T, H>::size_type
+wavelet_matrix<T, H>::rank(size_type i, value_type c) const {
     auto ps = sum(c);
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
         auto &bits = level_bits(l);
@@ -153,15 +157,18 @@ typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::rank(size_type i,
     return i + 1 - ps;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type
-wavelet_matrix<T, N>::select(size_type j, value_type c) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type
+wavelet_matrix<T, H>::select(size_type j, value_type c) const {
     return select_at(j + sum(c), c);
 }
 
-template <typename T, std::size_t N>
-std::pair<typename wavelet_matrix<T, N>::value_type, typename wavelet_matrix<T, N>::size_type>
-wavelet_matrix<T, N>::access_and_lf(size_type i) const {
+template <typename T, std::size_t H>
+std::pair<
+    typename wavelet_matrix<T, H>::value_type,
+    typename wavelet_matrix<T, H>::size_type
+>
+wavelet_matrix<T, H>::access_and_lf(size_type i) const {
     value_type c = 0;
     for (size_type l = 0; l < HEIGHT; ++l) {
         auto &bits = level_bits(l);
@@ -173,56 +180,57 @@ wavelet_matrix<T, N>::access_and_lf(size_type i) const {
     return std::make_pair(c, i);
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::lf(size_type i) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::lf(size_type i) const {
     return access_and_lf(i).second;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::psi(size_type i) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::psi(size_type i) const {
     auto c = sums_.search(i + 1);
     return select_at(i, c);
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::at(size_type i) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::value_type wavelet_matrix<T, H>::at(size_type i) const {
     return access_and_lf(i).first;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::value_type wavelet_matrix<T, N>::operator[](size_type i) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::value_type
+wavelet_matrix<T, H>::operator[](size_type i) const {
     return at(i);
 }
 
-template <typename T, std::size_t N>
-inline void wavelet_matrix<T, N>::increase_num_zeros(size_type l) {
+template <typename T, std::size_t H>
+inline void wavelet_matrix<T, H>::increase_num_zeros(size_type l) {
     levels_[l].first++;
 }
 
-template <typename T, std::size_t N>
-inline void wavelet_matrix<T, N>::decrease_num_zeros(size_type l) {
+template <typename T, std::size_t H>
+inline void wavelet_matrix<T, H>::decrease_num_zeros(size_type l) {
     levels_[l].first--;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::size_type wavelet_matrix<T, N>::num_zeros(size_type l) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::num_zeros(size_type l) const {
     return levels_[l].first;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::bitmap &wavelet_matrix<T, N>::level_bits(size_type l) {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::bitmap &wavelet_matrix<T, H>::level_bits(size_type l) {
     return levels_[l].second;
 }
 
-template <typename T, std::size_t N>
-inline typename wavelet_matrix<T, N>::bitmap const &
-wavelet_matrix<T, N>::level_bits(size_type l) const {
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::bitmap const &
+wavelet_matrix<T, H>::level_bits(size_type l) const {
     return levels_[l].second;
 }
 
-template <typename T, std::size_t N>
-typename wavelet_matrix<T, N>::size_type
-wavelet_matrix<T, N>::select_at(size_type j, value_type c) const {
+template <typename T, std::size_t H>
+typename wavelet_matrix<T, H>::size_type
+wavelet_matrix<T, H>::select_at(size_type j, value_type c) const {
     for (auto l = HEIGHT; l > 0; --l) {
         auto &bits = level_bits(l - 1);
         auto b = (c >> (l - 1)) & 1;

@@ -12,7 +12,7 @@
 
 #include <dict/internal/bit_vector.hpp>
 
-using bitmap = dict::internal::bit_vector<2>;
+using bitmap = dict::internal::bit_vector<5>;
 
 // NOLINTNEXTLINE(runtime/references)
 void construct_bitmap(bitmap &bits) {

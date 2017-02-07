@@ -26,7 +26,6 @@ class permutation {
 
  public:  // Public Method(s)
     permutation();
-    ~permutation();
 
     void insert(size_type i, size_type j);
     void erase(size_type i);
@@ -41,7 +40,7 @@ class permutation {
  private:  // Private Type(s)
     struct link_and_rank;
     struct ranks_updater;
-    using bstree = rbtree<link_and_rank>;
+    using bstree = rbtree<link_and_rank, ranks_updater>;
 
  private:  // Private Static Method(s)
     static typename bstree::const_iterator
@@ -83,10 +82,6 @@ struct permutation::ranks_updater {
 
 inline permutation::permutation()
     : size_(0) {
-    // do nothing
-}
-
-inline permutation::~permutation() {
     // do nothing
 }
 

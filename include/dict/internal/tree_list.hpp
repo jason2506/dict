@@ -58,7 +58,7 @@ class tree_list {
  private:  // Private Type(s) - Part 2
     struct data;
     struct sizes_updater;
-    using tree = rbtree<data>;
+    using tree = rbtree<data, sizes_updater>;
 
  private:  // Private Static Method(s)
     static void update_sizes(typename tree::iterator it);
@@ -146,15 +146,15 @@ inline tree_list::~tree_list() {
 }
 
 inline tree_list::iterator tree_list::insert(iterator it, value_type val) {
-    auto tree_it = tree_.template insert_before<sizes_updater>(
+    auto tree_it = tree_.insert_before(
         it.get_tree_iterator(), tree::value_type(val));
     update_sizes(tree_it);
     return decltype(insert(it, val))(tree_it);
 }
 
 inline tree_list::iterator tree_list::erase(iterator it) {
-    auto tree_it = tree_.template erase<sizes_updater>(it.get_tree_iterator());
-    update_sizes(tree_it);
+    auto erased_it = it.get_tree_iterator();
+    auto tree_it = tree_.erase(erased_it);
     return decltype(erase(it))(tree_it);
 }
 
@@ -226,7 +226,7 @@ inline tree_list::const_reference tree_list::operator[](size_type i) const {
 }
 
 inline void tree_list::update_sizes(typename tree::iterator it) {
-    while (it) {
+    do {
         it->size = 1;
         if (it.has_left()) {
             it->size += it.left()->size;
@@ -237,7 +237,7 @@ inline void tree_list::update_sizes(typename tree::iterator it) {
         }
 
         it.go_parent();
-    }
+    } while (it);
 }
 
 /************************************************

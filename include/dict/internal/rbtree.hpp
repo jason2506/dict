@@ -10,6 +10,8 @@
 #define DICT_INTERNAL_RBTREE_HPP_
 
 #include <cstddef>
+#include <cstdint>
+
 #include <memory>
 #include <type_traits>
 #include <utility>
@@ -19,10 +21,10 @@ namespace dict {
 namespace internal {
 
 /************************************************
- * Declaration: class rbtree<T>
+ * Declaration: class rbtree<T, U>
  ************************************************/
 
-template <typename T>
+template <typename T, typename Updater>
 class rbtree {
  private:  // Private Type(s) - Part 1
     template <bool IsConst> class tree_iterator;
@@ -36,10 +38,10 @@ class rbtree {
 
  public:  // Public Method(s)
     rbtree();
-    ~rbtree();
 
     iterator root();
     const_iterator root() const;
+    const_iterator croot() const;
     iterator begin();
     const_iterator begin() const;
     const_iterator cbegin() const;
@@ -47,13 +49,14 @@ class rbtree {
     const_iterator end() const;
     const_iterator cend() const;
 
-    template <typename Updater>
-    iterator insert_before(iterator pos, value_type const &data, Updater const &update = Updater());
-    template <typename Updater>
-    iterator erase(iterator pos, Updater const &update = Updater());
+    iterator insert_before(iterator it, value_type const &data, Updater const &update = Updater());
+    iterator insert_before(iterator it, value_type &&data, Updater const &update = Updater());
+    iterator erase(iterator it, Updater const &update = Updater());
+
+    size_type size() const;
 
  private:  // Private Type(s) - Part 2
-    enum class color: bool {red, black};
+    enum class color: std::uint8_t {red, black};
     class node;
     class node_pool;
     struct node_deleter;
@@ -63,18 +66,15 @@ class rbtree {
     using node_ptr = std::unique_ptr<node, node_deleter>;
 
  private:  // Private Method(s)
-    template <typename Updater>
+    iterator insert_before(iterator it, weak_node_ptr new_node_ptr, Updater const &update);
     void rebalance_after_insertion(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
-    template <typename Updater>
     void rebalance_after_erasure(weak_node_ptr ptr, weak_node_ptr parent, Updater const &update);
 
-    template <typename Updater>
     void rotate_left(weak_node_ptr weak_ptr, Updater const &update);
-    template <typename Updater>
     void rotate_right(weak_node_ptr weak_ptr, Updater const &update);
 
-    weak_node_ptr next_node(weak_node_ptr ptr) const;
-    weak_node_ptr prev_node(weak_node_ptr ptr) const;
+    weak_node_ptr next_node(weak_const_node_ptr ptr) const;
+    weak_node_ptr prev_node(weak_const_node_ptr ptr) const;
 
     static bool is_red_node(weak_const_node_ptr ptr);
     static bool is_black_node(weak_const_node_ptr ptr);
@@ -86,17 +86,16 @@ class rbtree {
  private:  // Private Property(ies)
     node_ptr root_;
     weak_node_ptr first_, last_;
-};  // class rbtree<T>
+};  // class rbtree<T, U>
 
 /************************************************
- * Declaration: class rbtree<T>::node
+ * Declaration: class rbtree<T, U>::node
  ************************************************/
 
-template <typename T>
-class rbtree<T>::node {
+template <typename T, typename U>
+class rbtree<T, U>::node {
  public:  // Public Method(s)
     explicit node(value_type const &data);
-    ~node();
 
     weak_const_node_ptr get_parent() const;
     weak_node_ptr get_parent();
@@ -106,13 +105,13 @@ class rbtree<T>::node {
     weak_node_ptr get_left();
     void set_left(weak_node_ptr left);
     void set_left(node_ptr &&left);
-    node_ptr move_left();
+    node_ptr &&move_left();
 
     weak_const_node_ptr get_right() const;
     weak_node_ptr get_right();
     void set_right(weak_node_ptr right);
     void set_right(node_ptr &&right);
-    node_ptr move_right();
+    node_ptr &&move_right();
 
     color get_color() const;
     void set_color(color c);
@@ -120,19 +119,21 @@ class rbtree<T>::node {
     value_type const &data() const;
     value_type &data();
 
+    size_type size() const;
+
  private:  // Private Property(ies)
     weak_node_ptr parent_;
     node_ptr left_, right_;
     color color_;
     value_type data_;
-};  // class rbtree<T>::node
+};  // class rbtree<T, U>::node
 
 /************************************************
- * Declaration: class rbtree<T>::node_pool
+ * Declaration: class rbtree<T, U>::node_pool
  ************************************************/
 
-template <typename T>
-class rbtree<T>::node_pool {
+template <typename T, typename U>
+class rbtree<T, U>::node_pool {
  public:  // Public Method(s)
     explicit node_pool(size_type size);
     node_pool(node_pool const &) = delete;
@@ -140,13 +141,14 @@ class rbtree<T>::node_pool {
 
     node_pool &operator=(node_pool const &) = delete;
 
-    weak_node_ptr new_node(value_type const &data);
+    template <typename ...Args>
+    weak_node_ptr new_node(Args &&...args);
     void delete_node(weak_node_ptr p);
 
  private:  // Private Type(s)
     union block {
-        block()    { /* do nothing */ }
-        ~block()   { /* do nothing */ }
+        block()     { /* do nothing */ }
+        ~block()    { /* do nothing */ }
 
         node data;
         block *next;
@@ -156,32 +158,32 @@ class rbtree<T>::node_pool {
     size_type next_size_;
     block *chunks_head_;
     block *free_list_head_;
-};  // class rbtree<T>::node_pool
+};  // class rbtree<T, U>::node_pool
 
 /************************************************
- * Declaration: struct rbtree<T>::node_deleter
+ * Declaration: struct rbtree<T, U>::node_deleter
  ************************************************/
 
-template <typename T>
-struct rbtree<T>::node_deleter {
+template <typename T, typename U>
+struct rbtree<T, U>::node_deleter {
     void operator()(weak_node_ptr p) const {
         pool_.delete_node(p);
     }
-};  // struct rbtree<T>::node_deleter
+};  // struct rbtree<T, U>::node_deleter
 
 /************************************************
- * Declaration: class rbtree<T>::tree_iterator<B>
+ * Declaration: class rbtree<T, U>::tree_iterator<B>
  ************************************************/
 
-template <typename T>
+template <typename T, typename U>
 template <bool IsConst>
-class rbtree<T>::tree_iterator {
+class rbtree<T, U>::tree_iterator {
  public:  // Public Type(s)
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type = typename std::conditional<
         IsConst,
-        rbtree<T>::value_type const,
-        rbtree<T>::value_type
+        rbtree<T, U>::value_type const,
+        rbtree<T, U>::value_type
     >::type;
     using pointer = value_type *;
     using reference = value_type &;
@@ -197,8 +199,7 @@ class rbtree<T>::tree_iterator {
     tree_iterator();
     explicit tree_iterator(rbtree const *tree);
     tree_iterator(rbtree const *tree, node_ptr ptr);
-    tree_iterator(rbtree const *tree, typename rbtree<T>::node_ptr const &ptr);
-    ~tree_iterator();
+    tree_iterator(rbtree const *tree, typename rbtree<T, U>::node_ptr const &ptr);
 
     bool has_parent();
     bool has_left();
@@ -231,71 +232,83 @@ class rbtree<T>::tree_iterator {
  private:  // Private Property(ies)
     rbtree const *tree_;
     node_ptr ptr_;
-};  // class rbtree<T>::tree_iterator<B>
+};  // class rbtree<T, U>::tree_iterator<B>
 
 /************************************************
- * Implementation: class rbtree<T>
+ * Implementation: class rbtree<T, U>
  ************************************************/
 
-template <typename T>
-typename rbtree<T>::node_pool rbtree<T>::pool_(INITIAL_POOL_SIZE);
+template <typename T, typename U>
+typename rbtree<T, U>::node_pool rbtree<T, U>::pool_(INITIAL_POOL_SIZE);
 
-template <typename T>
-inline rbtree<T>::rbtree() : first_(nullptr), last_(nullptr) {
+template <typename T, typename U>
+inline rbtree<T, U>::rbtree() : first_(nullptr), last_(nullptr) {
     // do nothing
 }
 
-template <typename T>
-inline rbtree<T>::~rbtree() {
-    // do nothing
-}
-
-template <typename T>
-inline typename rbtree<T>::iterator rbtree<T>::root() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::iterator rbtree<T, U>::root() {
     return iterator(this, root_);
 }
 
-template <typename T>
-inline typename rbtree<T>::const_iterator rbtree<T>::root() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::root() const {
+    return croot();
+}
+
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::croot() const {
     return const_iterator(this, root_);
 }
 
-template <typename T>
-inline typename rbtree<T>::iterator rbtree<T>::begin() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::iterator rbtree<T, U>::begin() {
     return iterator(this, first_);
 }
 
-template <typename T>
-inline typename rbtree<T>::const_iterator rbtree<T>::begin() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::begin() const {
     return cbegin();
 }
 
-template <typename T>
-inline typename rbtree<T>::const_iterator rbtree<T>::cbegin() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::cbegin() const {
     return const_iterator(this, first_);
 }
 
-template <typename T>
-inline typename rbtree<T>::iterator rbtree<T>::end() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::iterator rbtree<T, U>::end() {
     return iterator(this);
 }
 
-template <typename T>
-inline typename rbtree<T>::const_iterator rbtree<T>::end() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::end() const {
     return cend();
 }
 
-template <typename T>
-inline typename rbtree<T>::const_iterator rbtree<T>::cend() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::const_iterator rbtree<T, U>::cend() const {
     return const_iterator(this);
 }
 
-template <typename T>
-template <typename Updater>
-typename rbtree<T>::iterator rbtree<T>::insert_before(
-        iterator pos, value_type const &data, Updater const &update) {
-    auto new_node = pool_.new_node(data);
-    auto ptr = pos.get_node_ptr();
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
+        iterator it, value_type const &data, U const &update) {
+    auto new_node_ptr = pool_.new_node(data);
+    return insert_before(it, new_node_ptr, update);
+}
+
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
+        iterator it, value_type &&data, U const &update) {
+    auto new_node_ptr = pool_.new_node(std::move(data));
+    return insert_before(it, new_node_ptr, update);
+}
+
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::insert_before(
+        iterator it, weak_node_ptr new_node_ptr, U const &update) {
+    auto ptr = it.get_node_ptr();
     if (ptr) {
         if (ptr->get_left()) {
             ptr = ptr->get_left();
@@ -303,37 +316,36 @@ typename rbtree<T>::iterator rbtree<T>::insert_before(
                 ptr = ptr->get_right();
             }
 
-            ptr->set_right(new_node);
+            ptr->set_right(new_node_ptr);
         } else {
-            if (ptr == first_) { first_ = new_node; }
+            if (ptr == first_) { first_ = new_node_ptr; }
 
-            ptr->set_left(new_node);
+            ptr->set_left(new_node_ptr);
         }
 
-        new_node->set_parent(ptr);
-        new_node->set_color(color::red);
+        new_node_ptr->set_parent(ptr);
+        new_node_ptr->set_color(color::red);
     } else if (last_) {
         // insert after the last node
-        new_node->set_parent(last_);
-        new_node->set_color(color::red);
-        last_->set_right(new_node);
-        last_ = new_node;
+        new_node_ptr->set_parent(last_);
+        new_node_ptr->set_color(color::red);
+        last_->set_right(new_node_ptr);
+        last_ = new_node_ptr;
     } else {
         // current node is at the root of the tree
-        first_ = last_ = new_node;
-        root_.reset(new_node);
+        first_ = last_ = new_node_ptr;
+        root_.reset(new_node_ptr);
         root_->set_color(color::black);
         return iterator(this, root_);
     }
 
-    rebalance_after_insertion(new_node, new_node->get_parent(), update);
-    return iterator(this, new_node);
+    rebalance_after_insertion(new_node_ptr, new_node_ptr->get_parent(), update);
+    return iterator(this, new_node_ptr);
 }
 
-template <typename T>
-template <typename Updater>
-typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Updater const &update) {
-    auto ptr = pos.get_node_ptr();
+template <typename T, typename U>
+typename rbtree<T, U>::iterator rbtree<T, U>::erase(iterator it, U const &update) {
+    auto ptr = it.get_node_ptr();
     if (first_ == ptr && last_ == ptr) {
         // current node is at the root of the tree
         root_.release();
@@ -341,11 +353,11 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Updater const &updat
         return end();
     }
 
-    auto parent_it = pos.parent();
-    ++pos;
-    auto next_parent_it = pos ? pos.parent() : end();
+    auto parent_it = it.parent();
+    ++it;
+    auto next_parent_it = it ? it.parent() : end();
 
-    auto next_ptr = pos.get_node_ptr();
+    auto next_ptr = it.get_node_ptr();
     if (ptr == first_)  { first_ = next_ptr; }
     if (ptr == last_)   { last_ = prev_node(ptr); }
 
@@ -413,8 +425,8 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Updater const &updat
     }
 
     if (ptr == next_parent_it.get_node_ptr()) {
-        update(pos);
-    } else if (pos && pos.parent() != next_parent_it) {
+        update(it);
+    } else if (it && it.parent() != next_parent_it) {
         update(next_parent_it);
     } else {
         update(parent_it);
@@ -427,10 +439,9 @@ typename rbtree<T>::iterator rbtree<T>::erase(iterator pos, Updater const &updat
     return iterator(this, next_ptr);
 }
 
-template <typename T>
-template <typename Updater>
-void rbtree<T>::rebalance_after_insertion(
-        weak_node_ptr ptr, weak_node_ptr parent, Updater const &update) {
+template <typename T, typename U>
+void rbtree<T, U>::rebalance_after_insertion(
+        weak_node_ptr ptr, weak_node_ptr parent, U const &update) {
     while (is_red_node(parent)) {
         auto grandparent = parent->get_parent();
         auto uncle = grandparent
@@ -473,10 +484,9 @@ void rbtree<T>::rebalance_after_insertion(
     root_->set_color(color::black);
 }
 
-template <typename T>
-template <typename Updater>
-void rbtree<T>::rebalance_after_erasure(
-        weak_node_ptr ptr, weak_node_ptr parent, Updater const &update) {
+template <typename T, typename U>
+void rbtree<T, U>::rebalance_after_erasure(
+        weak_node_ptr ptr, weak_node_ptr parent, U const &update) {
     while (parent && is_black_node(ptr)) {
         auto sibling = (ptr == parent->get_left())
             ? parent->get_right()
@@ -546,9 +556,8 @@ void rbtree<T>::rebalance_after_erasure(
     }
 }
 
-template <typename T>
-template <typename Updater>
-void rbtree<T>::rotate_left(weak_node_ptr ptr, Updater const &update) {
+template <typename T, typename U>
+void rbtree<T, U>::rotate_left(weak_node_ptr ptr, U const &update) {
     auto parent = ptr->get_parent();
     auto right = ptr->move_right();
     right->set_parent(parent);
@@ -573,9 +582,8 @@ void rbtree<T>::rotate_left(weak_node_ptr ptr, Updater const &update) {
     update(iterator(this, ptr));
 }
 
-template <typename T>
-template <typename Updater>
-void rbtree<T>::rotate_right(weak_node_ptr ptr, Updater const &update) {
+template <typename T, typename U>
+void rbtree<T, U>::rotate_right(weak_node_ptr ptr, U const &update) {
     auto parent = ptr->get_parent();
     auto left = ptr->move_left();
     left->set_parent(parent);
@@ -600,8 +608,8 @@ void rbtree<T>::rotate_right(weak_node_ptr ptr, Updater const &update) {
     update(iterator(this, ptr));
 }
 
-template <typename T>
-typename rbtree<T>::weak_node_ptr rbtree<T>::next_node(weak_node_ptr ptr) const {
+template <typename T, typename U>
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::next_node(weak_const_node_ptr ptr) const {
     if (!ptr) {
         ptr = first_;
     } else if (ptr == last_) {
@@ -619,11 +627,11 @@ typename rbtree<T>::weak_node_ptr rbtree<T>::next_node(weak_node_ptr ptr) const 
         ptr = ptr->get_parent();
     }
 
-    return ptr;
+    return const_cast<weak_node_ptr>(ptr);
 }
 
-template <typename T>
-typename rbtree<T>::weak_node_ptr rbtree<T>::prev_node(weak_node_ptr ptr) const {
+template <typename T, typename U>
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::prev_node(weak_const_node_ptr ptr) const {
     if (!ptr) {
         ptr = last_;
     } else if (ptr == first_) {
@@ -641,131 +649,138 @@ typename rbtree<T>::weak_node_ptr rbtree<T>::prev_node(weak_node_ptr ptr) const 
         ptr = ptr->get_parent();
     }
 
-    return ptr;
+    return const_cast<weak_node_ptr>(ptr);
 }
 
-template <typename T>
-inline bool rbtree<T>::is_red_node(weak_const_node_ptr ptr) {
+template <typename T, typename U>
+inline bool rbtree<T, U>::is_red_node(weak_const_node_ptr ptr) {
     return ptr && ptr->get_color() == color::red;
 }
 
-template <typename T>
-inline bool rbtree<T>::is_black_node(weak_const_node_ptr ptr) {
+template <typename T, typename U>
+inline bool rbtree<T, U>::is_black_node(weak_const_node_ptr ptr) {
     return !is_red_node(ptr);
 }
 
+template <typename T, typename U>
+inline typename rbtree<T, U>::size_type rbtree<T, U>::size() const {
+    return root_ ? root_->size() : 0;
+}
+
 /************************************************
- * Implementation: struct rbtree<T>::node
+ * Implementation: struct rbtree<T, U>::node
  ************************************************/
 
-template <typename T>
-inline rbtree<T>::node::node(T const &data)
+template <typename T, typename U>
+inline rbtree<T, U>::node::node(T const &data)
     : parent_(nullptr), data_(data) {
     // do nothing
 }
 
-template <typename T>
-inline rbtree<T>::node::~node() {
-    // do nothing
-}
-
-template <typename T>
-inline typename rbtree<T>::weak_const_node_ptr rbtree<T>::node::get_parent() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_const_node_ptr rbtree<T, U>::node::get_parent() const {
     return parent_;
 }
 
-template <typename T>
-inline typename rbtree<T>::weak_node_ptr rbtree<T>::node::get_parent() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node::get_parent() {
     return parent_;
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_parent(weak_node_ptr parent) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_parent(weak_node_ptr parent) {
     parent_ = parent;
 }
 
-template <typename T>
-inline typename rbtree<T>::weak_const_node_ptr rbtree<T>::node::get_left() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_const_node_ptr rbtree<T, U>::node::get_left() const {
     return left_.get();
 }
 
-template <typename T>
-inline typename rbtree<T>::weak_node_ptr rbtree<T>::node::get_left() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node::get_left() {
     return left_.get();
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_left(weak_node_ptr left) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_left(weak_node_ptr left) {
     left_.reset(left);
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_left(node_ptr &&left) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_left(node_ptr &&left) {
     left_ = std::move(left);
 }
 
-template <typename T>
-inline typename rbtree<T>::node_ptr rbtree<T>::node::move_left() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::node_ptr &&rbtree<T, U>::node::move_left() {
     return std::move(left_);
 }
 
-template <typename T>
-inline typename rbtree<T>::weak_const_node_ptr rbtree<T>::node::get_right() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_const_node_ptr rbtree<T, U>::node::get_right() const {
     return right_.get();
 }
 
-template <typename T>
-inline typename rbtree<T>::weak_node_ptr rbtree<T>::node::get_right() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node::get_right() {
     return right_.get();
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_right(weak_node_ptr right) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_right(weak_node_ptr right) {
     right_.reset(right);
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_right(node_ptr &&right) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_right(node_ptr &&right) {
     right_ = std::move(right);
 }
 
-template <typename T>
-inline typename rbtree<T>::node_ptr rbtree<T>::node::move_right() {
+template <typename T, typename U>
+inline typename rbtree<T, U>::node_ptr &&rbtree<T, U>::node::move_right() {
     return std::move(right_);
 }
 
-template <typename T>
-inline typename rbtree<T>::color rbtree<T>::node::get_color() const {
+template <typename T, typename U>
+inline typename rbtree<T, U>::color rbtree<T, U>::node::get_color() const {
     return color_;
 }
 
-template <typename T>
-inline void rbtree<T>::node::set_color(color c) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node::set_color(color c) {
     color_ = c;
 }
 
-template <typename T>
-inline T const &rbtree<T>::node::data() const {
+template <typename T, typename U>
+inline T const &rbtree<T, U>::node::data() const {
     return data_;
 }
 
-template <typename T>
-inline T &rbtree<T>::node::data() {
+template <typename T, typename U>
+inline T &rbtree<T, U>::node::data() {
     return data_;
+}
+
+template <typename T, typename U>
+inline typename rbtree<T, U>::size_type rbtree<T, U>::node::size() const {
+    return 1
+        + (left_ ? left_->size() : 0)
+        + (right_ ? right_->size() : 0);
 }
 
 /************************************************
- * Implementation: class rbtree<T>::node_pool
+ * Implementation: class rbtree<T, U>::node_pool
  ************************************************/
 
-template <typename T>
-inline rbtree<T>::node_pool::node_pool(size_type size)
+template <typename T, typename U>
+inline rbtree<T, U>::node_pool::node_pool(size_type size)
     : next_size_(size), chunks_head_(nullptr), free_list_head_(nullptr) {
     // do nothing
 }
 
-template <typename T>
-inline rbtree<T>::node_pool::~node_pool() {
+template <typename T, typename U>
+inline rbtree<T, U>::node_pool::~node_pool() {
     auto chunk = chunks_head_;
     while (chunk != nullptr) {
         auto next_chunk = chunk[0].next;
@@ -774,8 +789,9 @@ inline rbtree<T>::node_pool::~node_pool() {
     }
 }
 
-template <typename T>
-typename rbtree<T>::weak_node_ptr rbtree<T>::node_pool::new_node(value_type const &data) {
+template <typename T, typename U>
+template <typename ...Args>
+typename rbtree<T, U>::weak_node_ptr rbtree<T, U>::node_pool::new_node(Args &&...args) {
     if (free_list_head_ == nullptr) {
         auto chunk = new block[next_size_ + 1];
         chunk[0].next = chunks_head_;
@@ -791,189 +807,187 @@ typename rbtree<T>::weak_node_ptr rbtree<T>::node_pool::new_node(value_type cons
 
     auto p = &(free_list_head_->data);
     free_list_head_ = free_list_head_->next;
-    return new(p) node(data);
+    return new(p) node(std::forward<Args>(args)...);
 }
 
-template <typename T>
-inline void rbtree<T>::node_pool::delete_node(weak_node_ptr p) {
+template <typename T, typename U>
+inline void rbtree<T, U>::node_pool::delete_node(weak_node_ptr p) {
     p->~node();
     reinterpret_cast<block *>(p)->next = free_list_head_;
     free_list_head_ = reinterpret_cast<block *>(p);
 }
 
 /************************************************
- * Implementation: class rbtree<T>::tree_iterator<B>
+ * Implementation: class rbtree<T, U>::tree_iterator<B>
  ************************************************/
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::tree_iterator()
+inline rbtree<T, U>::tree_iterator<B>::tree_iterator()
     : tree_(nullptr), ptr_(nullptr) {
     // do nothing
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::tree_iterator(rbtree const *tree)
+inline rbtree<T, U>::tree_iterator<B>::tree_iterator(rbtree const *tree)
     : tree_(tree), ptr_(nullptr) {
     // do nothing
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::tree_iterator(rbtree const *tree, node_ptr ptr)
+inline rbtree<T, U>::tree_iterator<B>::tree_iterator(rbtree const *tree, node_ptr ptr)
     : tree_(tree), ptr_(ptr) {
     // do nothing
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::tree_iterator(
-        rbtree const *tree, typename rbtree<T>::node_ptr const &ptr)
+inline rbtree<T, U>::tree_iterator<B>::tree_iterator(
+        rbtree const *tree, typename rbtree<T, U>::node_ptr const &ptr)
     : tree_(tree), ptr_(ptr.get()) {
     // do nothing
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::~tree_iterator() {
-    // do nothing
-}
-
-template <typename T>
-template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::has_parent() {
+inline bool rbtree<T, U>::tree_iterator<B>::has_parent() {
     return ptr_->get_parent();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::has_left() {
+inline bool rbtree<T, U>::tree_iterator<B>::has_left() {
     return ptr_->get_left();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::has_right() {
+inline bool rbtree<T, U>::tree_iterator<B>::has_right() {
     return ptr_->get_right();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline void rbtree<T>::tree_iterator<B>::go_parent() {
+inline void rbtree<T, U>::tree_iterator<B>::go_parent() {
     ptr_ = ptr_->get_parent();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline void rbtree<T>::tree_iterator<B>::go_left() {
+inline void rbtree<T, U>::tree_iterator<B>::go_left() {
     ptr_ = ptr_->get_left();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline void rbtree<T>::tree_iterator<B>::go_right() {
+inline void rbtree<T, U>::tree_iterator<B>::go_right() {
     ptr_ = ptr_->get_right();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> rbtree<T>::tree_iterator<B>::parent() {
+inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_iterator<B>::parent() {
     return tree_iterator(tree_, ptr_->get_parent());
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> rbtree<T>::tree_iterator<B>::left() {
+inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_iterator<B>::left() {
     return tree_iterator(tree_, ptr_->get_left());
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> rbtree<T>::tree_iterator<B>::right() {
+inline typename rbtree<T, U>::template tree_iterator<B> rbtree<T, U>::tree_iterator<B>::right() {
     return tree_iterator(tree_, ptr_->get_right());
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<false>
-rbtree<T>::tree_iterator<B>::unconst() const {
+inline typename rbtree<T, U>::template tree_iterator<false>
+rbtree<T, U>::tree_iterator<B>::unconst() const {
     using node_ptr = typename tree_iterator<false>::node_ptr;
     return tree_iterator<false>(tree_, const_cast<node_ptr>(ptr_));
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> &rbtree<T>::tree_iterator<B>::operator++() {
+inline typename rbtree<T, U>::template tree_iterator<B> &
+rbtree<T, U>::tree_iterator<B>::operator++() {
     ptr_ = tree_->next_node(ptr_);
     return *this;
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> rbtree<T>::tree_iterator<B>::operator++(int) {
+inline typename rbtree<T, U>::template tree_iterator<B>
+rbtree<T, U>::tree_iterator<B>::operator++(int) {
     tree_iterator it(tree_, ptr_);
     operator++();
     return it;
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> &rbtree<T>::tree_iterator<B>::operator--() {
+inline typename rbtree<T, U>::template tree_iterator<B> &
+rbtree<T, U>::tree_iterator<B>::operator--() {
     ptr_ = tree_->prev_node(ptr_);
     return *this;
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B> rbtree<T>::tree_iterator<B>::operator--(int) {
+inline typename rbtree<T, U>::template tree_iterator<B>
+rbtree<T, U>::tree_iterator<B>::operator--(int) {
     tree_iterator it(tree_, ptr_);
     operator--();
     return it;
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B>::reference
-rbtree<T>::tree_iterator<B>::operator*() {
+inline typename rbtree<T, U>::template tree_iterator<B>::reference
+rbtree<T, U>::tree_iterator<B>::operator*() {
     return *operator->();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B>::pointer
-rbtree<T>::tree_iterator<B>::operator->() {
+inline typename rbtree<T, U>::template tree_iterator<B>::pointer
+rbtree<T, U>::tree_iterator<B>::operator->() {
     return &ptr_->data();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::operator==(tree_iterator it) const {
+inline bool rbtree<T, U>::tree_iterator<B>::operator==(tree_iterator it) const {
     return ptr_ == it.ptr_;
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::operator!=(tree_iterator it) const {
+inline bool rbtree<T, U>::tree_iterator<B>::operator!=(tree_iterator it) const {
     return !(*this == it);
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline bool rbtree<T>::tree_iterator<B>::operator!() const {
+inline bool rbtree<T, U>::tree_iterator<B>::operator!() const {
     return !this->operator bool();
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline rbtree<T>::tree_iterator<B>::operator bool() const {
+inline rbtree<T, U>::tree_iterator<B>::operator bool() const {
     return static_cast<bool>(ptr_);
 }
 
-template <typename T>
+template <typename T, typename U>
 template <bool B>
-inline typename rbtree<T>::template tree_iterator<B>::node_ptr
-rbtree<T>::tree_iterator<B>::get_node_ptr() {
+inline typename rbtree<T, U>::template tree_iterator<B>::node_ptr
+rbtree<T, U>::tree_iterator<B>::get_node_ptr() {
     return ptr_;
 }
 
