@@ -46,6 +46,7 @@ class wavelet_matrix {
     size_type lf(size_type i) const;
     std::pair<size_type, value_type> psi_and_access(size_type i) const;
     size_type psi(size_type i) const;
+    size_type psi(size_type i, value_type hint) const;
 
     value_type at(size_type i) const;
 
@@ -199,6 +200,12 @@ wavelet_matrix<T, H>::psi_and_access(size_type i) const {
 template <typename T, std::size_t H>
 inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::psi(size_type i) const {
     return psi_and_access(i).first;
+}
+
+template <typename T, std::size_t H>
+inline typename wavelet_matrix<T, H>::size_type wavelet_matrix<T, H>::psi(size_type i,
+                                                                          value_type hint) const {
+    return select_at(i, hint);
 }
 
 template <typename T, std::size_t H>

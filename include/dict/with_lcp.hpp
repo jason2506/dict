@@ -109,6 +109,10 @@ void with_lcp<UPs...>::policy<TI, T>::update(
         return x == 0 ? pos : wm.psi(x - (x < lf_pos));
     };
 
+    auto psi_hint = [pos, lf_pos, &wm](size_type x, typename wm_type::value_type hint) {
+        return x == 0 ? pos : wm.psi(x - (x < lf_pos), hint);
+    };
+
     auto term_at_f = [lf_pos, &wm](size_type x) {
         return x == 0 ? 0 : wm.search(x + 1 - (x < lf_pos));
     };
@@ -130,11 +134,12 @@ void with_lcp<UPs...>::policy<TI, T>::update(
             y = psi(y);
         }
 
-        auto c = term_at_f(x);
-        while (c != 0 && c == term_at_f(y)) {
-            x = psi(x);
-            y = psi(y);
-            c = term_at_f(x);
+        auto cx = term_at_f(x);
+        decltype(cx) cy;
+        while (cx != 0 && cx == (cy = term_at_f(y))) {
+            x = psi_hint(x, cx);
+            y = psi_hint(y, cy);
+            cx = term_at_f(x);
             ++lcp_;
         }
     }
@@ -148,11 +153,12 @@ void with_lcp<UPs...>::policy<TI, T>::update(
             y = psi(y);
         }
 
-        auto c = term_at_f(x);
-        while (c != 0 && c == term_at_f(y)) {
-            x = psi(x);
-            y = psi(y);
-            c = term_at_f(x);
+        auto cx = term_at_f(x);
+        decltype(cx) cy;
+        while (cx != 0 && cx == (cy = term_at_f(y))) {
+            x = psi_hint(x, cx);
+            y = psi_hint(y, cy);
+            cx = term_at_f(x);
             ++lcp;
         }
     }
