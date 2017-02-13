@@ -103,13 +103,14 @@ template <typename Sequence>
 void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_term<Sequence> const &info) {
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
+    auto const &wm = wm_;
 
-    auto psi = [&](size_type x) {
-        return x == 0 ? pos : wm_.psi(x - (x < lf_pos));
+    auto psi = [pos, lf_pos, &wm](size_type x) {
+        return x == 0 ? pos : wm.psi(x - (x < lf_pos));
     };
 
-    auto term_at_f = [&](size_type x) {
-        return x == 0 ? 0 : wm_.search(x + 1 - (x < lf_pos));
+    auto term_at_f = [lf_pos, &wm](size_type x) {
+        return x == 0 ? 0 : wm.search(x + 1 - (x < lf_pos));
     };
 
     // calculate LCP[pos]
