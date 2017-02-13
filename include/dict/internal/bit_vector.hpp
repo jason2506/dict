@@ -299,11 +299,12 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
     auto it = tree_.root();
     while (it) {
         size_type num_left_bits, num_left_set_bits;
-        if (it.has_left()) {
-            num_left_bits = it.left()->num_sub_bits;
+        auto left = it.left();
+        if (left) {
+            num_left_bits = left->num_sub_bits;
             num_left_set_bits = b
-                ? it.left()->num_sub_set_bits
-                : num_left_bits - it.left()->num_sub_set_bits;
+                ? left->num_sub_set_bits
+                : num_left_bits - left->num_sub_set_bits;
         } else {
             num_left_bits = num_left_set_bits = 0;
         }
@@ -367,9 +368,10 @@ bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) const {
     auto it = tree_.root();
     while (it) {
         size_type num_left_bits, num_left_set_bits;
-        if (it.has_left()) {
-            num_left_bits = it.left()->num_sub_bits;
-            num_left_set_bits = it.left()->num_sub_set_bits;
+        auto left = it.left();
+        if (left) {
+            num_left_bits = left->num_sub_bits;
+            num_left_set_bits = left->num_sub_set_bits;
         } else {
             num_left_bits = num_left_set_bits = 0;
         }
@@ -442,14 +444,14 @@ inline void bit_vector<N>::update_counts(typename bstree::iterator it) {
         it->num_sub_bits = it->num_bits;
         it->num_sub_set_bits = it->bits.count();
 
-        if (it.has_left()) {
-            auto left = it.left();
+        auto left = it.left();
+        if (left) {
             it->num_sub_bits += left->num_sub_bits;
             it->num_sub_set_bits += left->num_sub_set_bits;
         }
 
-        if (it.has_right()) {
-            auto right = it.right();
+        auto right = it.right();
+        if (right) {
             it->num_sub_bits += right->num_sub_bits;
             it->num_sub_set_bits += right->num_sub_set_bits;
         }
