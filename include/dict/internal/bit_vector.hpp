@@ -9,6 +9,8 @@
 #ifndef DICT_INTERNAL_BIT_VECTOR_HPP_
 #define DICT_INTERNAL_BIT_VECTOR_HPP_
 
+#include <cassert>
+
 #include <bitset>
 #include <iterator>
 #include <stdexcept>
@@ -84,7 +86,13 @@ class bit_vector {
 
 template <std::size_t N>
 struct bit_vector<N>::block {
-    block() : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
+    block()
+        : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
+        // do nothing
+    }
+
+    explicit block(bool b)
+        : num_bits(1), num_sub_bits(1), num_sub_set_bits(b), bits(b ? 1 : 0) {
         // do nothing
     }
 
@@ -136,11 +144,8 @@ inline bit_vector<N> &bit_vector<N>::reset(size_type i) {
 template <std::size_t N>
 void bit_vector<N>::insert(size_type i, value_type b) {
     if (!tree_.root()) {
-        block bb;
-        bb.num_bits = bb.num_sub_bits = 1;
-        bb.num_sub_set_bits = (b ? 1 : 0);
-        bb.bits[i] = b;
-        tree_.insert_before(tree_.end(), bb);
+        assert(i == 0);
+        tree_.insert_before(tree_.end(), block(b));
         return;
     }
 
