@@ -120,7 +120,8 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     // calculate LCP[pos]
     auto lcpa_it = lcpa_.find(pos);
     auto old_lcp = lcpa_it ? *lcpa_it : 0;
-    if (pos > 0 && psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
+    assert(pos > 0);
+    if (psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
         auto c = term_at_f(pos);
         if (c != 0 && c == term_at_f(pos - 1)) {
             ++lcp_;
