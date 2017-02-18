@@ -9,6 +9,8 @@
 #ifndef DICT_WITH_LCP_HPP_
 #define DICT_WITH_LCP_HPP_
 
+#include <iterator>
+
 #include "internal/lcp_trait.hpp"
 #include "internal/tree_list.hpp"
 
@@ -73,7 +75,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 inline with_lcp<UPs...>::policy<TI, T>::policy(wm_type const &wt)
-    : wm_(wt), psi_lcp_(0) {
+    : wm_(wt), lcpa_(), psi_lcp_(0) {
     // do nothing
 }
 
@@ -103,6 +105,8 @@ template <typename Sequence>
 void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_term<Sequence> const &info) {
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
+    auto num_inserted = info.num_inserted;
+    auto s_rend = std::rbegin(info.s) + num_inserted - 1;
     auto const &wm = wm_;
 
     auto psi = [pos, lf_pos, &wm](size_type x) {
@@ -122,45 +126,40 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     auto old_lcp = lcpa_it ? *lcpa_it : 0;
     assert(pos > 0);
     if (psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
-        auto c = term_at_f(pos);
-        if (c != 0 && c == term_at_f(pos - 1)) {
+        if (num_inserted > 0 && *s_rend == term_at_f(pos - 1)) {
             ++psi_lcp_;
         } else {
             psi_lcp_ = 0;
         }
     } else {
-        auto x = pos, y = pos - 1;
+        auto x = pos - 1;
         for (psi_lcp_ = 0; psi_lcp_ < old_lcp; ++psi_lcp_) {
             x = psi(x);
-            y = psi(y);
         }
 
-        auto cx = term_at_f(x);
-        decltype(cx) cy;
-        while (cx != 0 && cx == (cy = term_at_f(y))) {
+        auto s_it = s_rend - old_lcp;
+        decltype(term_at_f(x)) cx;
+        while (psi_lcp_ < num_inserted && *s_it == (cx = term_at_f(x))) {
             x = psi_hint(x, cx);
-            y = psi_hint(y, cy);
-            cx = term_at_f(x);
             ++psi_lcp_;
+            --s_it;
         }
     }
 
     if (lcpa_it && old_lcp == psi_lcp_) {
         // re-calculate LCP[pos + 1]
         auto &next_lcp = *lcpa_it;
-        auto x = pos + 1, y = pos;
+        auto x = pos + 1;
         for (next_lcp = 0; next_lcp < old_lcp; ++next_lcp) {
             x = psi(x);
-            y = psi(y);
         }
 
-        auto cx = term_at_f(x);
-        decltype(cx) cy;
-        while (cx != 0 && cx == (cy = term_at_f(y))) {
+        auto s_it = s_rend - old_lcp;
+        decltype(term_at_f(x)) cx;
+        while (next_lcp < num_inserted && *s_it == (cx = term_at_f(x))) {
             x = psi_hint(x, cx);
-            y = psi_hint(y, cy);
-            cx = term_at_f(x);
             ++next_lcp;
+            --s_it;
         }
     }
 
