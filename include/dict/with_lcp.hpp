@@ -132,12 +132,13 @@ void with_lcp<UPs...>::policy<TI, T>::update(
             psi_lcp_ = 0;
         }
     } else {
+        auto s_it = s_rend;
         auto x = pos - 1;
         for (psi_lcp_ = 0; psi_lcp_ < old_lcp; ++psi_lcp_) {
-            x = psi(x);
+            x = psi_hint(x, *s_it);
+            --s_it;
         }
 
-        auto s_it = s_rend - old_lcp;
         while (psi_lcp_ < num_inserted && *s_it == term_at_f(x)) {
             x = psi_hint(x, *s_it);
             ++psi_lcp_;
@@ -148,12 +149,13 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     if (lcpa_it && old_lcp == psi_lcp_) {
         // re-calculate LCP[pos + 1]
         auto &next_lcp = *lcpa_it;
+        auto s_it = s_rend;
         auto x = pos + 1;
         for (next_lcp = 0; next_lcp < old_lcp; ++next_lcp) {
-            x = psi(x);
+            x = psi_hint(x, *s_it);
+            --s_it;
         }
 
-        auto s_it = s_rend - old_lcp;
         while (next_lcp < num_inserted && *s_it == term_at_f(x)) {
             x = psi_hint(x, *s_it);
             ++next_lcp;
