@@ -63,7 +63,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
  private:  // Private Property(ies)
     wm_type const &wm_;
     internal::tree_list lcpa_;
-    size_type lcp_;
+    size_type psi_lcp_;
 };  // class with_lcp<UPs...>::policy<TI, T>
 
 /************************************************
@@ -73,7 +73,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 inline with_lcp<UPs...>::policy<TI, T>::policy(wm_type const &wt)
-    : wm_(wt), lcp_(0) {
+    : wm_(wt), psi_lcp_(0) {
     // do nothing
 }
 
@@ -89,7 +89,7 @@ template <typename TI, typename T>
 template <typename Sequence>
 inline void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_first_term<Sequence> const &info) {
-    assert(lcp_ == 0);
+    assert(psi_lcp_ == 0);
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
         info.s, 0,
@@ -124,13 +124,13 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     if (psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
         auto c = term_at_f(pos);
         if (c != 0 && c == term_at_f(pos - 1)) {
-            ++lcp_;
+            ++psi_lcp_;
         } else {
-            lcp_ = 0;
+            psi_lcp_ = 0;
         }
     } else {
         auto x = pos, y = pos - 1;
-        for (lcp_ = 0; lcp_ < old_lcp; ++lcp_) {
+        for (psi_lcp_ = 0; psi_lcp_ < old_lcp; ++psi_lcp_) {
             x = psi(x);
             y = psi(y);
         }
@@ -141,11 +141,11 @@ void with_lcp<UPs...>::policy<TI, T>::update(
             x = psi_hint(x, cx);
             y = psi_hint(y, cy);
             cx = term_at_f(x);
-            ++lcp_;
+            ++psi_lcp_;
         }
     }
 
-    if (lcpa_it && old_lcp == lcp_) {
+    if (lcpa_it && old_lcp == psi_lcp_) {
         // re-calculate LCP[pos + 1]
         auto &next_lcp = *lcpa_it;
         auto x = pos + 1, y = pos;
@@ -164,11 +164,11 @@ void with_lcp<UPs...>::policy<TI, T>::update(
         }
     }
 
-    lcpa_.insert(lcpa_it, lcp_);
+    lcpa_.insert(lcpa_it, psi_lcp_);
     updating_policies::update(
         typename lcp_trait::event::template after_inserting_lcp<Sequence>{
             info.s, info.num_inserted,
-            pos, lcp_, lcpa_it ? *lcpa_it : 0
+            pos, psi_lcp_, lcpa_it ? *lcpa_it : 0
         });
 }
 
