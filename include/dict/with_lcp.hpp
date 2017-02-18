@@ -89,7 +89,7 @@ template <typename TI, typename T>
 template <typename Sequence>
 inline void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_first_term<Sequence> const &info) {
-    // lcp_ = 0;
+    assert(lcp_ == 0);
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
         info.s, 0,
