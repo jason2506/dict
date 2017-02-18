@@ -146,9 +146,9 @@ void with_lcp<UPs...>::policy<TI, T>::update(
 
     if (lcpa_it && old_lcp == lcp_) {
         // re-calculate LCP[pos + 1]
-        auto &lcp = *lcpa_it;
+        auto &next_lcp = *lcpa_it;
         auto x = pos + 1, y = pos;
-        for (lcp = 0; lcp < old_lcp; ++lcp) {
+        for (next_lcp = 0; next_lcp < old_lcp; ++next_lcp) {
             x = psi(x);
             y = psi(y);
         }
@@ -159,7 +159,7 @@ void with_lcp<UPs...>::policy<TI, T>::update(
             x = psi_hint(x, cx);
             y = psi_hint(y, cy);
             cx = term_at_f(x);
-            ++lcp;
+            ++next_lcp;
         }
     }
 
