@@ -138,9 +138,8 @@ void with_lcp<UPs...>::policy<TI, T>::update(
         }
 
         auto s_it = s_rend - old_lcp;
-        decltype(term_at_f(x)) cx;
-        while (psi_lcp_ < num_inserted && *s_it == (cx = term_at_f(x))) {
-            x = psi_hint(x, cx);
+        while (psi_lcp_ < num_inserted && *s_it == term_at_f(x)) {
+            x = psi_hint(x, *s_it);
             ++psi_lcp_;
             --s_it;
         }
@@ -155,9 +154,8 @@ void with_lcp<UPs...>::policy<TI, T>::update(
         }
 
         auto s_it = s_rend - old_lcp;
-        decltype(term_at_f(x)) cx;
-        while (next_lcp < num_inserted && *s_it == (cx = term_at_f(x))) {
-            x = psi_hint(x, cx);
+        while (next_lcp < num_inserted && *s_it == term_at_f(x)) {
+            x = psi_hint(x, *s_it);
             ++next_lcp;
             --s_it;
         }
