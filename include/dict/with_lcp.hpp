@@ -9,6 +9,8 @@
 #ifndef DICT_WITH_LCP_HPP_
 #define DICT_WITH_LCP_HPP_
 
+#include <iterator>
+
 #include "internal/lcp_trait.hpp"
 #include "internal/tree_list.hpp"
 
@@ -63,7 +65,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
  private:  // Private Property(ies)
     wm_type const &wm_;
     internal::tree_list lcpa_;
-    size_type lcp_;
+    size_type psi_lcp_;
 };  // class with_lcp<UPs...>::policy<TI, T>
 
 /************************************************
@@ -73,7 +75,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
 inline with_lcp<UPs...>::policy<TI, T>::policy(wm_type const &wt)
-    : wm_(wt), lcp_(0) {
+    : wm_(wt), lcpa_(), psi_lcp_(0) {
     // do nothing
 }
 
@@ -89,7 +91,7 @@ template <typename TI, typename T>
 template <typename Sequence>
 inline void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_first_term<Sequence> const &info) {
-    // lcp_ = 0;
+    assert(psi_lcp_ == 0);
     lcpa_.insert(lcpa_.begin(), 0);
     updating_policies::update(typename lcp_trait::event::template after_inserting_lcp<Sequence>{
         info.s, 0,
@@ -103,64 +105,69 @@ template <typename Sequence>
 void with_lcp<UPs...>::policy<TI, T>::update(
         typename event::template after_inserting_term<Sequence> const &info) {
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
+    auto num_inserted = info.num_inserted;
+    auto s_rend = std::rbegin(info.s) + num_inserted - 1;
+    auto const &wm = wm_;
 
-    auto psi = [&](size_type x) {
-        return x == 0 ? pos : wm_.psi(x - (x < lf_pos));
+    auto psi = [pos, lf_pos, &wm](size_type x) {
+        return x == 0 ? pos : wm.psi(x - (x < lf_pos));
     };
 
-    auto term_at_f = [&](size_type x) {
-        return x == 0 ? 0 : wm_.search(x + 1 - (x < lf_pos));
+    auto psi_hint = [pos, lf_pos, &wm](size_type x, typename wm_type::value_type hint) {
+        return x == 0 ? pos : wm.psi(x - (x < lf_pos), hint);
+    };
+
+    auto term_at_f = [lf_pos, &wm](size_type x) {
+        return x == 0 ? 0 : wm.search(x + 1 - (x < lf_pos));
     };
 
     // calculate LCP[pos]
     auto lcpa_it = lcpa_.find(pos);
     auto old_lcp = lcpa_it ? *lcpa_it : 0;
-    if (pos > 0 && psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
-        auto c = term_at_f(pos);
-        if (c != 0 && c == term_at_f(pos - 1)) {
-            ++lcp_;
+    assert(pos > 0);
+    if (psi_pos > 0 && psi(pos - 1) == psi_pos - 1) {
+        if (num_inserted > 0 && *s_rend == term_at_f(pos - 1)) {
+            ++psi_lcp_;
         } else {
-            lcp_ = 0;
+            psi_lcp_ = 0;
         }
     } else {
-        auto x = pos, y = pos - 1;
-        for (lcp_ = 0; lcp_ < old_lcp; ++lcp_) {
-            x = psi(x);
-            y = psi(y);
+        auto s_it = s_rend;
+        auto x = pos - 1;
+        for (psi_lcp_ = 0; psi_lcp_ < old_lcp; ++psi_lcp_) {
+            x = psi_hint(x, *s_it);
+            --s_it;
         }
 
-        auto c = term_at_f(x);
-        while (c != 0 && c == term_at_f(y)) {
-            x = psi(x);
-            y = psi(y);
-            c = term_at_f(x);
-            ++lcp_;
+        while (psi_lcp_ < num_inserted && *s_it == term_at_f(x)) {
+            x = psi_hint(x, *s_it);
+            ++psi_lcp_;
+            --s_it;
         }
     }
 
-    if (lcpa_it && old_lcp == lcp_) {
+    if (lcpa_it && old_lcp == psi_lcp_) {
         // re-calculate LCP[pos + 1]
-        auto &lcp = *lcpa_it;
-        auto x = pos + 1, y = pos;
-        for (lcp = 0; lcp < old_lcp; ++lcp) {
-            x = psi(x);
-            y = psi(y);
+        auto &next_lcp = *lcpa_it;
+        auto s_it = s_rend;
+        auto x = pos + 1;
+        for (next_lcp = 0; next_lcp < old_lcp; ++next_lcp) {
+            x = psi_hint(x, *s_it);
+            --s_it;
         }
 
-        auto c = term_at_f(x);
-        while (c != 0 && c == term_at_f(y)) {
-            x = psi(x);
-            y = psi(y);
-            c = term_at_f(x);
-            ++lcp;
+        while (next_lcp < num_inserted && *s_it == term_at_f(x)) {
+            x = psi_hint(x, *s_it);
+            ++next_lcp;
+            --s_it;
         }
     }
 
-    lcpa_.insert(lcpa_it, lcp_);
+    lcpa_.insert(lcpa_it, psi_lcp_);
     updating_policies::update(
         typename lcp_trait::event::template after_inserting_lcp<Sequence>{
             info.s, info.num_inserted,
-            pos, lcp_, lcpa_it ? *lcpa_it : 0
+            pos, psi_lcp_, lcpa_it ? *lcpa_it : 0
         });
 }
 

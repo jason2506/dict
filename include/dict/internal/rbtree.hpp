@@ -95,6 +95,7 @@ class rbtree {
 template <typename T, typename U>
 class rbtree<T, U>::node {
  public:  // Public Method(s)
+    explicit node(value_type &&data);
     explicit node(value_type const &data);
 
     weak_const_node_ptr get_parent() const;
@@ -670,6 +671,12 @@ inline typename rbtree<T, U>::size_type rbtree<T, U>::size() const {
 /************************************************
  * Implementation: struct rbtree<T, U>::node
  ************************************************/
+
+template <typename T, typename U>
+inline rbtree<T, U>::node::node(T &&data)
+    : parent_(nullptr), data_(std::move(data)) {
+    // do nothing
+}
 
 template <typename T, typename U>
 inline rbtree<T, U>::node::node(T const &data)

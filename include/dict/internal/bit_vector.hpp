@@ -9,6 +9,8 @@
 #ifndef DICT_INTERNAL_BIT_VECTOR_HPP_
 #define DICT_INTERNAL_BIT_VECTOR_HPP_
 
+#include <cassert>
+
 #include <bitset>
 #include <iterator>
 #include <stdexcept>
@@ -84,7 +86,13 @@ class bit_vector {
 
 template <std::size_t N>
 struct bit_vector<N>::block {
-    block() : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
+    block()
+        : num_bits(0), num_sub_bits(0), num_sub_set_bits(0) {
+        // do nothing
+    }
+
+    explicit block(bool b)
+        : num_bits(1), num_sub_bits(1), num_sub_set_bits(b), bits(b ? 1 : 0) {
         // do nothing
     }
 
@@ -136,11 +144,8 @@ inline bit_vector<N> &bit_vector<N>::reset(size_type i) {
 template <std::size_t N>
 void bit_vector<N>::insert(size_type i, value_type b) {
     if (!tree_.root()) {
-        block bb;
-        bb.num_bits = bb.num_sub_bits = 1;
-        bb.num_sub_set_bits = (b ? 1 : 0);
-        bb.bits[i] = b;
-        tree_.insert_before(tree_.end(), bb);
+        assert(i == 0);
+        tree_.insert_before(tree_.end(), block(b));
         return;
     }
 
@@ -299,11 +304,12 @@ typename bit_vector<N>::size_type bit_vector<N>::select(size_type i, value_type 
     auto it = tree_.root();
     while (it) {
         size_type num_left_bits, num_left_set_bits;
-        if (it.has_left()) {
-            num_left_bits = it.left()->num_sub_bits;
+        auto left = it.left();
+        if (left) {
+            num_left_bits = left->num_sub_bits;
             num_left_set_bits = b
-                ? it.left()->num_sub_set_bits
-                : num_left_bits - it.left()->num_sub_set_bits;
+                ? left->num_sub_set_bits
+                : num_left_bits - left->num_sub_set_bits;
         } else {
             num_left_bits = num_left_set_bits = 0;
         }
@@ -367,9 +373,10 @@ bit_vector<N>::find_block(size_type i, size_type &pos, size_type &rank) const {
     auto it = tree_.root();
     while (it) {
         size_type num_left_bits, num_left_set_bits;
-        if (it.has_left()) {
-            num_left_bits = it.left()->num_sub_bits;
-            num_left_set_bits = it.left()->num_sub_set_bits;
+        auto left = it.left();
+        if (left) {
+            num_left_bits = left->num_sub_bits;
+            num_left_set_bits = left->num_sub_set_bits;
         } else {
             num_left_bits = num_left_set_bits = 0;
         }
@@ -442,14 +449,14 @@ inline void bit_vector<N>::update_counts(typename bstree::iterator it) {
         it->num_sub_bits = it->num_bits;
         it->num_sub_set_bits = it->bits.count();
 
-        if (it.has_left()) {
-            auto left = it.left();
+        auto left = it.left();
+        if (left) {
             it->num_sub_bits += left->num_sub_bits;
             it->num_sub_set_bits += left->num_sub_set_bits;
         }
 
-        if (it.has_right()) {
-            auto right = it.right();
+        auto right = it.right();
+        if (right) {
             it->num_sub_bits += right->num_sub_bits;
             it->num_sub_set_bits += right->num_sub_set_bits;
         }

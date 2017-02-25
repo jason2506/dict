@@ -15,7 +15,7 @@ The recommended way to use _DICT_ package in your project is to install the pack
 Assume that your project is built with CMake, you can just execute the following command in your __build directory__:
 
 ```sh
-$ conan install dict/0.1.1@jason2506/testing -b outdated -g cmake
+$ conan install dict/0.1.2@jason2506/testing -b outdated -g cmake
 ```
 
 The `install` command will download the package (together with its dependencies) and generate `conanbuildinfo.cmake` file in the current directory.
