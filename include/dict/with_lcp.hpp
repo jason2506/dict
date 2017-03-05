@@ -46,6 +46,7 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<
 
  private:  // Private Types(s)
     using wm_type = typename Trait::wm_type;
+    using core_access = typename Trait::core_access;
     using event = typename Trait::event;
 
     using lcp_trait = internal::lcp_trait<Trait>;
@@ -58,8 +59,6 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<
         >;
 
  public:  // Public Method(s)
-    policy(wm_type const &wt);
-
     size_type lcp(size_type i) const;
 
  protected:  // Protected Method(s)
@@ -71,7 +70,6 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<
     void update(typename event::template after_inserting_sequence<Sequence> const &);
 
  private:  // Private Property(ies)
-    wm_type const &wm_;
     internal::tree_list lcpa_;
     size_type psi_lcp_;
 };  // class with_lcp<UPs...>::policy<TI, T>
@@ -79,13 +77,6 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<
 /************************************************
  * Implementation: class with_lcp<UPs...>::policy<TI, T>
  ************************************************/
-
-template <template <typename, typename> class... UPs>
-template <typename TI, typename T>
-inline with_lcp<UPs...>::policy<TI, T>::policy(wm_type const &wt)
-    : wm_(wt), lcpa_(), psi_lcp_(0) {
-    // do nothing
-}
 
 template <template <typename, typename> class... UPs>
 template <typename TI, typename T>
@@ -115,7 +106,7 @@ void with_lcp<UPs...>::policy<TI, T>::update(
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
     auto num_inserted = info.num_inserted;
     auto s_rend = std::rbegin(info.s) + num_inserted - 1;
-    auto const &wm = wm_;
+    auto const &wm = core_access::get_wm(this);
 
     auto psi = [pos, lf_pos, &wm](size_type x) {
         return x == 0 ? pos : wm.psi(x - (x < lf_pos));

@@ -27,12 +27,10 @@ class with_csa {
     using term_type = typename Trait::term_type;
 
  private:  // Private Types(s)
-    using wm_type = typename Trait::wm_type;
+    using core_access = typename Trait::core_access;
     using event = typename Trait::event;
 
  public:  // Public Method(s)
-    explicit with_csa(wm_type const &wt);
-
     value_type at(size_type i) const;
     size_type rank(value_type j) const;
     term_type term(value_type j) const;
@@ -56,7 +54,6 @@ class with_csa {
     static constexpr size_type BIT_BLOCK_SIZE = 64;
 
  private:  // Private Property(ies)
-    wm_type const &wm_;
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
@@ -67,16 +64,10 @@ class with_csa {
  ************************************************/
 
 template <typename TI, typename T>
-inline with_csa<TI, T>::with_csa(wm_type const &wt)
-    : wm_(wt) {
-    // do nothing
-}
-
-template <typename TI, typename T>
 typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     size_type off = 0;
     while (!sa_samples_[i]) {
-        i = static_cast<host_type const *>(this)->lf(i);
+        i = core_access::to_host(this)->lf(i);
         ++off;
     }
 
@@ -84,7 +75,7 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     auto j = pi_.at(r - 1);
 
     auto sa = isa_samples_.select(j, true) + off;
-    auto n = static_cast<host_type const *>(this)->num_terms();
+    auto n = core_access::to_host(this)->num_terms();
     return sa < n ? sa : sa - n;
 }
 
@@ -103,7 +94,7 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
         auto i = pi_.rank(r);
         auto v = sa_samples_.select(i, true);
         for (decltype(off) t = 0; t < off; ++t) {
-            v = static_cast<host_type const *>(this)->lf(v);
+            v = core_access::to_host(this)->lf(v);
         }
 
         return v;
@@ -112,7 +103,8 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
 
 template <typename TI, typename T>
 inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const {
-    return wm_.search(rank(j) + 1);
+    auto const &wm = core_access::get_wm(this);
+    return wm.search(rank(j) + 1);
 }
 
 template <typename TI, typename T>
@@ -150,7 +142,7 @@ inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
 
 template <typename TI, typename T>
 void with_csa<TI, T>::add_samples(value_type j) {
-    auto n = static_cast<host_type const *>(this)->num_terms();
+    auto n = core_access::to_host(this)->num_terms();
     if (j + 1 == n) { return; }
 
     auto r = isa_samples_.rank(j, true);

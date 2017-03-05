@@ -16,7 +16,6 @@
 #include "internal/chained_updater.hpp"
 #include "internal/text_index_trait.hpp"
 #include "internal/type_list.hpp"
-#include "internal/wavelet_matrix.hpp"
 
 namespace dict {
 
@@ -52,6 +51,9 @@ class text_index : public internal::chained_updater<
     size_type lf(size_type i) const;
 
  private:  // Private Type(s)
+    friend internal::text_index_trait::core_access;
+
+    using wm_type = internal::text_index_trait::wm_type;
     using event = internal::text_index_trait::event;
     using updating_policies = internal::chained_updater<
             internal::type_list<
@@ -62,7 +64,7 @@ class text_index : public internal::chained_updater<
         >;
 
  private:  // Private Property(ies)
-    internal::wavelet_matrix<term_type> wm_;
+    wm_type wm_;
     size_type sentinel_pos_;
     size_type sentinel_rank_;
     size_type num_seqs_;
@@ -74,7 +76,7 @@ class text_index : public internal::chained_updater<
 
 template <template <typename, typename> class... UPs>
 inline text_index<UPs...>::text_index()
-    : updating_policies(wm_), sentinel_pos_(0), sentinel_rank_(0), num_seqs_(0) {
+    : updating_policies(), sentinel_pos_(0), sentinel_rank_(0), num_seqs_(0) {
     // do nothing
 }
 
