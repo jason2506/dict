@@ -10,10 +10,12 @@
 #define DICT_TEXT_INDEX_HPP_
 
 #include <cassert>
+
 #include <iterator>
 
 #include "internal/chained_updater.hpp"
 #include "internal/text_index_trait.hpp"
+#include "internal/type_list.hpp"
 #include "internal/wavelet_matrix.hpp"
 
 namespace dict {
@@ -23,11 +25,13 @@ namespace dict {
  ************************************************/
 
 template <template <typename, typename> class... UpdatingPolicies>
-class text_index : public internal::chained_updater<UpdatingPolicies...>
-    ::template updater<
+class text_index : public internal::chained_updater<
+    internal::type_list<
         text_index<UpdatingPolicies...>,
         internal::text_index_trait
-    > {
+    >,
+    UpdatingPolicies...
+> {
  public:  // Public Type(s)
     using size_type = internal::text_index_trait::size_type;
     using term_type = internal::text_index_trait::term_type;
@@ -49,10 +53,12 @@ class text_index : public internal::chained_updater<UpdatingPolicies...>
 
  private:  // Private Type(s)
     using event = internal::text_index_trait::event;
-    using updating_policies = typename internal::chained_updater<UpdatingPolicies...>
-        ::template updater<
-            text_index,
-            internal::text_index_trait
+    using updating_policies = internal::chained_updater<
+            internal::type_list<
+                text_index<UpdatingPolicies...>,
+                internal::text_index_trait
+            >,
+            UpdatingPolicies...
         >;
 
  private:  // Private Property(ies)

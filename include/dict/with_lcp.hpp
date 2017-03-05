@@ -13,6 +13,7 @@
 
 #include "internal/lcp_trait.hpp"
 #include "internal/tree_list.hpp"
+#include "internal/type_list.hpp"
 
 namespace dict {
 
@@ -32,11 +33,13 @@ struct with_lcp {
 
 template <template <typename, typename> class... UPs>
 template <typename TextIndex, typename Trait>
-class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
-    ::template updater<
+class with_lcp<UPs...>::policy : public internal::chained_updater<
+    internal::type_list<
         policy<TextIndex, Trait>,
         internal::lcp_trait<Trait>
-    > {
+    >,
+    UPs...
+> {
  public:  // Public Type(s)
     using host_type = TextIndex;
     using size_type = typename Trait::size_type;
@@ -46,8 +49,13 @@ class with_lcp<UPs...>::policy : public internal::chained_updater<UPs...>
     using event = typename Trait::event;
 
     using lcp_trait = internal::lcp_trait<Trait>;
-    using updating_policies = typename internal::chained_updater<UPs...>
-        ::template updater<policy, lcp_trait>;
+    using updating_policies = internal::chained_updater<
+            internal::type_list<
+                policy<TextIndex, Trait>,
+                internal::lcp_trait<Trait>
+            >,
+            UPs...
+        >;
 
  public:  // Public Method(s)
     policy(wm_type const &wt);
