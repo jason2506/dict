@@ -41,7 +41,6 @@ class with_lcp_impl : public chained_updater<
     using size_type = typename Trait::size_type;
 
  private:  // Private Types(s)
-    using wm_type = typename Trait::wm_type;
     using core_access = typename Trait::core_access;
     using event = typename Trait::event;
 
@@ -105,7 +104,7 @@ void with_lcp_impl<TI, T, UPs...>::update(
         return x == 0 ? pos : wm.psi(x - (x < lf_pos));
     };
 
-    auto psi_hint = [pos, lf_pos, &wm](size_type x, typename wm_type::value_type hint) {
+    auto psi_hint = [pos, lf_pos, &wm](size_type x, decltype(wm[0]) hint) {
         return x == 0 ? pos : wm.psi(x - (x < lf_pos), hint);
     };
 
