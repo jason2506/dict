@@ -15,20 +15,20 @@
 namespace dict {
 
 /************************************************
- * Declaration: class with_csa<TI, T>
+ * Declaration: class with_csa<TI, AF>
  ************************************************/
 
-template <typename TextIndex, typename Trait>
+template <typename TextIndex, typename AccessorFactory>
 class with_csa {
  public:  // Public Type(s)
     using host_type = TextIndex;
-    using size_type = typename Trait::size_type;
-    using value_type = typename Trait::size_type;
-    using term_type = typename Trait::term_type;
+    using size_type = text_index_trait::size_type;
+    using value_type = text_index_trait::size_type;
+    using term_type = text_index_trait::term_type;
 
  private:  // Private Types(s)
-    using core_access = typename Trait::core_access;
-    using event = typename Trait::event;
+    using accessor_factory = AccessorFactory;
+    using event = text_index_trait::event;
 
  public:  // Public Method(s)
     value_type at(size_type i) const;
@@ -44,6 +44,8 @@ class with_csa {
     void update(typename event::template after_inserting_term<Sequence> const &info);
     template <typename Sequence>
     void update(typename event::template after_inserting_sequence<Sequence> const &);
+    template <typename Event>
+    void update(Event const &);
 
  private:  // Private Method(s)
     void insert_term(size_type i, bool is_sampled);
@@ -57,17 +59,17 @@ class with_csa {
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
-};  // class with_csa<TI, T>
+};  // class with_csa<TI, AF>
 
 /************************************************
- * Implementation: class with_csa<TI, T>
+ * Implementation: class with_csa<TI, AF>
  ************************************************/
 
-template <typename TI, typename T>
-typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
+template <typename TI, typename AF>
+typename with_csa<TI, AF>::value_type with_csa<TI, AF>::at(size_type i) const {
     size_type off = 0;
     while (!sa_samples_[i]) {
-        i = core_access::to_host(this)->lf(i);
+        i = accessor_factory::template create<host_type>().to_host(this)->lf(i);
         ++off;
     }
 
@@ -75,12 +77,12 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     auto j = pi_.at(r - 1);
 
     auto sa = isa_samples_.select(j, true) + off;
-    auto n = core_access::to_host(this)->num_terms();
+    auto n = accessor_factory::template create<host_type>().to_host(this)->num_terms();
     return sa < n ? sa : sa - n;
 }
 
-template <typename TI, typename T>
-typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
+template <typename TI, typename AF>
+typename with_csa<TI, AF>::size_type with_csa<TI, AF>::rank(value_type j) const {
     auto br_pair = isa_samples_.access_and_rank(j, true);
     auto b = br_pair.first;
     auto r = br_pair.second;
@@ -94,55 +96,61 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
         auto i = pi_.rank(r);
         auto v = sa_samples_.select(i, true);
         for (decltype(off) t = 0; t < off; ++t) {
-            v = core_access::to_host(this)->lf(v);
+            v = accessor_factory::template create<host_type>().to_host(this)->lf(v);
         }
 
         return v;
     }
 }
 
-template <typename TI, typename T>
-inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const {
-    auto const &wm = core_access::get_wm(this);
+template <typename TI, typename AF>
+inline typename with_csa<TI, AF>::term_type with_csa<TI, AF>::term(value_type j) const {
+    auto const &wm = accessor_factory::template create<host_type>().get_wm(this);
     return wm.search(rank(j) + 1);
 }
 
-template <typename TI, typename T>
-inline typename with_csa<TI, T>::value_type with_csa<TI, T>::operator[](size_type i) const {
+template <typename TI, typename AF>
+inline typename with_csa<TI, AF>::value_type with_csa<TI, AF>::operator[](size_type i) const {
     return at(i);
 }
 
-template <typename TI, typename T>
+template <typename TI, typename AF>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(
+inline void with_csa<TI, AF>::update(
         typename event::template after_inserting_first_term<Sequence> const &) {
     insert_term(0, true);
     pi_.insert(0, 0);
 }
 
-template <typename TI, typename T>
+template <typename TI, typename AF>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(
+inline void with_csa<TI, AF>::update(
         typename event::template after_inserting_term<Sequence> const &info) {
     insert_term(info.pos, false);
 }
 
-template <typename TI, typename T>
+template <typename TI, typename AF>
 template <typename Sequence>
-inline void with_csa<TI, T>::update(
+inline void with_csa<TI, AF>::update(
         typename event::template after_inserting_sequence<Sequence> const &) {
     add_samples(0);
 }
 
-template <typename TI, typename T>
-inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
+template <typename TI, typename AF>
+template <typename Event>
+inline void with_csa<TI, AF>::update(Event const &) {
+    // do nothing
+}
+
+template <typename TI, typename AF>
+inline void with_csa<TI, AF>::insert_term(size_type i, bool is_sampled) {
     sa_samples_.insert(i, is_sampled);
     isa_samples_.insert(0, is_sampled);
 }
 
-template <typename TI, typename T>
-void with_csa<TI, T>::add_samples(value_type j) {
-    auto n = core_access::to_host(this)->num_terms();
+template <typename TI, typename AF>
+void with_csa<TI, AF>::add_samples(value_type j) {
+    auto n = accessor_factory::template create<host_type>().to_host(this)->num_terms();
     if (j + 1 == n) { return; }
 
     auto r = isa_samples_.rank(j, true);

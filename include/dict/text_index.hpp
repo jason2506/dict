@@ -15,9 +15,21 @@
 
 #include "internal/chained_updater.hpp"
 #include "internal/text_index_trait.hpp"
-#include "internal/type_list.hpp"
 
 namespace dict {
+
+namespace internal {
+
+struct accessor_factory {
+    template <typename T>
+    static typename T::accessor create() {
+        return decltype(create<T>())();
+    }
+};
+
+};
+
+using internal::text_index_trait;
 
 /************************************************
  * Declaration: class text_index<UPs...>
@@ -25,15 +37,13 @@ namespace dict {
 
 template <template <typename, typename> class... UpdatingPolicies>
 class text_index : public internal::chained_updater<
-    internal::type_list<
-        text_index<UpdatingPolicies...>,
-        internal::text_index_trait
-    >,
+    text_index<UpdatingPolicies...>,
+    internal::accessor_factory,
     UpdatingPolicies...
 > {
  public:  // Public Type(s)
-    using size_type = internal::text_index_trait::size_type;
-    using term_type = internal::text_index_trait::term_type;
+    using size_type = text_index_trait::size_type;
+    using term_type = text_index_trait::term_type;
 
  public:  // Public Method(s)
     text_index();
@@ -51,15 +61,14 @@ class text_index : public internal::chained_updater<
     size_type lf(size_type i) const;
 
  private:  // Private Type(s)
-    friend internal::text_index_trait::core_access;
+    friend internal::accessor_factory;
+    struct accessor;
 
-    using wm_type = internal::text_index_trait::wm_type;
-    using event = internal::text_index_trait::event;
+    using wm_type = text_index_trait::wm_type;
+    using event = text_index_trait::event;
     using updating_policies = internal::chained_updater<
-            internal::type_list<
-                text_index<UpdatingPolicies...>,
-                internal::text_index_trait
-            >,
+            text_index<UpdatingPolicies...>,
+            internal::accessor_factory,
             UpdatingPolicies...
         >;
 
@@ -69,6 +78,35 @@ class text_index : public internal::chained_updater<
     size_type sentinel_rank_;
     size_type num_seqs_;
 };  // class text_index<UPs...>
+
+/************************************************
+ * Declaration: class text_index<UPs...>::accessor
+ ************************************************/
+
+template <template <typename, typename> class... UPs>
+struct text_index<UPs...>::accessor {
+    using host_type = text_index<UPs...>;
+
+    template <typename TextIndex>
+    host_type *to_host(TextIndex *ti) {  // NOLINT(runtime/references)
+        return static_cast<host_type *>(ti);
+    }
+
+    template <typename TextIndex>
+    host_type const *to_host(TextIndex const *ti) {
+        return static_cast<host_type const *>(ti);
+    }
+
+    template <typename TextIndex>
+    typename host_type::wm_type const &get_wm(TextIndex const *ti) {
+        return to_host(ti)->wm_;
+    }
+
+    template <typename TextIndex, typename Event>
+    void notify(TextIndex *ti, Event const &info) {
+        to_host(ti)->update(info);
+    }
+};  // class text_index<UPs...>::accessor
 
 /************************************************
  * Implementation: class text_index<UPs...>

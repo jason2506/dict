@@ -9,17 +9,18 @@
 #ifndef DICT_INTERNAL_LCP_TRAIT_HPP_
 #define DICT_INTERNAL_LCP_TRAIT_HPP_
 
+#include "text_index_trait.hpp"
+
 namespace dict {
 
 namespace internal {
 
 /************************************************
- * Declaration: struct lcp_trait<T>
+ * Declaration: struct lcp_trait
  ************************************************/
 
-template <typename Trait>
 struct lcp_trait {
-    using size_type = typename Trait::size_type;
+    using size_type = typename text_index_trait::size_type;
 
     struct event {
         template <typename Sequence>

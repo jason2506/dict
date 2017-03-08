@@ -18,7 +18,7 @@
 
 using text_index = dict::text_index<
     dict::with_csa,
-    dict::with_lcp<>::policy
+    dict::with_lcp
 >;
 
 // NOLINTNEXTLINE(runtime/references)
