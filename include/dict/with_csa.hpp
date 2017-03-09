@@ -27,7 +27,7 @@ class with_csa {
     using term_type = typename Trait::term_type;
 
  private:  // Private Types(s)
-    using core_access = typename Trait::core_access;
+    using helper = typename Trait::helper;
     using event = typename Trait::event;
 
  public:  // Public Method(s)
@@ -67,7 +67,7 @@ template <typename TI, typename T>
 typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     size_type off = 0;
     while (!sa_samples_[i]) {
-        i = core_access::to_host(this)->lf(i);
+        i = helper::to_host(this)->lf(i);
         ++off;
     }
 
@@ -75,7 +75,7 @@ typename with_csa<TI, T>::value_type with_csa<TI, T>::at(size_type i) const {
     auto j = pi_.at(r - 1);
 
     auto sa = isa_samples_.select(j, true) + off;
-    auto n = core_access::to_host(this)->num_terms();
+    auto n = helper::to_host(this)->num_terms();
     return sa < n ? sa : sa - n;
 }
 
@@ -94,7 +94,7 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
         auto i = pi_.rank(r);
         auto v = sa_samples_.select(i, true);
         for (decltype(off) t = 0; t < off; ++t) {
-            v = core_access::to_host(this)->lf(v);
+            v = helper::to_host(this)->lf(v);
         }
 
         return v;
@@ -103,7 +103,7 @@ typename with_csa<TI, T>::size_type with_csa<TI, T>::rank(value_type j) const {
 
 template <typename TI, typename T>
 inline typename with_csa<TI, T>::term_type with_csa<TI, T>::term(value_type j) const {
-    auto const &wm = core_access::get_wm(this);
+    auto const &wm = helper::get_wm(this);
     return wm.search(rank(j) + 1);
 }
 
@@ -142,7 +142,7 @@ inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
 
 template <typename TI, typename T>
 void with_csa<TI, T>::add_samples(value_type j) {
-    auto n = core_access::to_host(this)->num_terms();
+    auto n = helper::to_host(this)->num_terms();
     if (j + 1 == n) { return; }
 
     auto r = isa_samples_.rank(j, true);

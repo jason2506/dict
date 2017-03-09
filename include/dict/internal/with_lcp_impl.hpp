@@ -41,7 +41,7 @@ class with_lcp_impl : public chained_updater<
     using size_type = typename Trait::size_type;
 
  private:  // Private Types(s)
-    using core_access = typename Trait::core_access;
+    using helper = typename Trait::helper;
     using event = typename Trait::event;
 
     using lcp_trait = lcp_trait<Trait>;
@@ -98,7 +98,7 @@ void with_lcp_impl<TI, T, UPs...>::update(
     auto pos = info.pos, psi_pos = info.psi_pos, lf_pos = info.lf_pos;
     auto num_inserted = info.num_inserted;
     auto s_rend = std::rbegin(info.s) + num_inserted - 1;
-    auto const &wm = core_access::get_wm(this);
+    auto const &wm = helper::get_wm(this);
 
     auto psi = [pos, lf_pos, &wm](size_type x) {
         return x == 0 ? pos : wm.psi(x - (x < lf_pos));

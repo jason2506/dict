@@ -24,15 +24,15 @@ struct text_index_trait {
     using term_type = std::uint16_t;
     using wm_type = wavelet_matrix<term_type>;
 
-    struct core_access;
+    struct helper;
     struct event;
 };  // class text_index_trait
 
 /************************************************
- * Declaration: struct text_index_trait::core_access
+ * Declaration: struct text_index_trait::helper
  ************************************************/
 
-struct text_index_trait::core_access {
+struct text_index_trait::helper {
     template <typename TextIndex>
     static typename TextIndex::host_type *to_host(TextIndex *ti) {  // NOLINT(runtime/references)
         return static_cast<typename TextIndex::host_type *>(ti);
@@ -47,7 +47,7 @@ struct text_index_trait::core_access {
     static wm_type const &get_wm(TextIndex const *ti) {
         return to_host(ti)->wm_;
     }
-};  // class text_index_trait::core_access
+};  // class text_index_trait::helper
 
 /************************************************
  * Declaration: struct text_index_trait::event

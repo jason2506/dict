@@ -51,7 +51,7 @@ class text_index : public internal::chained_updater<
     size_type lf(size_type i) const;
 
  private:  // Private Type(s)
-    friend internal::text_index_trait::core_access;
+    friend internal::text_index_trait::helper;
 
     using wm_type = internal::text_index_trait::wm_type;
     using event = internal::text_index_trait::event;
