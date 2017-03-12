@@ -12,6 +12,7 @@
 #include <cassert>
 
 #include <iterator>
+#include <utility>
 
 #include "internal/chained_updater.hpp"
 #include "internal/text_index_trait.hpp"
@@ -40,6 +41,10 @@ class text_index : public internal::chained_updater<
 
     template <typename Sequence>
     void insert(Sequence const &s);
+
+    template <typename OutputIterator>
+    std::pair<size_type, OutputIterator>
+    reverse_recover(size_type i, OutputIterator it) const;
 
     bool empty() const;
     size_type num_seqs() const;
@@ -135,6 +140,23 @@ void text_index<UPs...>::insert(Sequence const &s) {
     ++num_seqs_;
 
     updating_policies::update(event::after_inserting_sequence<Sequence>{s});
+}
+
+template <template <typename, typename> class... UPs>
+template <typename OutputIterator>
+std::pair<typename text_index<UPs...>::size_type, OutputIterator>
+text_index<UPs...>::reverse_recover(size_type i, OutputIterator it) const {
+    assert(f(i) == 0);
+
+    i = lf(i);
+    auto c = f(i);
+    do {
+        *it++ = c;
+        i = lf(i);
+        c = f(i);
+    } while (c != 0);
+
+    return {i, it};
 }
 
 template <template <typename, typename> class... UPs>

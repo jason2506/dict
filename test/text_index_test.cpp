@@ -6,11 +6,13 @@
  *  Distributed under The BSD 3-Clause License
  ************************************************/
 
+#include <initializer_list>
+#include <iterator>
 #include <sstream>
 #include <vector>
-#include <initializer_list>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <dict/text_index.hpp>
 #include <dict/with_csa.hpp>
@@ -82,6 +84,10 @@ TEST(SuffixArrayTest, InsertSingleValueIntoEmptyIndex) {
         {1, 0},   // isa
         {5, 0},   // terms
         {0, 0});  // lcpa
+
+    std::vector<text_index::term_type> s;
+    ti.reverse_recover(0, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({5}), testing::ContainerEq(s));
 }
 
 TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyIndex) {
@@ -97,6 +103,10 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoEmptyIndex) {
         {2, 5, 3, 6, 4, 1, 0},   // isa
         {1, 3, 1, 3, 2, 1, 0},   // terms
         {0, 0, 1, 2, 0, 0, 1});  // lcpa
+
+    std::vector<text_index::term_type> s;
+    ti.reverse_recover(0, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({1, 2, 3, 1, 3, 1}), testing::ContainerEq(s));
 }
 
 TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyIndex) {
@@ -113,6 +123,14 @@ TEST(SuffixArrayTest, InsertMultipleValuesIntoNonEmptyIndex) {
         {4, 9, 6, 1, 3, 8, 5, 10, 7, 2, 0},  // isa
         {1, 3, 2, 0, 1, 3, 1, 3, 2, 1, 0},   // terms
         {0, 0, 0, 1, 2, 3, 0, 1, 0, 1, 2});  // lcpa
+
+    std::vector<text_index::term_type> s;
+    ti.reverse_recover(0, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({1, 2, 3, 1, 3, 1}), testing::ContainerEq(s));
+
+    s.clear();
+    ti.reverse_recover(1, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({2, 3, 1}), testing::ContainerEq(s));
 }
 
 TEST(SuffixArrayTest, InsertMultipleSequences) {
@@ -130,4 +148,16 @@ TEST(SuffixArrayTest, InsertMultipleSequences) {
         {5, 10, 6, 1, 7, 3, 2, 8, 4, 9, 0},  // isa
         {1, 3, 2, 0, 2, 1, 0, 2, 1, 3, 0},   // terms
         {0, 0, 0, 0, 1, 2, 0, 1, 2, 0, 1});  // lcpa
+
+    std::vector<text_index::term_type> s;
+    ti.reverse_recover(0, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({3, 1, 2}), testing::ContainerEq(s));
+
+    s.clear();
+    ti.reverse_recover(1, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({2, 3, 1}), testing::ContainerEq(s));
+
+    s.clear();
+    ti.reverse_recover(2, std::back_inserter(s));
+    EXPECT_THAT(decltype(s)({1, 2}), testing::ContainerEq(s));
 }
