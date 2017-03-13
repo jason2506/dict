@@ -64,6 +64,11 @@ class with_lcp_impl : public chained_updater<
     template <typename Sequence>
     void update(typename event::template after_inserting_sequence<Sequence> const &);
 
+    void update(typename event::before_erasuring_sequence const &);
+    void update(typename event::after_erasuring_term const &info);
+    void update(typename event::after_moving_term const &);
+    void update(typename event::after_erasuring_sequence const &);
+
  private:  // Private Property(ies)
     tree_list lcpa_;
     size_type psi_lcp_;
@@ -166,6 +171,39 @@ template <typename TI, typename T, template <typename, typename> class... UPs>
 template <typename Sequence>
 inline void with_lcp_impl<TI, T, UPs...>::update(
         typename event::template after_inserting_sequence<Sequence> const &) {
+    // do nothing
+}
+
+template <typename TI, typename T, template <typename, typename> class... UPs>
+inline void with_lcp_impl<TI, T, UPs...>::update(
+        typename event::before_erasuring_sequence const &) {
+    // do nothing
+}
+
+template <typename TI, typename T, template <typename, typename> class... UPs>
+inline void with_lcp_impl<TI, T, UPs...>::update(
+        typename event::after_erasuring_term const &info) {
+    auto it = lcpa_.find(info.pos);
+    auto lcp = *it;
+    auto next_it = lcpa_.erase(it);
+    auto next_lcp = next_it ? *next_it : 0;
+    if (next_lcp > lcp) { *next_it = lcp; }
+
+    updating_policies::update(
+        typename lcp_trait::event::after_erasing_lcp{
+            info.s, info.pos, lcp, next_lcp
+        });
+}
+
+template <typename TI, typename T, template <typename, typename> class... UPs>
+inline void with_lcp_impl<TI, T, UPs...>::update(
+        typename event::after_moving_term const &) {
+    // do nothing
+}
+
+template <typename TI, typename T, template <typename, typename> class... UPs>
+inline void with_lcp_impl<TI, T, UPs...>::update(
+        typename event::after_erasuring_sequence const &) {
     // do nothing
 }
 

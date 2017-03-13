@@ -45,6 +45,11 @@ class with_csa {
     template <typename Sequence>
     void update(typename event::template after_inserting_sequence<Sequence> const &);
 
+    void update(typename event::before_erasuring_sequence const &info);
+    void update(typename event::after_erasuring_term const &info);
+    void update(typename event::after_moving_term const &info);
+    void update(typename event::after_erasuring_sequence const &);
+
  private:  // Private Method(s)
     void insert_term(size_type i, bool is_sampled);
     void add_samples(value_type j);
@@ -57,6 +62,8 @@ class with_csa {
     internal::bit_vector<BIT_BLOCK_SIZE> isa_samples_;
     internal::bit_vector<BIT_BLOCK_SIZE> sa_samples_;
     internal::permutation pi_;
+
+    size_type erased_isa_pos_;
 };  // class with_csa<TI, T>
 
 /************************************************
@@ -135,6 +142,49 @@ inline void with_csa<TI, T>::update(
 }
 
 template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::before_erasuring_sequence const &info) {
+    erased_isa_pos_ = at(info.pos);
+}
+
+template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::after_erasuring_term const &info) {
+    auto pos = info.pos;
+    sa_samples_.erase(pos);
+    auto b = isa_samples_.erase(erased_isa_pos_);
+    if (b) {
+        auto r = pos > 0 ? sa_samples_.rank(pos - 1, true) : 0;
+        pi_.erase(r);
+    }
+
+    if (erased_isa_pos_) { --erased_isa_pos_; }
+}
+
+template <typename TI, typename T>
+void with_csa<TI, T>::update(typename event::after_moving_term const &info) {
+    auto from_pos = info.from_pos;
+    auto to_pos = info.to_pos;
+
+    auto b = sa_samples_.erase(from_pos);
+    if (b) {
+        auto from_rank = from_pos > 0 ? sa_samples_.rank(from_pos - 1, true) : 0;
+        auto to_rank = to_pos > 0 ? sa_samples_.rank(to_pos - 1, true) : 0;
+        if (from_rank != to_rank) {
+            pi_.move(from_rank, to_rank);
+        }
+    }
+
+    sa_samples_.insert(to_pos, b);
+}
+
+template <typename TI, typename T>
+inline void with_csa<TI, T>::update(typename event::after_erasuring_sequence const &) {
+    auto const &wm = helper::get_wm(this);
+    if (wm.size()) {
+        add_samples(erased_isa_pos_);
+    }
+}
+
+template <typename TI, typename T>
 inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
     sa_samples_.insert(i, is_sampled);
     isa_samples_.insert(0, is_sampled);
@@ -143,7 +193,16 @@ inline void with_csa<TI, T>::insert_term(size_type i, bool is_sampled) {
 template <typename TI, typename T>
 void with_csa<TI, T>::add_samples(value_type j) {
     auto n = helper::to_host(this)->num_terms();
-    if (j + 1 == n) { return; }
+    if (j + 1 == n) {
+        if (!isa_samples_[j]) {
+            auto r = isa_samples_.rank(j, true);
+            sa_samples_.set(0);
+            isa_samples_.set(j);
+            pi_.insert(0, r);
+        }
+
+        return;
+    }
 
     auto r = isa_samples_.rank(j, true);
     auto left_sample_pos = r > 0 ? isa_samples_.select(r - 1, true) + 1 : 0;

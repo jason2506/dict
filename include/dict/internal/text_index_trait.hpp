@@ -9,6 +9,8 @@
 #ifndef DICT_INTERNAL_TEXT_INDEX_TRAIT_HPP_
 #define DICT_INTERNAL_TEXT_INDEX_TRAIT_HPP_
 
+#include <vector>
+
 #include "wavelet_matrix.hpp"
 
 namespace dict {
@@ -22,6 +24,7 @@ namespace internal {
 struct text_index_trait {
     using size_type = std::size_t;
     using term_type = std::uint16_t;
+    using seq_type = std::vector<term_type>;
     using wm_type = wavelet_matrix<term_type>;
 
     struct helper;
@@ -72,6 +75,24 @@ struct text_index_trait::event {
     template <typename Sequence>
     struct after_inserting_sequence {
         Sequence const &s;
+    };
+
+    struct before_erasuring_sequence {
+        size_type pos;
+    };
+
+    struct after_erasuring_term {
+        seq_type const &s;
+        size_type pos;
+    };
+
+    struct after_erasuring_sequence {
+        seq_type const &s;
+    };
+
+    struct after_moving_term {
+        size_type from_pos;
+        size_type to_pos;
     };
 };  // class text_index_trait::event
 
