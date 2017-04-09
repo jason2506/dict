@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 project(DICT
-    VERSION 0.1.2
+    VERSION 0.2.0
     LANGUAGES C CXX
 )
 
