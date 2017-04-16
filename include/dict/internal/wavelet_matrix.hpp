@@ -83,8 +83,7 @@ void wavelet_matrix<T, H>::insert(size_type i, value_type c) {
     for (size_type l = 0; l < HEIGHT; ++l, c >>= 1) {
         auto &bits = level_bits(l);
         auto b = c & 1;
-        bits.insert(i, b);
-        i = bits.rank(i, b) - 1;
+        i = bits.insert(i, b) - 1;
         if (b) {
             i += num_zeros(l);
         } else {

@@ -37,7 +37,7 @@ class bit_vector {
 
     bit_vector &set(size_type i, value_type b = true);
     bit_vector &reset(size_type i);
-    void insert(size_type i, value_type b);
+    size_type insert(size_type i, value_type b);
     value_type erase(size_type i);
 
     std::pair<value_type, size_type> access_and_rank(size_type i) const;
@@ -142,35 +142,42 @@ inline bit_vector<N> &bit_vector<N>::reset(size_type i) {
 }
 
 template <std::size_t N>
-void bit_vector<N>::insert(size_type i, value_type b) {
+typename bit_vector<N>::size_type bit_vector<N>::insert(size_type i, value_type b) {
     if (!tree_.root()) {
         assert(i == 0);
         tree_.insert_before(tree_.end(), block(b));
-        return;
+        return 1;
     }
+
+    auto k = i;
+    size_type rank = 0;
 
     auto it = tree_.end();
     if (i == size()) {
         --it;
         i = it->num_bits;
+        rank = count() - it->bits.count();
     } else {
-        size_type pos = 0, rank = 0;
+        assert(i < size());
+        size_type pos = 0;
         it = find_block(i, pos, rank);
         i -= pos;
     }
 
-    if (it->num_bits == MAX_BLOCK_SIZE) {
+    if (it->num_bits >= MAX_BLOCK_SIZE) {
         auto prev_it = std::prev(it);
         auto next_it = std::next(it);
         if (prev_it &&
                 prev_it->num_bits + it->num_bits <= (MAX_MERGE_SIZE << 1) &&
                 (!next_it || prev_it->num_bits < next_it->num_bits)) {
             i += prev_it->num_bits;
+            rank -= prev_it->bits.count();
             equalize_blocks(*prev_it, *it);
 
             if (i >= prev_it->num_bits) {
                 update_counts(prev_it);
                 i -= prev_it->num_bits;
+                rank += prev_it->bits.count();
             } else {
                 update_counts(it);
                 it = prev_it;
@@ -182,6 +189,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
             if (i >= it->num_bits) {
                 update_counts(it);
                 i -= it->num_bits;
+                rank += it->bits.count();
                 it = next_it;
             } else {
                 update_counts(next_it);
@@ -194,6 +202,7 @@ void bit_vector<N>::insert(size_type i, value_type b) {
             if (i >= new_it->num_bits) {
                 update_counts(new_it);
                 i -= new_it->num_bits;
+                rank += new_it->bits.count();
             } else {
                 update_counts(it);
                 it = new_it;
@@ -207,7 +216,10 @@ void bit_vector<N>::insert(size_type i, value_type b) {
     } else if (i < it->num_bits) {
         auto mask = (it->bits >> i) << i;
         it->bits ^= mask;
+        rank += it->bits.count();
         it->bits |= mask << 1;
+    } else {
+        rank += it->bits.count();
     }
 
     it->bits[i] = b;
@@ -215,6 +227,9 @@ void bit_vector<N>::insert(size_type i, value_type b) {
     // update counters
     it->num_bits++;
     update_counts(it);
+
+    assert(rank <= k);
+    return (b ? rank : k - rank) + 1;
 }
 
 template <std::size_t N>

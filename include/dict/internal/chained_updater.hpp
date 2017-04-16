@@ -14,108 +14,91 @@ namespace dict {
 namespace internal {
 
 /************************************************
- * Declaration: struct chained_updater<Us...>
+ * Declaration: class chained_updater<T, Us...>
  ************************************************/
 
-template <template <typename...> class... Updaters>
-struct chained_updater;
+template <typename UpdaterArgs, template <typename...> class... Updaters>
+class chained_updater;
 
 /************************************************
- * Declaration: struct chained_updater<U, Us...>
+ * Declaration: class chained_updater<T, U, Us...>
  ************************************************/
 
-template<
+template <
+    typename UpdaterArgs,
     template <typename...> class FirstUpdater,
     template <typename...> class... RestUpdaters
 >
-struct chained_updater<FirstUpdater, RestUpdaters...> {
-    template <typename... Args>
-    class updater;
-};  // class chained_updater<U, Us...>
-
-/************************************************
- * Declaration: struct chained_updater<>
- ************************************************/
-
-template <>
-struct chained_updater<> {
-    template <typename... Args>
-    class updater;
-};  // class chained_updater<>
-
-/************************************************
- * Declaration: class chained_updater<U, Us...>::updater<Args...>
- ************************************************/
-
-template<
-    template <typename...> class FirstUpdater,
-    template <typename...> class... RestUpdaters
->
-template <typename... Args>
-class chained_updater<FirstUpdater, RestUpdaters...>::updater
-    : public FirstUpdater<Args...>
-    , public chained_updater<RestUpdaters...>::template updater<Args...> {
+class chained_updater<UpdaterArgs, FirstUpdater, RestUpdaters...>
+    : public UpdaterArgs::template apply<FirstUpdater>
+    , public chained_updater<UpdaterArgs, RestUpdaters...> {
  public:  // Public Method(s)
-    template <typename... ConstructorArgs>
-    updater(ConstructorArgs const &... args);
+    template <typename... Args>
+    explicit chained_updater(Args const &... args);
 
  protected:  // Protected Method(s)
     template <typename Event>
     void update(Event const &info);
 
  private:  // Private Type(s)
-    using first_updater = FirstUpdater<Args...>;
-    using rest_updaters = typename chained_updater<RestUpdaters...>::template updater<Args...>;
-};  // class chained_updater<U, Us...>::updater<Args...>
+    using first_updater = typename UpdaterArgs::template apply<FirstUpdater>;
+    using rest_updaters = chained_updater<UpdaterArgs, RestUpdaters...>;
+};  // class chained_updater<T, U, Us...>
 
 /************************************************
- * Declaration: class chained_updater<>::updater<Args...>
+ * Declaration: class chained_updater<T>
  ************************************************/
 
-template <typename... Args>
-class chained_updater<>::updater {
+template <typename UpdaterArgs>
+class chained_updater<UpdaterArgs> {
  public:  // Public Method(s)
-    template <typename... ConstructorArgs>
-    updater(ConstructorArgs const &... args);
+    template <typename... Args>
+    explicit chained_updater(Args const &... args);
 
  protected:  // Protected Method(s)
     template <typename Event>
     void update(Event const &info);
-};  // class chained_updater<>::updater<Args...>
+};  // class chained_updater<T>
 
 /************************************************
- * Implementation: class chained_updater<U, Us...>::updater<Args...>
+ * Implementation: class chained_updater<T, U, Us...>
  ************************************************/
 
-template <template <typename...> class U, template <typename...> class... Us>
+template <
+    typename UpdaterArgs,
+    template <typename...> class U,
+    template <typename...> class... Us
+>
 template <typename... Args>
-template <typename... ConstructorArgs>
-inline chained_updater<U, Us...>::updater<Args...>::updater(ConstructorArgs const &... args)
+inline chained_updater<UpdaterArgs, U, Us...>::chained_updater(Args const &... args)
     : first_updater(args...) , rest_updaters(args...) {
     // do nothing
 }
 
-template <template <typename...> class U, template <typename...> class... Us>
-template <typename... Args>
+template <
+    typename UpdaterArgs,
+    template <typename...> class U,
+    template <typename...> class... Us
+>
 template <typename Event>
-inline void chained_updater<U, Us...>::updater<Args...>::update(Event const &info) {
+inline void chained_updater<UpdaterArgs, U, Us...>::update(Event const &info) {
     first_updater::update(info);
     rest_updaters::update(info);
 }
 
 /************************************************
- * Implementation: class chained_updater<>::updater<Args...>
+ * Implementation: class chained_updater<T>
  ************************************************/
 
+template <typename UpdaterArgs>
 template <typename... Args>
-template <typename... ConstructorArgs>
-inline chained_updater<>::updater<Args...>::updater(ConstructorArgs const &... args) {
+inline chained_updater<UpdaterArgs>::chained_updater(Args const &... args) {
     // do nothing
 }
 
-template <typename... Args>
+template <typename UpdaterArgs>
 template <typename Event>
-inline void chained_updater<>::updater<Args...>::update(Event const &) {
+inline void chained_updater<UpdaterArgs>::update(Event const &) {
     // do nothing
 }
 
